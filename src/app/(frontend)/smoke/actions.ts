@@ -96,12 +96,32 @@ export async function resetSmokeSession(confirmText: string) {
     .update({
       start_time: new Date().toISOString(),
       cravings_defeated: 0,
+      last_check_in_at: null,
     })
     .eq('user_id', user.id)
     .select()
     .single()
 
   if (error) return { error: 'Failed to reset session' }
+
+  revalidatePath('/smoke')
+  return { data }
+}
+
+export async function dailyCheckIn() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return { error: 'Not authenticated' }
+
+  const { data, error } = await supabase
+    .from('smoke_state')
+    .update({ last_check_in_at: new Date().toISOString() })
+    .eq('user_id', user.id)
+    .select()
+    .single()
+
+  if (error) return { error: 'Failed to check in' }
 
   revalidatePath('/smoke')
   return { data }

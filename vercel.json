@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/smoke-reminder",
+      "schedule": "0 1 * * *"
+    }
+  ]
+}
