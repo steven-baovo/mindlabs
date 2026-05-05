@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Lora } from "next/font/google";
 import "./globals.css";
+import DevPanel from "@/components/dev/DevPanel";
+import { createClient } from "@/lib/supabase/server";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -17,17 +19,27 @@ export const metadata: Metadata = {
   description: "Khám phá các nội dung giá trị được thiết kế để nâng cao sức khỏe tinh thần và thể chất của bạn.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase())
+  // Always include your email as a hardcoded fallback for now to ensure access
+  const isAdmin = user?.email && (adminEmails.includes(user.email.toLowerCase()) || user.email === 'voquocbao1999@gmail.com')
+
   return (
     <html
       lang="vi"
       className={`${inter.variable} ${lora.variable} antialiased`}
     >
-      <body>{children}</body>
+      <body>
+        {children}
+        {(process.env.NODE_ENV === 'development' || isAdmin) && <DevPanel />}
+      </body>
     </html>
   );
 }
