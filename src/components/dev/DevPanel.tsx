@@ -5,7 +5,7 @@ import { useAppTime } from '@/hooks/useAppTime'
 import { adminSetProgressDays, adminResetCheckIn, adminForceStartInFuture, adminHardReset } from '@/app/(frontend)/smoke/admin-actions'
 import { Terminal, Clock, Zap, RotateCcw, ChevronRight, X } from 'lucide-react'
 
-export default function DevPanel() {
+export default function DevPanel({ isAdmin }: { isAdmin: boolean }) {
   const [isOpen, setIsOpen] = useState(false)
   const { hour, setAppHour, isMocked } = useAppTime()
   const [activeTab, setActiveTab] = useState<'smoke' | 'system'>('smoke')
@@ -63,91 +63,105 @@ export default function DevPanel() {
           </div>
 
           <div className="p-4 space-y-6 max-h-[400px] overflow-y-auto">
-            {/* VIRTUAL TIME SECTION (GLOBAL) */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-1">
-                  <Clock className="w-3 h-3" /> Virtual Time
-                </span>
-                {isMocked && (
-                  <button onClick={() => setAppHour(null)} className="text-[10px] text-red-500 hover:underline">Reset</button>
-                )}
+            {!isAdmin ? (
+              <div className="py-12 text-center space-y-4">
+                <div className="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto">
+                  <X className="w-6 h-6" />
+                </div>
+                <p className="text-xs font-bold text-gray-900">Quyền truy cập bị từ chối</p>
+                <p className="text-[10px] text-gray-500 leading-relaxed px-4">
+                  Bạn cần đăng nhập bằng tài khoản Quản trị viên để sử dụng các công cụ này.
+                </p>
               </div>
-              <div className="flex items-center gap-2">
-                <input 
-                  type="range" min="0" max="23" value={hour}
-                  onChange={(e) => setAppHour(parseInt(e.target.value))}
-                  className="flex-1 accent-[#1a2b49]"
-                />
-                <span className="font-mono text-sm font-bold w-12 text-center bg-gray-100 rounded px-1">
-                  {hour.toString().padStart(2, '0')}:00
-                </span>
-              </div>
-              <p className="text-[9px] text-gray-400 italic">"Giao diện sẽ coi như hiện tại là {hour}h để test cổng 19:00."</p>
-              <p className="text-[9px] text-blue-500 font-bold uppercase mt-1">
-                Giờ hệ thống (GMT+7): {new Date(new Date().getTime() + (new Date().getTimezoneOffset() * 60000) + (7 * 60 * 60 * 1000)).getHours()}h
-              </p>
-            </div>
-
-            {activeTab === 'smoke' && (
-              <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div className="space-y-2">
-                  <span className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-1">
-                    <Zap className="w-3 h-3 text-yellow-500" /> Fast Forward
-                  </span>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[3, 7, 14, 21].map(d => (
-                      <button 
-                        key={d}
-                        onClick={() => adminSetProgressDays(d)}
-                        className="py-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded text-[10px] font-medium transition-colors"
-                      >
-                        Nhảy Day {d}
-                      </button>
-                    ))}
+            ) : (
+              <>
+                {/* VIRTUAL TIME SECTION (GLOBAL) */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-1">
+                      <Clock className="w-3 h-3" /> Virtual Time
+                    </span>
+                    {isMocked && (
+                      <button onClick={() => setAppHour(null)} className="text-[10px] text-red-500 hover:underline">Reset</button>
+                    )}
                   </div>
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="range" min="0" max="23" value={hour}
+                      onChange={(e) => setAppHour(parseInt(e.target.value))}
+                      className="flex-1 accent-[#1a2b49]"
+                    />
+                    <span className="font-mono text-sm font-bold w-12 text-center bg-gray-100 rounded px-1">
+                      {hour.toString().padStart(2, '0')}:00
+                    </span>
+                  </div>
+                  <p className="text-[9px] text-gray-400 italic">"Giao diện sẽ coi như hiện tại là {hour}h để test cổng 19:00."</p>
+                  <p className="text-[9px] text-blue-500 font-bold uppercase mt-1">
+                    Giờ hệ thống (GMT+7): {new Date(new Date().getTime() + (new Date().getTimezoneOffset() * 60000) + (7 * 60 * 60 * 1000)).getHours()}h
+                  </p>
                 </div>
 
-                <div className="space-y-2">
-                  <span className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-1">
-                    <RotateCcw className="w-3 h-3 text-blue-500" /> Reset Actions
-                  </span>
-                  <button 
-                    onClick={() => adminResetCheckIn()}
-                    className="w-full py-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded text-[10px] font-medium text-left px-3 flex items-center justify-between group"
-                  >
-                    <span>Xóa Điểm danh hôm nay</span>
-                    <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </button>
-                  <button 
-                    onClick={async () => {
-                      if(confirm('Xóa sạch dữ liệu và bắt đầu lại từ đầu?')) {
-                        await adminHardReset();
-                        window.location.reload();
-                      }
-                    }}
-                    className="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 rounded text-[10px] font-medium text-left px-3 flex items-center justify-between group"
-                  >
-                    <span>Reset về Trạng thái Mới (New User)</span>
-                    <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </button>
-                </div>
-              </div>
-            )}
+                {activeTab === 'smoke' && (
+                  <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <div className="space-y-2">
+                      <span className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-1">
+                        <Zap className="w-3 h-3 text-yellow-500" /> Fast Forward
+                      </span>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[3, 7, 14, 21].map(d => (
+                          <button 
+                            key={d}
+                            onClick={() => adminSetProgressDays(d)}
+                            className="py-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded text-[10px] font-medium transition-colors"
+                          >
+                            Nhảy Day {d}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
 
-            {activeTab === 'system' && (
-              <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div className="space-y-1">
-                  <p className="text-[10px] text-gray-400">NODE_ENV: <span className="text-gray-900 font-mono">{process.env.NODE_ENV}</span></p>
-                  <p className="text-[10px] text-gray-400">API URL: <span className="text-gray-900 font-mono truncate block">{process.env.NEXT_PUBLIC_SUPABASE_URL}</span></p>
-                </div>
-                <button 
-                  onClick={() => { localStorage.clear(); window.location.reload() }}
-                  className="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded text-[10px] font-bold transition-colors"
-                >
-                  Xóa sạch LocalStorage & Reload
-                </button>
-              </div>
+                    <div className="space-y-2">
+                      <span className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-1">
+                        <RotateCcw className="w-3 h-3 text-blue-500" /> Reset Actions
+                      </span>
+                      <button 
+                        onClick={() => adminResetCheckIn()}
+                        className="w-full py-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded text-[10px] font-medium text-left px-3 flex items-center justify-between group"
+                      >
+                        <span>Xóa Điểm danh hôm nay</span>
+                        <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </button>
+                      <button 
+                        onClick={async () => {
+                          if(confirm('Xóa sạch dữ liệu và bắt đầu lại từ đầu?')) {
+                            await adminHardReset();
+                            window.location.reload();
+                          }
+                        }}
+                        className="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 rounded text-[10px] font-medium text-left px-3 flex items-center justify-between group"
+                      >
+                        <span>Reset về Trạng thái Mới (New User)</span>
+                        <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'system' && (
+                  <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <div className="space-y-1">
+                      <p className="text-[10px] text-gray-400">NODE_ENV: <span className="text-gray-900 font-mono">{process.env.NODE_ENV}</span></p>
+                      <p className="text-[10px] text-gray-400">API URL: <span className="text-gray-900 font-mono truncate block">{process.env.NEXT_PUBLIC_SUPABASE_URL}</span></p>
+                    </div>
+                    <button 
+                      onClick={() => { localStorage.clear(); window.location.reload() }}
+                      className="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded text-[10px] font-bold transition-colors"
+                    >
+                      Xóa sạch LocalStorage & Reload
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
 

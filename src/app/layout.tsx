@@ -38,7 +38,7 @@ export default async function RootLayout({
     >
       <body>
         {children}
-        {(process.env.NODE_ENV === 'development' || isAdmin) && <DevPanel />}
+        <DevPanel isAdmin={isAdmin || process.env.NODE_ENV === 'development'} />
       </body>
     </html>
   );
