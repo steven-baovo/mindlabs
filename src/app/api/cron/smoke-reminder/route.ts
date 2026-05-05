@@ -4,113 +4,107 @@ import { createClient } from '@supabase/supabase-js'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-// Service role client to bypass RLS for cron job
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+const MILESTONE_MESSAGES: Record<number, string> = {
+  1: 'Nồng độ CO trong máu của bạn đã trở về mức bình thường.',
+  2: 'Nicotine đã rời khỏi cơ thể bạn hoàn toàn. Vị giác đang dần phục hồi.',
+  3: 'Bạn vừa vượt qua rào cản thể chất lớn nhất. Phổi đang thở dễ hơn.',
+  7: 'Một tuần hoàn thành! Vị giác và khứu giác đang nhạy bén hơn rõ rệt.',
+  14: 'Hai tuần! Đỉnh điểm Extinction Burst đã qua.',
+  21: 'Ba tuần! Chúc mừng bạn đã hình thành thói quen mới. Đây là một khởi đầu tuyệt vời, hãy giữ vững nó.',
+}
+
 export async function GET(request: NextRequest) {
-  // Protect against unauthorized access
   const authHeader = request.headers.get('authorization')
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // Get all active smoke sessions
-  const { data: sessions, error } = await supabase
-    .from('smoke_state')
-    .select('user_id, start_time, cravings_defeated')
+  // Get current hour in GMT+7
+  const now = new Date()
+  const gmt7Time = new Date(now.getTime() + (7 * 60 * 60 * 1000))
+  const hour = gmt7Time.getUTCHours() // This is the hour in GMT+7
 
-  if (error || !sessions?.length) {
-    return NextResponse.json({ message: 'No active sessions', error })
-  }
+  const { data: sessions } = await supabase.from('smoke_state').select('*')
+  if (!sessions?.length) return NextResponse.json({ message: 'No active sessions' })
 
-  // Get user emails from auth.users
-  const userIds = sessions.map((s) => s.user_id)
-  const { data: users } = await supabase.auth.admin.listUsers()
-  const filteredUsers = users?.users.filter((u) => userIds.includes(u.id)) || []
+  const { data: usersData } = await supabase.auth.admin.listUsers()
+  const users = usersData?.users || []
 
   const results = []
 
   for (const session of sessions) {
-    const user = filteredUsers.find((u) => u.id === session.user_id)
+    const user = users.find(u => u.id === session.user_id)
     if (!user?.email) continue
 
-    const daysElapsed = Math.floor(
-      (Date.now() - new Date(session.start_time).getTime()) / 86400000
-    )
-
-    // Find current milestone description
-    const milestoneMessages: Record<number, string> = {
-      1: 'Nồng độ CO trong máu của bạn đã trở về mức bình thường.',
-      2: 'Nicotine đã rời khỏi cơ thể bạn hoàn toàn. Vị giác đang dần phục hồi.',
-      3: 'Bạn vừa vượt qua rào cản thể chất lớn nhất. Phổi đang thở dễ hơn.',
-      7: 'Một tuần hoàn thành! Vị giác và khứu giác của bạn đang trở nên nhạy bén hơn rõ rệt.',
-      14: 'Hai tuần! Đỉnh điểm Extinction Burst đã qua. Não bộ đang học cách tự sản sinh Dopamine.',
-      21: 'Ba tuần! Đường mòn thần kinh cũ đã suy yếu đáng kể. Bạn đã thực sự thay đổi.',
+    const startTime = new Date(session.start_time).getTime()
+    const daysElapsed = Math.floor((now.getTime() - startTime) / 86400000)
+    
+    // ─── TASK 1: 8 AM CONGRATS ──────────────────────────────────────────────
+    if (hour === 8) {
+      if (daysElapsed < 0) continue // Haven't started yet
+      
+      const specialMessage = MILESTONE_MESSAGES[daysElapsed]
+      const subject = `Ngày thứ ${daysElapsed}: Bạn đang làm rất tốt`
+      const html = `
+        <div style="font-family: serif; max-width: 500px; margin: 0 auto; color: #1a2b49; border: 1px solid #e5e7eb; padding: 32px; border-radius: 12px;">
+          <h2 style="margin: 0 0 16px;">Ngày thứ ${daysElapsed} không khói thuốc</h2>
+          ${specialMessage ? `<p style="background: #eff6ff; padding: 12px; border-radius: 8px; font-style: italic;">"${specialMessage}"</p>` : ''}
+          <p>Hãy giữ vững kỷ luật. Mỗi ngày trôi qua là một chiến thắng.</p>
+          <a href="${process.env.NEXT_PUBLIC_SITE_URL}/smoke" style="display: inline-block; background: #1a2b49; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 16px;">VÀO DASHBOARD</a>
+        </div>
+      `
+      await resend.emails.send({ from: 'Mindlabs <onboarding@resend.dev>', to: user.email, subject, html })
+      results.push({ userId: user.id, type: 'morning_congrats' })
     }
 
-    const specialMessage = milestoneMessages[daysElapsed]
+    // ─── TASK 2: 8 PM (20:00) REMINDER ────────────────────────────────────────
+    if (hour === 20) {
+      const lastCheckIn = session.last_check_in_at ? new Date(session.last_check_in_at) : null
+      const isCheckedInToday = lastCheckIn && 
+        lastCheckIn.getDate() === gmt7Time.getUTCDate() && 
+        lastCheckIn.getMonth() === gmt7Time.getUTCMonth() && 
+        lastCheckIn.getFullYear() === gmt7Time.getUTCFullYear()
 
-    const subject = `Ngày thứ ${daysElapsed}: Bạn đang làm rất tốt`
-    const html = `
-      <div style="font-family: 'Georgia', serif; max-width: 560px; margin: 0 auto; color: #1a2b49;">
-        <div style="background: #fdfaf6; padding: 40px 32px; border-radius: 12px; border: 1px solid #e5e7eb;">
-          <p style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: #9ca3af; margin: 0 0 24px;">
-            MINDLABS — NHẬT KÝ CỦA BẠN
-          </p>
-          <h1 style="font-size: 28px; font-weight: bold; margin: 0 0 8px; color: #1a2b49;">
-            Ngày thứ ${daysElapsed} không khói thuốc
-          </h1>
-          <p style="color: #6b7280; font-size: 15px; margin: 0 0 32px;">
-            ${new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-          </p>
-
-          ${specialMessage ? `
-          <div style="background: #eff6ff; border-left: 4px solid #1a2b49; padding: 16px 20px; border-radius: 0 8px 8px 0; margin-bottom: 24px;">
-            <p style="font-size: 14px; color: #1e40af; margin: 0; line-height: 1.6;">
-              🎯 <strong>Cột mốc hôm nay:</strong> ${specialMessage}
-            </p>
+      if (!isCheckedInToday && daysElapsed >= 0) {
+        const subject = `Nhắc nhở: Xác nhận kỷ luật hôm nay`
+        const html = `
+          <div style="font-family: serif; max-width: 500px; margin: 0 auto; color: #1a2b49; border: 1px solid #e5e7eb; padding: 32px; border-radius: 12px;">
+            <h2 style="margin: 0 0 16px;">Kỷ luật cuối ngày</h2>
+            <p>Hệ thống ghi nhận bạn chưa xác nhận kỷ luật cho ngày hôm nay. Đừng để một ngày nỗ lực trôi qua trong im lặng.</p>
+            <p>Cổng điểm danh đã mở từ 19:00. Hãy vào xác nhận ngay.</p>
+            <a href="${process.env.NEXT_PUBLIC_SITE_URL}/smoke" style="display: inline-block; background: #1a2b49; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 16px;">ĐIỂM DANH NGAY</a>
           </div>
-          ` : ''}
+        `
+        await resend.emails.send({ from: 'Mindlabs <onboarding@resend.dev>', to: user.email, subject, html })
+        results.push({ userId: user.id, type: 'evening_reminder' })
+      }
+    }
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px;">
-            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; text-align: center;">
-              <p style="font-size: 36px; font-weight: bold; font-family: monospace; color: #1a2b49; margin: 0;">${daysElapsed}</p>
-              <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; margin: 4px 0 0;">Ngày sống sót</p>
-            </div>
-            <div style="background: #1a2b49; border-radius: 8px; padding: 20px; text-align: center;">
-              <p style="font-size: 36px; font-weight: bold; font-family: monospace; color: white; margin: 0;">${session.cravings_defeated}</p>
-              <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #93c5fd; margin: 4px 0 0;">Cơn thèm đã thắng</p>
-            </div>
+    // ─── TASK 3: DORMANCY CHECK (Run at 10 PM) ────────────────────────────────
+    if (hour === 22) {
+      const lastCheckIn = session.last_check_in_at ? new Date(session.last_check_in_at).getTime() : startTime
+      const hoursSinceLastActive = (now.getTime() - lastCheckIn) / 3600000
+      
+      if (hoursSinceLastActive > 48 && hoursSinceLastActive < 52) { // Just hit 2 days
+        const subject = `Cảnh báo: Lộ trình của bạn sắp bị Reset`
+        const html = `
+          <div style="font-family: serif; max-width: 500px; margin: 0 auto; color: #b91c1c; border: 1px solid #fee2e2; padding: 32px; border-radius: 12px;">
+            <h2 style="margin: 0 0 16px;">Cảnh báo Kỷ luật</h2>
+            <p>Đã 48 giờ bạn không tương tác với hệ thống. Nếu không có phản hồi trong 24h tới, lộ trình của bạn sẽ tự động reset về 0.</p>
+            <p>Đừng để công sức bấy lâu nay tan biến.</p>
+            <a href="${process.env.NEXT_PUBLIC_SITE_URL}/smoke" style="display: inline-block; background: #b91c1c; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 16px;">QUAY LẠI HÀNH TRÌNH</a>
           </div>
-
-          <p style="font-size: 14px; color: #6b7280; line-height: 1.6; margin: 0 0 24px;">
-            Đừng quên vào Mindlabs để <strong>điểm danh kỷ luật hôm nay</strong>. Mỗi ngày xác nhận là một dấu mốc nhỏ tích lũy thành sức mạnh lớn.
-          </p>
-
-          <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://mindlabs.vercel.app'}/smoke"
-            style="display: inline-block; background: #1a2b49; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; letter-spacing: 0.05em;">
-            ĐIỂM DANH HÔM NAY →
-          </a>
-
-          <p style="font-size: 11px; color: #d1d5db; margin: 32px 0 0;">
-            Mindlabs Smoke · Bạn nhận email này vì đang trong liệu trình bỏ thuốc lá.
-          </p>
-        </div>
-      </div>
-    `
-
-    const { error: emailError } = await resend.emails.send({
-      from: 'Mindlabs <onboarding@resend.dev>',
-      to: user.email,
-      subject,
-      html,
-    })
-
-    results.push({ userId: user.id, email: user.email, sent: !emailError, error: emailError?.message })
+        `
+        await resend.emails.send({ from: 'Mindlabs <onboarding@resend.dev>', to: user.email, subject, html })
+        results.push({ userId: user.id, type: 'dormancy_warning' })
+      }
+    }
   }
 
-  return NextResponse.json({ success: true, sent: results.length, results })
+  return NextResponse.json({ success: true, processed: results.length, details: results })
 }
