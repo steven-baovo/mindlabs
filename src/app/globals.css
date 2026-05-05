@@ -11,6 +11,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
   --font-serif: var(--font-lora);
+  --animate-spin-slow: spin 3s linear infinite;
 }
 
 @media (prefers-color-scheme: dark) {
