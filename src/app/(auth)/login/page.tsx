@@ -38,10 +38,12 @@ export default function LoginPage() {
         </p>
       </div>
       
-      <div className="mb-6 bg-blue-50/80 border border-blue-100 rounded-lg p-3 flex items-start text-sm text-blue-800">
-        <Info className="w-5 h-5 text-blue-500 mt-0.5 mr-2 shrink-0" />
-        <p>Lưu ý: Nếu bạn vừa đăng ký tài khoản mới, vui lòng kiểm tra <strong>hộp thư đến</strong> và <strong>hộp thư rác (spam)</strong> để xác thực tài khoản trước khi đăng nhập nhé!</p>
-      </div>
+      {searchParams.get('signup') === 'success' && (
+        <div className="mb-6 bg-blue-50/80 border border-blue-100 rounded-lg p-3 flex items-start text-sm text-blue-800">
+          <Info className="w-5 h-5 text-blue-500 mt-0.5 mr-2 shrink-0" />
+          <p>Lưu ý: Nếu bạn vừa đăng ký tài khoản mới, vui lòng kiểm tra <strong>hộp thư đến</strong> và <strong>hộp thư rác (spam)</strong> để xác thực tài khoản trước khi đăng nhập nhé!</p>
+        </div>
+      )}
 
       <form className="space-y-6" onSubmit={handleSubmit}>
         {error && (
