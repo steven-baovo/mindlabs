@@ -97,7 +97,9 @@ export default function SmokeDashboard({ initialState }: { initialState: SmokeSt
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleInit = async (data: { cigarettesPerDay: number; yearsSmoked: number; startDate: string }) => {
-    const res = await initSmokeSessionWithSurvey(data); if (res.data) setState(res.data)
+    const res = await initSmokeSessionWithSurvey(data); 
+    if (res?.error) alert(res.error);
+    else if (res?.data) setState(res.data);
   }
 
   useEffect(() => {
@@ -111,12 +113,37 @@ export default function SmokeDashboard({ initialState }: { initialState: SmokeSt
 
   useEffect(() => {
     if (!isSOSActive) return
-    if (sosTimeLeft === 0) { setIsSOSActive(false); incrementCravingDefeated().then(res => res.data && setState(res.data)); return }
+    if (sosTimeLeft === 0) { 
+      setIsSOSActive(false); 
+      incrementCravingDefeated().then(res => {
+        if (res?.error) alert(res.error);
+        else if (res?.data) setState(res.data);
+      }); 
+      return 
+    }
     const t = setTimeout(() => setSosTimeLeft((p) => p - 1), 1000); return () => clearTimeout(t)
   }, [isSOSActive, sosTimeLeft])
 
-  const handleCheckIn = async () => { const res = await dailyCheckIn(); if (res.data) setState(res.data) }
-  const handleReset = async () => { if (resetInput !== 'TÔI CHẤP NHẬN BẮT ĐẦU LẠI') return; setIsSubmitting(true); const res = await resetSmokeSession(resetInput); if (res.data) { setState(res.data); setIsResetModalOpen(false); setResetInput(''); setIsSOSActive(false) }; setIsSubmitting(false) }
+  const handleCheckIn = async () => { 
+    const res = await dailyCheckIn(); 
+    if (res?.error) alert(res.error);
+    else if (res?.data) setState(res.data);
+  }
+  
+  const handleReset = async () => { 
+    if (resetInput !== 'TÔI CHẤP NHẬN BẮT ĐẦU LẠI') return; 
+    setIsSubmitting(true); 
+    const res = await resetSmokeSession(resetInput); 
+    if (res?.error) {
+      alert(res.error);
+    } else if (res?.data) { 
+      setState(res.data); 
+      setIsResetModalOpen(false); 
+      setResetInput(''); 
+      setIsSOSActive(false);
+    }
+    setIsSubmitting(false);
+  }
 
   const isFutureStart = totalMsElapsed < 0
   const daysElapsed = isFutureStart ? 0 : totalMsElapsed / 86400000
