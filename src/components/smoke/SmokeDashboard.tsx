@@ -157,6 +157,10 @@ export default function SmokeDashboard({ initialState }: { initialState: SmokeSt
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center px-1">
+        <span className="text-[10px] font-bold bg-blue-100 text-[#1a2b49] px-2 py-0.5 rounded-full uppercase tracking-tighter">Protocol Phase 4.0</span>
+        <span className="text-[10px] text-gray-400 font-mono">ID: {state.user_id?.slice(0,8)}</span>
+      </div>
       {!hasCheckedInToday && (
         <div className={`border rounded-xl p-5 flex items-center justify-between gap-4 transition-all ${isCheckInAvailable ? 'bg-[#1a2b49] border-blue-900' : 'bg-gray-50 border-gray-200'}`}>
           <div className="flex gap-4 items-center">
