@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { login } from '@/app/auth/actions'
 import { ArrowRight, Mail, Lock, Loader2, Eye, EyeOff, Info } from 'lucide-react'
 
@@ -9,6 +10,8 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/'
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -16,7 +19,7 @@ export default function LoginPage() {
     setError(null)
     
     const formData = new FormData(e.currentTarget)
-    const result = await login(formData)
+    const result = await login(formData, redirectTo)
     
     if (result?.error) {
       setError(result.error)
