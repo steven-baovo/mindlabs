@@ -91,6 +91,9 @@ export default function DevPanel() {
                 </span>
               </div>
               <p className="text-[9px] text-gray-400 italic">"Giao diện sẽ coi như hiện tại là {hour}h để test cổng 19:00."</p>
+              <p className="text-[9px] text-blue-500 font-bold uppercase mt-1">
+                Giờ hệ thống (GMT+7): {new Date(new Date().getTime() + (new Date().getTimezoneOffset() * 60000) + (7 * 60 * 60 * 1000)).getHours()}h
+              </p>
             </div>
 
             {activeTab === 'smoke' && (

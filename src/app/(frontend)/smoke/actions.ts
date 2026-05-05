@@ -114,6 +114,14 @@ export async function dailyCheckIn() {
 
   if (!user) return { error: 'Not authenticated' }
 
+  // Server-side validation: must be after 7 PM (19:00) GMT+7
+  const now = new Date()
+  const gmt7Hour = new Date(now.getTime() + (7 * 60 * 60 * 1000)).getUTCHours()
+  
+  if (gmt7Hour < 19) {
+    return { error: `Cổng xác nhận chỉ mở sau 19:00 hàng ngày (Giờ hiện tại của bạn: ${gmt7Hour}:00).` }
+  }
+
   const { data, error } = await supabase
     .from('smoke_state')
     .update({ last_check_in_at: new Date().toISOString() })

@@ -121,7 +121,10 @@ export default function SmokeDashboard({ initialState }: { initialState: SmokeSt
   const isFutureStart = totalMsElapsed < 0
   const daysElapsed = isFutureStart ? 0 : totalMsElapsed / 86400000
   const isExtinctionBurst = daysElapsed >= 10 && daysElapsed < 14
-  const isCheckInAvailable = hour >= 19 // 7:00 PM
+  const isCheckInAvailable = (() => {
+    const gmt7Hour = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (7 * 60 * 60 * 1000)).getHours()
+    return gmt7Hour >= 19
+  })()
 
   const hasCheckedInToday = (() => {
     if (!state?.last_check_in_at) return false
