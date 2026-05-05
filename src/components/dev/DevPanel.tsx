@@ -111,7 +111,10 @@ export default function DevPanel({ isAdmin }: { isAdmin: boolean }) {
                         {[3, 7, 14, 21].map(d => (
                           <button 
                             key={d}
-                            onClick={() => adminSetProgressDays(d)}
+                            onClick={async () => {
+                              const res = await adminSetProgressDays(d);
+                              if (res?.error) alert(res.error);
+                            }}
                             className="py-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded text-[10px] font-medium transition-colors"
                           >
                             Nhảy Day {d}
@@ -125,7 +128,11 @@ export default function DevPanel({ isAdmin }: { isAdmin: boolean }) {
                         <RotateCcw className="w-3 h-3 text-blue-500" /> Reset Actions
                       </span>
                       <button 
-                        onClick={() => adminResetCheckIn()}
+                        onClick={async () => {
+                          const res = await adminResetCheckIn()
+                          if (res?.error) alert(res.error)
+                          else window.location.reload()
+                        }}
                         className="w-full py-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded text-[10px] font-medium text-left px-3 flex items-center justify-between group"
                       >
                         <span>Xóa Điểm danh hôm nay</span>
@@ -134,8 +141,9 @@ export default function DevPanel({ isAdmin }: { isAdmin: boolean }) {
                       <button 
                         onClick={async () => {
                           if(confirm('Xóa sạch dữ liệu và bắt đầu lại từ đầu?')) {
-                            await adminHardReset();
-                            window.location.reload();
+                            const res = await adminHardReset();
+                            if (res?.error) alert(res.error)
+                            else window.location.reload();
                           }
                         }}
                         className="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 rounded text-[10px] font-medium text-left px-3 flex items-center justify-between group"
