@@ -86,7 +86,7 @@ export default function Sidebar() {
           return (
             <Link
               key={index}
-              href={item.href}
+              href={item.href || '#'}
               className={`flex items-start gap-3 p-3 rounded-xl transition-all group ${
                 isActive 
                 ? 'bg-white shadow-sm ring-1 ring-gray-200' 
