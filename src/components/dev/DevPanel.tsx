@@ -12,7 +12,8 @@ export default function DevPanel() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+      // Support Alt+D, Cmd+Alt+D, or Backtick (`)
+      if ((e.altKey && e.key === 'd') || e.key === '`') {
         setIsOpen(prev => !prev)
       }
     }
@@ -27,7 +28,7 @@ export default function DevPanel() {
         <button 
           onClick={() => setIsOpen(true)}
           className="fixed bottom-4 right-4 z-[9999] bg-black/80 text-white p-2 rounded-full shadow-lg hover:bg-black transition-all group"
-          title="Open Dev Panel (Ctrl+Shift+D)"
+          title="Open Dev Panel (Alt+D or `)"
         >
           <Terminal className="w-5 h-5" />
         </button>
@@ -151,7 +152,7 @@ export default function DevPanel() {
           </div>
 
           <div className="bg-gray-50 p-3 border-t border-gray-100">
-            <p className="text-[9px] text-gray-400 text-center">Tổ hợp phím ẩn/hiện: <kbd className="bg-white border border-gray-200 px-1 rounded font-mono">Ctrl + Shift + D</kbd></p>
+            <p className="text-[9px] text-gray-400 text-center">Tổ hợp phím ẩn/hiện: <kbd className="bg-white border border-gray-200 px-1 rounded font-mono">Alt + D</kbd> hoặc <kbd className="bg-white border border-gray-200 px-1 rounded font-mono">`</kbd></p>
           </div>
         </div>
       )}
