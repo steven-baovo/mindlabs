@@ -10,8 +10,12 @@ async function verifyAdmin() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
-  // You can add your specific email here for production safety
-  // if (user?.email !== 'your-admin-email@gmail.com') throw new Error('Unauthorized')
+  if (!user || !user.email) throw new Error('Unauthorized')
+  
+  const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase())
+  if (!adminEmails.includes(user.email.toLowerCase())) {
+    throw new Error('Bạn không có quyền quản trị.')
+  }
   
   return user
 }
@@ -80,4 +84,21 @@ export async function adminForceStartInFuture(hours: number) {
   
   revalidatePath('/smoke')
   return { data }
+}
+
+export async function adminHardReset() {
+  const user = await verifyAdmin()
+  if (!user) return { error: 'Not authenticated' }
+
+  const supabase = await createClient()
+  
+  const { error } = await supabase
+    .from('smoke_state')
+    .delete()
+    .eq('user_id', user.id)
+
+  if (error) return { error: error.message }
+  
+  revalidatePath('/smoke')
+  return { success: true }
 }

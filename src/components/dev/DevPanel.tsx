@@ -2,21 +2,15 @@
 
 import { useState, useEffect } from 'react'
 import { useAppTime } from '@/hooks/useAppTime'
-import { adminSetProgressDays, adminResetCheckIn, adminForceStartInFuture } from '@/app/(frontend)/smoke/admin-actions'
+import { adminSetProgressDays, adminResetCheckIn, adminForceStartInFuture, adminHardReset } from '@/app/(frontend)/smoke/admin-actions'
 import { Terminal, Clock, Zap, RotateCcw, ChevronRight, X } from 'lucide-react'
 
 export default function DevPanel() {
   const [isOpen, setIsOpen] = useState(false)
-  const [isVisible, setIsVisible] = useState(false)
   const { hour, setAppHour, isMocked } = useAppTime()
   const [activeTab, setActiveTab] = useState<'smoke' | 'system'>('smoke')
 
   useEffect(() => {
-    // Only show if in development or specific flag is set
-    if (process.env.NODE_ENV === 'development' || localStorage.getItem('ENABLE_DEV_PANEL') === 'true') {
-      setIsVisible(true)
-    }
-
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.shiftKey && e.key === 'D') {
         setIsOpen(prev => !prev)
@@ -25,8 +19,6 @@ export default function DevPanel() {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
-
-  if (!isVisible) return null
 
   return (
     <>
@@ -127,10 +119,15 @@ export default function DevPanel() {
                     <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </button>
                   <button 
-                    onClick={() => adminForceStartInFuture(24)}
-                    className="w-full py-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded text-[10px] font-medium text-left px-3 flex items-center justify-between group"
+                    onClick={async () => {
+                      if(confirm('Xóa sạch dữ liệu và bắt đầu lại từ đầu?')) {
+                        await adminHardReset();
+                        window.location.reload();
+                      }
+                    }}
+                    className="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 rounded text-[10px] font-medium text-left px-3 flex items-center justify-between group"
                   >
-                    <span>Hẹn bắt đầu sau 24h</span>
+                    <span>Reset về Trạng thái Mới (New User)</span>
                     <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </button>
                 </div>
