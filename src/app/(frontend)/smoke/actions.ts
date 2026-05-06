@@ -25,6 +25,7 @@ export async function getSmokeState() {
 export async function initSmokeSessionWithSurvey(formData: {
   cigarettesPerDay: number
   yearsSmoked: number
+  startDate?: string
 }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -35,7 +36,7 @@ export async function initSmokeSessionWithSurvey(formData: {
     .from('smoke_state')
     .upsert({
       user_id: user.id,
-      start_time: new Date().toISOString(),
+      start_time: formData.startDate ?? new Date().toISOString(),
       cravings_defeated: 0,
       cigarettes_per_day: formData.cigarettesPerDay,
       years_smoked: formData.yearsSmoked,
