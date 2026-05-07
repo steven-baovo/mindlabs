@@ -7,6 +7,12 @@ export default async function Header() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  let profile = null
+  if (user) {
+    const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+    profile = data
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#f2f2f2] bg-white/95 backdrop-blur-sm">
       <div className="flex h-14 w-full items-center justify-between px-6">
@@ -31,9 +37,13 @@ export default async function Header() {
 
 
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gray-100 border border-gray-200 text-[#242424] rounded-full flex items-center justify-center text-xs font-bold uppercase overflow-hidden">
-                  {user.email?.[0]}
-                </div>
+                <Link href="/account" className="w-8 h-8 bg-gray-100 border border-gray-200 text-[#242424] rounded-full flex items-center justify-center text-xs font-bold uppercase overflow-hidden hover:ring-2 hover:ring-[#242424] transition-all">
+                  {profile?.avatar_url ? (
+                    <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    profile?.display_name?.[0] || user.email?.[0]
+                  )}
+                </Link>
                 <form action={logout}>
                   <button type="submit" className="p-1 text-gray-400 hover:text-red-500 transition-all" title="Sign out">
                     <LogOut className="w-4 h-4" />
