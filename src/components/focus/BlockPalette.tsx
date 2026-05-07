@@ -14,7 +14,7 @@ export default function BlockPalette({ onDragStart, customDurations, onDurationC
 
   return (
     <div className="w-44 shrink-0">
-      <div className="sticky top-20">
+      <div>
         <p className="text-[12px] font-black text-[#1a2b49] uppercase tracking-widest mb-4">
           Khối thời gian
         </p>
