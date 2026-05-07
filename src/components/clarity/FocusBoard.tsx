@@ -301,7 +301,7 @@ export default function FocusBoard({ initialBlocks }: Props) {
           <div className="relative" ref={settingsRef}>
             <button 
               onClick={() => setShowSettings(!showSettings)}
-              className={`p-1.5 transition-colors rounded-lg ${showSettings ? 'bg-gray-100 text-[#1a2b49]' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`p-1.5 transition-colors rounded-lg cursor-pointer ${showSettings ? 'bg-gray-100 text-[#1a2b49]' : 'text-gray-400 hover:text-gray-600'}`}
             >
               <Settings className="w-4 h-4" />
             </button>
