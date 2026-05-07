@@ -22,7 +22,7 @@ const MENU_ITEMS = [
     href: '/',
   },
   { 
-    title: 'Focus Protocol', 
+    title: 'Clarity Planner', 
     icon: Brain, 
     href: '/focus',
   },

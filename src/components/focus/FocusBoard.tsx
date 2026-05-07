@@ -261,7 +261,7 @@ export default function FocusBoard({ initialBlocks }: Props) {
       {/* ── Sub Header / Navigation ── */}
       <div className="bg-white border-b border-gray-200 px-8 py-3 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-8">
-          <h1 className="text-sm font-black text-[#1a2b49] uppercase tracking-tighter">Focus Protocol</h1>
+          <h1 className="text-sm font-black text-[#1a2b49] uppercase tracking-tighter">Clarity Planner</h1>
           
           <nav className="flex items-center gap-6">
             {['Schedule', 'Tasks', 'Analytics'].map(tab => (

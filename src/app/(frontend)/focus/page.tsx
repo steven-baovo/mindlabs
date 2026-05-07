@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
 export const metadata = {
-  title: 'Focus Protocol — Mindlabs',
+  title: 'Clarity Planner — Mindlabs',
   description: 'Thời khóa biểu tuần tối giản. Quy hoạch thời gian, không phải quản lý việc vặt.',
 }
 
