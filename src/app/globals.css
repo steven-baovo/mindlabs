@@ -13,8 +13,8 @@
   --color-foreground: var(--foreground);
   --color-secondary: var(--secondary);
   --color-border-medium: var(--border);
-  --font-sans: var(--font-plus-jakarta);
-  --font-serif: var(--font-plus-jakarta);
+  --font-sans: var(--font-manrope);
+  --font-serif: var(--font-manrope);
   --animate-spin-slow: spin 3s linear infinite;
 }
 
@@ -39,7 +39,6 @@ body {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
-
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;

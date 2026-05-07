@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 
 import { createClient } from "@/lib/supabase/server";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["vietnamese", "latin"],
 });
 
@@ -25,7 +25,7 @@ export default async function RootLayout({
   return (
     <html
       lang="vi"
-      className={`${plusJakartaSans.variable} antialiased`}
+      className={`${manrope.variable} antialiased`}
     >
       <body>
         {children}
