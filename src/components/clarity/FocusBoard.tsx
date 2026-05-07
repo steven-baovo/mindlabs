@@ -29,6 +29,8 @@ export default function FocusBoard({ initialBlocks }: Props) {
   const [dragPreview, setDragPreview] = useState<{ dayIndex: number; startMinutes: number } | null>(null)
   const [duplicateMenu, setDuplicateMenu] = useState<{ fromDay: number } | null>(null)
   const [showSettings, setShowSettings] = useState(false)
+  const settingsRef = useRef<HTMLDivElement>(null)
+  const duplicateRef = useRef<HTMLDivElement>(null)
   const [activeTab, setActiveTab] = useState('Schedule')
   const [viewStartHour, setViewStartHour] = useState(6) // Default 06:00 AM
 
@@ -56,6 +58,20 @@ export default function FocusBoard({ initialBlocks }: Props) {
     check()
     window.addEventListener('resize', check)
     return () => window.removeEventListener('resize', check)
+  }, [])
+
+  // Close menus when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (settingsRef.current && !settingsRef.current.contains(event.target as Node)) {
+        setShowSettings(false)
+      }
+      if (duplicateRef.current && !duplicateRef.current.contains(event.target as Node)) {
+        setDuplicateMenu(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
   // ─── Drag from Palette ───────────────────────────────────────────────
@@ -282,7 +298,7 @@ export default function FocusBoard({ initialBlocks }: Props) {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="relative">
+          <div className="relative" ref={settingsRef}>
             <button 
               onClick={() => setShowSettings(!showSettings)}
               className={`p-1.5 transition-colors rounded-lg ${showSettings ? 'bg-gray-100 text-[#1a2b49]' : 'text-gray-400 hover:text-gray-600'}`}
@@ -339,7 +355,7 @@ export default function FocusBoard({ initialBlocks }: Props) {
             ) : (
               <div className="flex flex-1 divide-x divide-gray-50">
                 {DAYS.map((d, i) => (
-                  <div key={i} className="flex-1 min-w-0 relative group">
+                  <div key={i} className="flex-1 min-w-0 relative group" ref={duplicateMenu?.fromDay === i ? duplicateRef : null}>
                     <div className="text-center py-3">
                       <span className="text-[11px] font-black text-[#1a2b49] uppercase tracking-[0.2em]">{d}</span>
                     </div>
