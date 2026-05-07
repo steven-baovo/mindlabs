@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { FocusBlock } from '@/app/(frontend)/clarity/actions'
-import { BLOCK_CONFIGS, minutesToPx, minutesToTime, PIXELS_PER_MINUTE } from './blockConfig'
+import { BLOCK_CONFIGS, CUSTOM_COLORS, minutesToPx, minutesToTime, PIXELS_PER_MINUTE } from './blockConfig'
 import { Trash2 } from 'lucide-react'
 
 interface Props {
@@ -18,9 +18,21 @@ export default function BlockItem({ block, onDragStart, onDelete, onLabelUpdate,
   const cfg = BLOCK_CONFIGS[block.block_type]
   if (!cfg) return null
 
+  let initialLabel = block.custom_label ?? ''
+  let initialColor = 0
+
+  if (block.block_type === 'custom' && block.custom_label) {
+    const parts = block.custom_label.split('|')
+    if (parts.length > 1 && !isNaN(Number(parts[0]))) {
+      initialColor = Number(parts[0])
+      initialLabel = parts.slice(1).join('|')
+    }
+  }
+
   const [editing, setEditing] = useState(false)
   const [editingTime, setEditingTime] = useState(false)
-  const [label, setLabel] = useState(block.custom_label ?? '')
+  const [label, setLabel] = useState(initialLabel)
+  const [selectedColor, setSelectedColor] = useState(initialColor)
   const [timeInput, setTimeInput] = useState(`${minutesToTime(block.start_minutes)} - ${minutesToTime(block.start_minutes + block.duration_minutes)}`)
   const [showActions, setShowActions] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
@@ -30,6 +42,9 @@ export default function BlockItem({ block, onDragStart, onDelete, onLabelUpdate,
   const height = minutesToPx(block.duration_minutes)
   const visualMinutes = (block.start_minutes - visualOffset + 1440) % 1440
   const top = minutesToPx(visualMinutes)
+
+  const bgColor = block.block_type === 'custom' ? CUSTOM_COLORS[selectedColor % CUSTOM_COLORS.length]?.bg ?? cfg.bgColor : cfg.bgColor
+  const textColor = block.block_type === 'custom' ? CUSTOM_COLORS[selectedColor % CUSTOM_COLORS.length]?.text ?? cfg.textColor : cfg.textColor
 
   const [isDraggingLocal, setIsDraggingLocal] = useState(false)
 
@@ -47,7 +62,8 @@ export default function BlockItem({ block, onDragStart, onDelete, onLabelUpdate,
 
   const handleLabelSubmit = () => {
     setEditing(false)
-    onLabelUpdate(block.id, label)
+    const finalLabel = block.block_type === 'custom' ? `${selectedColor}|${label}` : label
+    onLabelUpdate(block.id, finalLabel)
   }
 
   const handleTimeSubmit = () => {
@@ -106,7 +122,7 @@ export default function BlockItem({ block, onDragStart, onDelete, onLabelUpdate,
       onDragEnd={handleDragEnd}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => { setShowActions(false); if (editing) handleLabelSubmit() }}
-      className={`absolute left-1 right-1 rounded-lg border border-gray-100 cursor-grab active:cursor-grabbing overflow-hidden select-none transition-all duration-300 ease-in-out ${cfg.bgColor} ${showActions ? 'shadow-md scale-[1.02] z-10' : 'z-1'} ${isDraggingLocal ? 'opacity-20' : 'opacity-100'}`}
+      className={`absolute left-1 right-1 rounded-lg border border-gray-100 cursor-grab active:cursor-grabbing overflow-hidden select-none transition-all duration-300 ease-in-out ${bgColor} ${showActions ? 'shadow-md scale-[1.02] z-10' : 'z-1'} ${isDraggingLocal ? 'opacity-20' : 'opacity-100'}`}
       style={{ 
         top: top + 1, 
         height: Math.max(height, 24) - 2, 
@@ -118,15 +134,15 @@ export default function BlockItem({ block, onDragStart, onDelete, onLabelUpdate,
           <div className="min-w-0 flex-1">
             <div 
               onClick={(e) => { e.stopPropagation(); setEditing(true) }}
-              className={`text-[11px] font-bold leading-tight truncate ${cfg.textColor} cursor-text hover:opacity-80 transition-opacity`}
+              className={`text-[11px] font-bold leading-tight truncate ${textColor} cursor-text hover:opacity-80 transition-opacity`}
             >
-              {block.custom_label || cfg.label}
+              {label || cfg.label}
             </div>
 
             {!isSmall && (
               <div 
                 onClick={(e) => { e.stopPropagation(); setEditingTime(true) }}
-                className={`text-[10px] opacity-60 font-medium ${cfg.textColor} mt-0.5 cursor-text hover:opacity-100 transition-opacity`}
+                className={`text-[10px] opacity-60 font-medium ${textColor} mt-0.5 cursor-text hover:opacity-100 transition-opacity`}
               >
                 {editingTime ? (
                   <input
@@ -166,11 +182,26 @@ export default function BlockItem({ block, onDragStart, onDelete, onLabelUpdate,
               onChange={e => setLabel(e.target.value)}
               onBlur={handleLabelSubmit}
               onKeyDown={e => e.key === 'Enter' && handleLabelSubmit()}
-              placeholder="Sửa tên khối..."
-              className={`w-full text-[10px] bg-white/50 rounded px-1.5 py-1 border-none outline-none ${cfg.textColor} placeholder-opacity-50`}
+              placeholder="Tên khối tùy chỉnh..."
+              className={`w-full text-[10px] bg-white/50 rounded px-1.5 py-1 border-none outline-none ${textColor} placeholder-opacity-50`}
               autoFocus
               onClick={e => e.stopPropagation()}
             />
+            
+            {block.block_type === 'custom' && (
+              <div className="mt-2 flex flex-wrap gap-1" onClick={e => e.stopPropagation()}>
+                {CUSTOM_COLORS.map((color, idx) => (
+                  <button
+                    key={idx}
+                    onMouseDown={(e) => {
+                      e.preventDefault(); // Prevent input onBlur
+                      setSelectedColor(idx);
+                    }}
+                    className={`w-4 h-4 rounded-full ${color.bg} border ${selectedColor === idx ? 'border-gray-500 scale-110' : 'border-transparent hover:scale-110'} transition-transform`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
 

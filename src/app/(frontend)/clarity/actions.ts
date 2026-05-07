@@ -10,6 +10,8 @@ export type BlockType =
   | 'break'
   | 'exercise'
   | 'wind_down'
+  | 'connection'
+  | 'custom'
 
 export interface FocusBlock {
   id: string
