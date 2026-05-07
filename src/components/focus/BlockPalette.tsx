@@ -13,7 +13,7 @@ export default function BlockPalette({ onDragStart, customDurations, onDurationC
   const blocks = Object.values(BLOCK_CONFIGS)
 
   return (
-    <div className="w-44 shrink-0">
+    <div className="w-full shrink-0">
       <div>
         <p className="text-[12px] font-black text-[#1a2b49] uppercase tracking-widest mb-4">
           Khối thời gian

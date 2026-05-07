@@ -414,7 +414,7 @@ export default function FocusBoard({ initialBlocks }: Props) {
         </div>
 
         {/* ── Block Palette Sidebar (Sticky) ── */}
-        <div className="w-48 bg-gray-50/20 p-5 border-l border-gray-100 hidden lg:block sticky top-14 self-start h-[calc(100vh-56px)] overflow-y-auto">
+        <div className="w-48 bg-gray-50/20 p-5 border-l border-gray-100 hidden lg:block sticky top-14 self-start h-[calc(100vh-56px)] overflow-y-auto overflow-x-hidden no-scrollbar">
           <BlockPalette 
             onDragStart={handlePaletteDragStart} 
             customDurations={customDurations}
