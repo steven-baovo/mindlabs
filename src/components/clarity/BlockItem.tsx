@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { FocusBlock } from '@/app/(frontend)/focus/actions'
+import { FocusBlock } from '@/app/(frontend)/clarity/actions'
 import { BLOCK_CONFIGS, minutesToPx, minutesToTime, PIXELS_PER_MINUTE } from './blockConfig'
 import { Trash2 } from 'lucide-react'
 

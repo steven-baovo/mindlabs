@@ -1,5 +1,5 @@
 import { loadBlocks } from './actions'
-import FocusBoard from '@/components/focus/FocusBoard'
+import FocusBoard from '@/components/clarity/FocusBoard'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 

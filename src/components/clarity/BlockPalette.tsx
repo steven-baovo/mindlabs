@@ -1,6 +1,6 @@
 'use client'
 
-import { BlockType } from '@/app/(frontend)/focus/actions'
+import { BlockType } from '@/app/(frontend)/clarity/actions'
 import { BLOCK_CONFIGS } from './blockConfig'
 
 interface Props {

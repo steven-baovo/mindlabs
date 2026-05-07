@@ -24,7 +24,7 @@ const MENU_ITEMS = [
   { 
     title: 'Clarity Planner', 
     icon: Brain, 
-    href: '/focus',
+    href: '/clarity',
   },
   { 
     title: '21-Day Habit', 

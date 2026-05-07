@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { FocusBlock, BlockType, saveBlock, updateBlock, deleteBlock, duplicateDay, updateBlocks } from '@/app/(frontend)/focus/actions'
+import { FocusBlock, BlockType, saveBlock, updateBlock, deleteBlock, duplicateDay, updateBlocks } from '@/app/(frontend)/clarity/actions'
 import {
   BLOCK_CONFIGS, DAYS,
   minutesToPx, pxToMinutes, minutesToTime,

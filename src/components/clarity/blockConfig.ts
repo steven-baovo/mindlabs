@@ -1,4 +1,4 @@
-import { BlockType } from '@/app/(frontend)/focus/actions'
+import { BlockType } from '@/app/(frontend)/clarity/actions'
 import { Layout, Coffee, Sun, Dumbbell, Moon } from 'lucide-react'
 
 export interface BlockConfig {
