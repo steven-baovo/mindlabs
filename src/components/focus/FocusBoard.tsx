@@ -1,14 +1,14 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { FocusBlock, BlockType, saveBlock, updateBlock, deleteBlock, duplicateDay } from '@/app/(frontend)/focus/actions'
+import { FocusBlock, BlockType, saveBlock, updateBlock, deleteBlock, duplicateDay, updateBlocks } from '@/app/(frontend)/focus/actions'
 import {
   BLOCK_CONFIGS, DAYS,
   minutesToPx, pxToMinutes, minutesToTime,
   SNAP_MINUTES, PIXELS_PER_MINUTE,
   START_HOUR, END_HOUR
 } from './blockConfig'
-import { Trash2, GripVertical, Grip, Settings, Bell, User, LayoutGrid, BarChart3, ListTodo } from 'lucide-react'
+import { Settings } from 'lucide-react'
 import BlockItem from './BlockItem'
 import BlockPalette from './BlockPalette'
 
@@ -105,10 +105,9 @@ export default function FocusBoard({ initialBlocks }: Props) {
         const found = updatedDayBlocks.find(db => db.id === b.id)
         return found ? { ...b, start_minutes: found.start_minutes } : b
       }))
-      // Save changes to DB
-      for (const b of updatedDayBlocks) {
-        await updateBlock(b.id, { start_minutes: b.start_minutes })
-      }
+      // Batch update to DB
+      const updates = updatedDayBlocks.map(b => ({ id: b.id, start_minutes: b.start_minutes }))
+      await updateBlocks(updates)
     }
   }, [viewStartHour])
 

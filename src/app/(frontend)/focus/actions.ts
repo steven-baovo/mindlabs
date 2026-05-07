@@ -121,3 +121,26 @@ export async function duplicateDay(
   revalidatePath('/focus')
   return { error: insertError?.message ?? null }
 }
+
+export async function updateBlocks(
+  updates: { id: string; start_minutes: number }[]
+): Promise<{ error: string | null }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  // Execute updates in parallel
+  const promises = updates.map(u => 
+    supabase
+      .from('focus_blocks')
+      .update({ start_minutes: u.start_minutes })
+      .eq('id', u.id)
+      .eq('user_id', user.id)
+  )
+
+  const results = await Promise.all(promises)
+  const firstError = results.find(r => r.error)?.error
+  
+  revalidatePath('/focus')
+  return { error: firstError?.message ?? null }
+}
