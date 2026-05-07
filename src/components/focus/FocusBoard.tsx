@@ -230,7 +230,7 @@ export default function FocusBoard({ initialBlocks }: Props) {
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* ── Sub Header / Navigation ── */}
-      <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+      <div className="bg-white border-b border-gray-200 px-8 py-3 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-8">
           <h1 className="text-sm font-black text-[#1a2b49] uppercase tracking-tighter">Focus Protocol</h1>
           
@@ -284,24 +284,23 @@ export default function FocusBoard({ initialBlocks }: Props) {
         </div>
       </div>
 
-      <div className="p-6 flex gap-6">
-        {/* ── Main Board ── */}
-        <div className="flex-1 overflow-x-auto no-scrollbar">
+      <div className="flex flex-1 overflow-hidden px-8">
+        {/* ── Main Board (Full Width) ── */}
+        <div className="flex-1 overflow-x-auto no-scrollbar border-r border-gray-100 bg-white">
           {/* ─ Header row ─ */}
-          <div className="flex">
+          <div className="flex bg-white border-b border-gray-100">
             {/* Time ruler gutter */}
-            <div className="w-20 shrink-0 mr-2" />
+            <div className="w-16 shrink-0" />
             {isMobile ? (
-              /* Mobile: day tabs */
-              <div className="flex gap-1 mb-2 flex-1">
+              <div className="flex gap-1 p-2 flex-1">
                 {DAYS.map((d, i) => (
                   <button
                     key={i}
                     onClick={() => setActiveDay(i)}
-                    className={`flex-1 text-xs font-bold py-2 rounded-lg transition-colors ${
+                    className={`flex-1 text-[10px] font-black py-2 rounded transition-colors ${
                       activeDay === i
                         ? 'bg-[#1a2b49] text-white'
-                        : 'bg-white text-gray-500 hover:bg-gray-100'
+                        : 'bg-white text-gray-500 hover:bg-gray-50'
                     }`}
                   >
                     {d}
@@ -309,31 +308,27 @@ export default function FocusBoard({ initialBlocks }: Props) {
                 ))}
               </div>
             ) : (
-              /* Desktop: 7 column headers */
-              <div className="flex flex-1 gap-1">
+              <div className="flex flex-1 divide-x divide-gray-50">
                 {DAYS.map((d, i) => (
                   <div key={i} className="flex-1 min-w-0 relative group">
-                    <div className="text-center py-2">
-                      <span className="text-sm font-bold text-[#242424] uppercase tracking-widest">{d}</span>
+                    <div className="text-center py-3">
+                      <span className="text-[11px] font-black text-[#1a2b49] uppercase tracking-[0.2em]">{d}</span>
                     </div>
 
-                    {/* Duplicate button */}
                     <button
                       onClick={() => setDuplicateMenu(duplicateMenu?.fromDay === i ? null : { fromDay: i })}
-                      className="absolute right-1 top-1 opacity-0 group-hover:opacity-100 transition-opacity text-[9px] bg-gray-50 hover:bg-gray-100 text-gray-400 rounded px-1 py-0.5"
-                      title="Sao chép ngày này sang ngày khác"
+                      className="absolute right-1 top-1 opacity-0 group-hover:opacity-100 transition-opacity text-[8px] font-bold bg-gray-50 hover:bg-gray-100 text-gray-400 rounded px-1 py-0.5"
                     >
-                      copy
+                      COPY
                     </button>
-                    {/* Duplicate popover */}
                     {duplicateMenu?.fromDay === i && (
-                      <div className="absolute top-8 right-0 z-20 bg-white rounded-xl border border-gray-100 p-2 min-w-32">
-                        <p className="text-[10px] text-gray-400 mb-1 px-1">Sao chép sang:</p>
+                      <div className="absolute top-10 right-2 z-50 bg-white rounded-lg border border-gray-200 shadow-xl p-2 min-w-[140px]">
+                        <p className="text-[9px] font-black text-gray-400 mb-2 px-1 uppercase">Sao chép sang:</p>
                         {DAYS.map((td, ti) => ti !== i && (
                           <button
                             key={ti}
                             onClick={() => handleDuplicate(i, ti)}
-                            className="w-full text-left text-xs px-2 py-1 rounded-lg hover:bg-gray-50 text-gray-700"
+                            className="w-full text-left text-[11px] font-bold px-2 py-1.5 rounded hover:bg-gray-50 text-gray-700 transition-colors"
                           >
                             {DAYS[ti]}
                           </button>
@@ -347,9 +342,9 @@ export default function FocusBoard({ initialBlocks }: Props) {
           </div>
 
           {/* ─ Board Content ─ */}
-          <div className="flex items-start">
-            {/* Time ruler (OUTSIDE the card) */}
-            <div className="w-20 shrink-0 relative mr-2" style={{ height: BOARD_H }}>
+          <div className="flex items-start bg-white">
+            {/* Time ruler */}
+            <div className="w-16 shrink-0 relative bg-white border-r border-gray-50" style={{ height: BOARD_H }}>
               {Array.from({ length: 49 }).map((_, i) => {
                 const visualMins = i * 30;
                 const realMins = getRealMinutes(visualMins);
@@ -362,46 +357,40 @@ export default function FocusBoard({ initialBlocks }: Props) {
                     className="absolute right-0 flex items-center -translate-y-1/2"
                     style={{ top: minutesToPx(visualMins) }}
                   >
-
                     {!isHalfHour && (
-                      <span className="text-[10px] font-medium text-[#1a2b49] mr-3">
+                      <span className="text-[9px] font-black text-gray-400 mr-2 tabular-nums">
                         {String(hour).padStart(2, '0')}:00
                       </span>
                     )}
-
-                    <div 
-                      className={`rounded-full ${isHalfHour ? 'w-2 h-[1.5px] bg-gray-200' : 'w-4 h-[1.5px] bg-gray-400'}`} 
-                    />
-
+                    <div className={`h-[1px] ${isHalfHour ? 'w-1 bg-gray-100' : 'w-2 bg-gray-200'}`} />
                   </div>
                 );
               })}
             </div>
 
-
-            {/* Main Board Card with Divider */}
-            <div className="flex-1 flex border border-gray-300 rounded-lg overflow-hidden bg-white">
-              {/* Columns */}
+            {/* Columns Area */}
+            <div className="flex-1 flex bg-white">
               {isMobile ? (
                 <div className="flex-1 relative" style={{ height: BOARD_H }}>
                   {renderColumn(activeDay)}
                 </div>
               ) : (
-                <div className="flex flex-1 divide-x divide-gray-100">
+                <div className="flex flex-1 divide-x divide-gray-50">
                   {DAYS.map((_, i) => renderColumn(i))}
                 </div>
               )}
             </div>
           </div>
-
         </div>
 
-        {/* ── Block Palette ── */}
-        <BlockPalette 
-          onDragStart={handlePaletteDragStart} 
-          customDurations={customDurations}
-          onDurationChange={(type, dur) => setCustomDurations(prev => ({ ...prev, [type]: dur }))}
-        />
+        {/* ── Block Palette Sidebar ── */}
+        <div className="w-48 bg-gray-50/20 p-5 border-l border-gray-100 hidden lg:block">
+          <BlockPalette 
+            onDragStart={handlePaletteDragStart} 
+            customDurations={customDurations}
+            onDurationChange={(type, dur) => setCustomDurations(prev => ({ ...prev, [type]: dur }))}
+          />
+        </div>
       </div>
     </div>
   )
