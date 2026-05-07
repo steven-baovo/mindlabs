@@ -70,7 +70,7 @@ export default async function Home() {
   }
 
   return (
-    <div className="w-full bg-[#fdfaf6] min-h-screen pb-20">
+    <div className="w-full bg-white min-h-screen pb-20">
       {/* Header Welcome */}
       <section className="pt-16 pb-12 text-center container mx-auto px-4">
         <h1 className="font-lora text-4xl md:text-5xl font-bold text-[#1a2b49] mb-4">
