@@ -10,7 +10,7 @@ export default function FrontendLayout({
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
-      <div className="flex-1 flex container mx-auto max-w-7xl">
+      <div className="flex-1 flex w-full">
         <Sidebar />
         <main className="flex-1 w-full lg:max-w-none">
           {children}
