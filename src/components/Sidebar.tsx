@@ -128,19 +128,7 @@ export default function Sidebar() {
         })}
       </div>
 
-      <div className={`mt-auto pt-8 transition-opacity duration-300 ${isCollapsed ? 'opacity-0 pointer-events-none hidden' : 'opacity-100'}`}>
-        <div className="bg-[#1a2b49] rounded-2xl p-4 text-white relative overflow-hidden">
-          <div className="relative z-10">
-            <Zap className="w-8 h-8 text-yellow-400 mb-2" />
-            <p className="text-xs font-bold leading-tight">Nâng cấp Mindlabs Pro</p>
-            <p className="text-[10px] text-blue-200 mt-1">Mở khóa toàn bộ giao thức tối ưu não bộ.</p>
-            <button className="mt-3 w-full py-2 bg-white text-[#1a2b49] rounded-lg text-[10px] font-bold hover:bg-blue-50 transition-colors">
-              Tìm hiểu thêm
-            </button>
-          </div>
-          <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-500/20 rounded-full blur-2xl" />
-        </div>
-      </div>
+
     </aside>
   )
 }
