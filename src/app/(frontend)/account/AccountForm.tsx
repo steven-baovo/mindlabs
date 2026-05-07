@@ -26,9 +26,9 @@ export default function AccountForm({ user, profile }: { user: User, profile: an
     try {
       const res = await uploadAvatar(formData)
       if (res.error) showMessage('error', res.error)
-      else showMessage('success', res.success || 'Avatar uploaded')
+      else showMessage('success', res.success || 'Đã tải ảnh lên')
     } catch (error: any) {
-      showMessage('error', error.message || 'Failed to upload avatar')
+      showMessage('error', error.message || 'Không thể tải ảnh đại diện')
     } finally {
       setAvatarUploading(false)
     }
@@ -42,9 +42,9 @@ export default function AccountForm({ user, profile }: { user: User, profile: an
     try {
       const res = await updateProfile(formData)
       if (res.error) showMessage('error', res.error)
-      else showMessage('success', res.success || 'Profile updated')
+      else showMessage('success', res.success || 'Đã cập nhật thông tin')
     } catch (error: any) {
-      showMessage('error', error.message || 'Failed to update profile')
+      showMessage('error', error.message || 'Không thể cập nhật thông tin')
     } finally {
       setProfileSaving(false)
     }
@@ -59,11 +59,11 @@ export default function AccountForm({ user, profile }: { user: User, profile: an
       const res = await updatePassword(formData)
       if (res.error) showMessage('error', res.error)
       else {
-        showMessage('success', res.success || 'Password updated')
+        showMessage('success', res.success || 'Đã đổi mật khẩu')
         e.currentTarget.reset()
       }
     } catch (error: any) {
-      showMessage('error', error.message || 'Failed to update password')
+      showMessage('error', error.message || 'Không thể đổi mật khẩu')
     } finally {
       setPasswordSaving(false)
     }
@@ -81,7 +81,7 @@ export default function AccountForm({ user, profile }: { user: User, profile: an
 
       {/* Avatar Section */}
       <section>
-        <h2 className="text-xl font-bold text-[#1a2b49] mb-4">Profile Picture</h2>
+        <h2 className="text-xl font-bold text-[#1a2b49] mb-4">Ảnh đại diện</h2>
         <div className="flex items-center gap-6">
           <div className="w-24 h-24 rounded-full bg-gray-100 border-2 border-gray-200 overflow-hidden flex items-center justify-center flex-shrink-0">
             {profile?.avatar_url ? (
@@ -92,7 +92,7 @@ export default function AccountForm({ user, profile }: { user: User, profile: an
           </div>
           <div>
             <label className="cursor-pointer bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors inline-block">
-              {avatarUploading ? 'Uploading...' : 'Change Avatar'}
+              {avatarUploading ? 'Đang tải...' : 'Đổi ảnh đại diện'}
               <input 
                 type="file" 
                 accept="image/*" 
@@ -101,7 +101,7 @@ export default function AccountForm({ user, profile }: { user: User, profile: an
                 disabled={avatarUploading}
               />
             </label>
-            <p className="text-xs text-gray-500 mt-2">JPG, GIF or PNG. 5MB max.</p>
+            <p className="text-xs text-gray-500 mt-2">Định dạng JPG, GIF hoặc PNG. Tối đa 5MB.</p>
           </div>
         </div>
       </section>
@@ -110,7 +110,7 @@ export default function AccountForm({ user, profile }: { user: User, profile: an
 
       {/* Profile Details */}
       <section>
-        <h2 className="text-xl font-bold text-[#1a2b49] mb-4">Personal Information</h2>
+        <h2 className="text-xl font-bold text-[#1a2b49] mb-4">Thông tin cá nhân</h2>
         <form onSubmit={handleProfileSubmit} className="space-y-4 max-w-md">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -120,16 +120,16 @@ export default function AccountForm({ user, profile }: { user: User, profile: an
               disabled 
               className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 focus:outline-none"
             />
-            <p className="text-xs text-gray-400 mt-1">Your email address cannot be changed here.</p>
+            <p className="text-xs text-gray-400 mt-1">Địa chỉ email không thể thay đổi tại đây.</p>
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Display Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tên hiển thị</label>
             <input 
               type="text" 
               name="displayName"
               defaultValue={profile?.display_name || ''} 
-              placeholder="How should we call you?"
+              placeholder="Chúng tôi nên gọi bạn là gì?"
               className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
             />
           </div>
@@ -139,7 +139,7 @@ export default function AccountForm({ user, profile }: { user: User, profile: an
             disabled={profileSaving}
             className="bg-[#242424] text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-black transition-all disabled:opacity-50"
           >
-            {profileSaving ? 'Saving...' : 'Save Changes'}
+            {profileSaving ? 'Đang lưu...' : 'Lưu thay đổi'}
           </button>
         </form>
       </section>
@@ -148,28 +148,28 @@ export default function AccountForm({ user, profile }: { user: User, profile: an
 
       {/* Security */}
       <section>
-        <h2 className="text-xl font-bold text-[#1a2b49] mb-4">Security</h2>
+        <h2 className="text-xl font-bold text-[#1a2b49] mb-4">Bảo mật</h2>
         <form onSubmit={handlePasswordSubmit} className="space-y-4 max-w-md">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu mới</label>
             <input 
               type="password" 
               name="password"
               required
               minLength={6}
-              placeholder="Minimum 6 characters"
+              placeholder="Tối thiểu 6 ký tự"
               className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Xác nhận mật khẩu mới</label>
             <input 
               type="password" 
               name="confirmPassword"
               required
               minLength={6}
-              placeholder="Confirm new password"
+              placeholder="Xác nhận mật khẩu mới"
               className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
             />
           </div>
@@ -179,7 +179,7 @@ export default function AccountForm({ user, profile }: { user: User, profile: an
             disabled={passwordSaving}
             className="bg-white text-[#242424] border border-[#242424] px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-all disabled:opacity-50"
           >
-            {passwordSaving ? 'Updating...' : 'Update Password'}
+            {passwordSaving ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}
           </button>
         </form>
       </section>

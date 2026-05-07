@@ -1,7 +1,7 @@
 import Link from 'next/link'
-import { Search, Bell, SquarePen, LogOut } from 'lucide-react'
+import { Search, Bell, SquarePen } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-import { logout } from '@/app/auth/actions'
+import UserMenu from './UserMenu'
 
 export default async function Header() {
   const supabase = await createClient()
@@ -25,7 +25,7 @@ export default async function Header() {
             <Search strokeWidth={1.5} className="w-4 h-4 text-gray-400 mr-2" />
             <input 
               type="text" 
-              placeholder="Search" 
+              placeholder="Tìm kiếm" 
               className="bg-transparent border-none outline-none text-sm text-gray-600 placeholder-gray-400 w-full"
             />
           </div>
@@ -36,28 +36,17 @@ export default async function Header() {
             <>
 
 
-              <div className="flex items-center gap-2">
-                <Link href="/account" className="w-8 h-8 bg-gray-100 border border-gray-200 text-[#242424] rounded-full flex items-center justify-center text-xs font-bold uppercase overflow-hidden hover:ring-2 hover:ring-[#242424] transition-all">
-                  {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
-                  ) : (
-                    profile?.display_name?.[0] || user.email?.[0]
-                  )}
-                </Link>
-                <form action={logout}>
-                  <button type="submit" className="p-1 text-gray-400 hover:text-red-500 transition-all" title="Sign out">
-                    <LogOut className="w-4 h-4" />
-                  </button>
-                </form>
+              <div className="flex items-center gap-4">
+                <UserMenu user={user} profile={profile} />
               </div>
             </>
           ) : (
             <div className="flex items-center gap-4">
               <Link href="/login" className="text-sm text-gray-500 hover:text-[#242424] transition-colors">
-                Sign in
+                Đăng nhập
               </Link>
               <Link href="/register" className="bg-[#242424] text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-black transition-all">
-                Get started
+                Bắt đầu ngay
               </Link>
             </div>
           )}

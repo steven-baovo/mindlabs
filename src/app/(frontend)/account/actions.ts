@@ -9,7 +9,7 @@ export async function updateProfile(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return { error: 'Not authenticated' }
+    return { error: 'Bạn chưa đăng nhập' }
   }
 
   const { error } = await supabase
@@ -23,7 +23,7 @@ export async function updateProfile(formData: FormData) {
 
   revalidatePath('/account')
   revalidatePath('/', 'layout')
-  return { success: 'Profile updated successfully' }
+  return { success: 'Cập nhật thông tin thành công' }
 }
 
 export async function updatePassword(formData: FormData) {
@@ -31,18 +31,18 @@ export async function updatePassword(formData: FormData) {
   const confirmPassword = formData.get('confirmPassword') as string
 
   if (password !== confirmPassword) {
-    return { error: 'Passwords do not match' }
+    return { error: 'Mật khẩu xác nhận không khớp' }
   }
 
   if (password.length < 6) {
-    return { error: 'Password must be at least 6 characters' }
+    return { error: 'Mật khẩu phải có ít nhất 6 ký tự' }
   }
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return { error: 'Not authenticated' }
+    return { error: 'Bạn chưa đăng nhập' }
   }
 
   const { error } = await supabase.auth.updateUser({
@@ -53,24 +53,24 @@ export async function updatePassword(formData: FormData) {
     return { error: error.message }
   }
 
-  return { success: 'Password updated successfully' }
+  return { success: 'Đổi mật khẩu thành công' }
 }
 
 export async function uploadAvatar(formData: FormData) {
   const file = formData.get('avatar') as File
   if (!file || file.size === 0) {
-    return { error: 'No file provided' }
+    return { error: 'Vui lòng chọn ảnh' }
   }
 
   if (file.size > 5 * 1024 * 1024) {
-    return { error: 'File size must be less than 5MB' }
+    return { error: 'Dung lượng ảnh phải nhỏ hơn 5MB' }
   }
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return { error: 'Not authenticated' }
+    return { error: 'Bạn chưa đăng nhập' }
   }
 
   const fileExt = file.name.split('.').pop()
@@ -105,5 +105,5 @@ export async function uploadAvatar(formData: FormData) {
 
   revalidatePath('/account')
   revalidatePath('/', 'layout')
-  return { success: 'Avatar updated successfully', url: publicUrl }
+  return { success: 'Cập nhật ảnh đại diện thành công', url: publicUrl }
 }

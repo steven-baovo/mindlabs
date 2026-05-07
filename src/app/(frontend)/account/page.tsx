@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import AccountForm from './AccountForm'
 
 export const metadata = {
-  title: 'Account Settings | Mindlabs',
+  title: 'Cài đặt tài khoản | Mindlabs',
 }
 
 export default async function AccountPage() {
@@ -24,8 +24,8 @@ export default async function AccountPage() {
   return (
     <div className="w-full max-w-2xl mx-auto py-12 px-4 md:px-6">
       <div className="mb-8 border-b border-[#f2f2f2] pb-6">
-        <h1 className="text-3xl font-lora font-bold text-[#1a2b49] mb-2">Account Settings</h1>
-        <p className="text-gray-500">Manage your profile, avatar, and security preferences.</p>
+        <h1 className="text-3xl font-lora font-bold text-[#1a2b49] mb-2">Cài đặt tài khoản</h1>
+        <p className="text-gray-500">Quản lý thông tin cá nhân, ảnh đại diện và bảo mật.</p>
       </div>
 
       <AccountForm user={user} profile={profile || {}} />
