@@ -56,7 +56,7 @@ export default function RegisterPage() {
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
             Địa chỉ Email
           </label>
-          <div className="mt-1 relative rounded-md shadow-sm">
+          <div className="mt-1 relative rounded-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Mail className="h-5 w-5 text-gray-400" />
             </div>
@@ -76,7 +76,7 @@ export default function RegisterPage() {
           <label htmlFor="password" className="block text-sm font-medium text-gray-700">
             Mật khẩu
           </label>
-          <div className="mt-1 relative rounded-md shadow-sm">
+          <div className="mt-1 relative rounded-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Lock className="h-5 w-5 text-gray-400" />
             </div>
@@ -108,7 +108,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isLoading || !!success}
-            className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all disabled:opacity-70"
+            className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all disabled:opacity-70"
           >
             {isLoading ? (
               <Loader2 className="w-5 h-5 animate-spin" />

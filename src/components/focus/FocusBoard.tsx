@@ -3,11 +3,12 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { FocusBlock, BlockType, saveBlock, updateBlock, deleteBlock, duplicateDay } from '@/app/(frontend)/focus/actions'
 import {
-  BLOCK_CONFIGS, DAYS, DAY_LABELS,
+  BLOCK_CONFIGS, DAYS,
   minutesToPx, pxToMinutes, minutesToTime,
   SNAP_MINUTES, PIXELS_PER_MINUTE,
   START_HOUR, END_HOUR
 } from './blockConfig'
+import { Trash2, GripVertical, Grip, Settings, Bell, User, LayoutGrid, BarChart3, ListTodo } from 'lucide-react'
 import BlockItem from './BlockItem'
 import BlockPalette from './BlockPalette'
 
@@ -15,17 +16,37 @@ interface Props {
   initialBlocks: FocusBlock[]
 }
 
-const TOTAL_MINUTES = (END_HOUR - START_HOUR) * 60
-const BOARD_HEIGHT = minutesToPx(TOTAL_MINUTES)
-const HOUR_MARKS = Array.from({ length: END_HOUR - START_HOUR + 1 }, (_, i) => i + START_HOUR)
+const SNAP_MINUTES_LOCAL = 15 // Internal snapping logic
 
 export default function FocusBoard({ initialBlocks }: Props) {
   const [mounted, setMounted] = useState(false)
-  const [blocks, setBlocks] = useState<FocusBlock[]>(initialBlocks)
+  const [blocks, setBlocks] = useState<FocusBlock[]>(() => 
+    initialBlocks.filter(b => !!BLOCK_CONFIGS[b.block_type])
+  )
   const [activeDay, setActiveDay] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
   const [dragging, setDragging] = useState<{ block: FocusBlock; offsetY: number } | null>(null)
   const [duplicateMenu, setDuplicateMenu] = useState<{ fromDay: number } | null>(null)
+  const [showSettings, setShowSettings] = useState(false)
+  const [activeTab, setActiveTab] = useState('Schedule')
+  const [viewStartHour, setViewStartHour] = useState(6) // Default 06:00 AM
+
+  const TOTAL_MINS = 1440 // Always 24 hours
+  const BOARD_H = minutesToPx(TOTAL_MINS)
+  const VISUAL_OFFSET = viewStartHour * 60
+
+  // Helper to map real minutes (0-1439) to visual position (0-1439)
+  const getVisualMinutes = (realMins: number) => (realMins - VISUAL_OFFSET + 1440) % 1440
+  // Helper to map visual position to real minutes
+  const getRealMinutes = (visualMins: number) => (visualMins + VISUAL_OFFSET) % 1440
+
+  const [customDurations, setCustomDurations] = useState<Record<BlockType, number>>(() => {
+    const initial: any = {}
+    Object.values(BLOCK_CONFIGS).forEach(cfg => {
+      initial[cfg.type] = cfg.defaultDuration
+    })
+    return initial
+  })
   const columnRefs = useRef<(HTMLDivElement | null)[]>([])
 
   useEffect(() => {
@@ -44,13 +65,51 @@ export default function FocusBoard({ initialBlocks }: Props) {
       user_id: '',
       day_of_week: 0,
       start_minutes: 480, // default 08:00
-      duration_minutes: cfg.defaultDuration,
+      duration_minutes: customDurations[type],
       block_type: type,
       custom_label: null,
       created_at: '',
     }
     setDragging({ block: phantom, offsetY: 0 })
-  }, [])
+  }, [customDurations])
+
+  // ─── Resolve Pushing (Domino Effect) ────────────────────────────────
+  const resolvePushing = useCallback(async (allBlocks: FocusBlock[], dayIndex: number) => {
+    // Sort blocks by visual position
+    const dayBlocks = [...allBlocks.filter(b => b.day_of_week === dayIndex)]
+      .sort((a, b) => getVisualMinutes(a.start_minutes) - getVisualMinutes(b.start_minutes))
+    
+    let changed = false
+    const updatedDayBlocks = [...dayBlocks]
+
+    for (let i = 1; i < updatedDayBlocks.length; i++) {
+      const prev = updatedDayBlocks[i - 1]
+      const curr = updatedDayBlocks[i]
+      
+      const prevVisualStart = getVisualMinutes(prev.start_minutes)
+      const prevVisualEnd = prevVisualStart + prev.duration_minutes
+      const currVisualStart = getVisualMinutes(curr.start_minutes)
+      
+      if (currVisualStart < prevVisualEnd) {
+        const newVisualStart = prevVisualEnd
+        if (newVisualStart < TOTAL_MINS) {
+          curr.start_minutes = getRealMinutes(newVisualStart)
+          changed = true
+        }
+      }
+    }
+
+    if (changed) {
+      setBlocks(prev => prev.map(b => {
+        const found = updatedDayBlocks.find(db => db.id === b.id)
+        return found ? { ...b, start_minutes: found.start_minutes } : b
+      }))
+      // Save changes to DB
+      for (const b of updatedDayBlocks) {
+        await updateBlock(b.id, { start_minutes: b.start_minutes })
+      }
+    }
+  }, [viewStartHour])
 
   // ─── Column Drop ─────────────────────────────────────────────────────
   const handleColumnDrop = useCallback(async (dayIndex: number, e: React.DragEvent) => {
@@ -63,10 +122,12 @@ export default function FocusBoard({ initialBlocks }: Props) {
     const rect = col.getBoundingClientRect()
     const rawY = e.clientY - rect.top - dragging.offsetY
     const snapped = Math.round(rawY / (SNAP_MINUTES * PIXELS_PER_MINUTE)) * SNAP_MINUTES
-    const start = Math.max(0, Math.min(snapped, TOTAL_MINUTES - dragging.block.duration_minutes))
+    
+    const visualStart = Math.max(0, Math.min(snapped, TOTAL_MINS - dragging.block.duration_minutes))
+    const start = getRealMinutes(visualStart)
 
+    let newBlocks = [...blocks]
     if (dragging.block.id.startsWith('phantom-')) {
-      // New block from palette
       const result = await saveBlock({
         day_of_week: dayIndex,
         start_minutes: start,
@@ -74,16 +135,19 @@ export default function FocusBoard({ initialBlocks }: Props) {
         block_type: dragging.block.block_type,
       })
       if (result.data) {
-        setBlocks(prev => [...prev, result.data!])
+        newBlocks = [...blocks, result.data]
+        setBlocks(newBlocks)
+        resolvePushing(newBlocks, dayIndex)
       }
     } else {
-      // Existing block moved
       const updated = { ...dragging.block, day_of_week: dayIndex, start_minutes: start }
-      setBlocks(prev => prev.map(b => b.id === updated.id ? updated : b))
+      newBlocks = blocks.map(b => b.id === updated.id ? updated : b)
+      setBlocks(newBlocks)
       await updateBlock(dragging.block.id, { day_of_week: dayIndex, start_minutes: start })
+      resolvePushing(newBlocks, dayIndex)
     }
     setDragging(null)
-  }, [dragging])
+  }, [dragging, blocks, resolvePushing, viewStartHour])
 
   // ─── Block Drag Start ─────────────────────────────────────────────────
   const handleBlockDragStart = useCallback((block: FocusBlock, offsetY: number) => {
@@ -101,6 +165,20 @@ export default function FocusBoard({ initialBlocks }: Props) {
     setBlocks(prev => prev.map(b => b.id === id ? { ...b, custom_label: label } : b))
     await updateBlock(id, { custom_label: label })
   }, [])
+
+  // ─── Update Time (Manual or Resize) ──────────────────────────────────
+  const handleTimeUpdate = useCallback(async (id: string, start: number, duration: number) => {
+    const updatedBlocks = blocks.map(b => b.id === id ? { ...b, start_minutes: start, duration_minutes: duration } : b)
+    setBlocks(updatedBlocks)
+    await updateBlock(id, { start_minutes: start, duration_minutes: duration })
+    
+    // Trigger pushing
+    const target = updatedBlocks.find(b => b.id === id)
+    if (target) {
+      resolvePushing(updatedBlocks, target.day_of_week)
+    }
+  }, [blocks, resolvePushing])
+
 
   // ─── Duplicate Day ────────────────────────────────────────────────────
   const handleDuplicate = useCallback(async (fromDay: number, toDay: number) => {
@@ -128,24 +206,8 @@ export default function FocusBoard({ initialBlocks }: Props) {
         ref={el => { columnRefs.current[dayIndex] = el }}
         onDragOver={e => e.preventDefault()}
         onDrop={e => handleColumnDrop(dayIndex, e)}
-        style={{ height: BOARD_HEIGHT }}
+        style={{ height: BOARD_H }}
       >
-        {/* Grid lines */}
-        {HOUR_MARKS.slice(0, -1).map(h => (
-          <div
-            key={h}
-            className="absolute left-0 right-0 border-t border-gray-100"
-            style={{ top: minutesToPx(h * 60) }}
-          />
-        ))}
-        {/* Half-hour lines */}
-        {HOUR_MARKS.slice(0, -1).map(h => (
-          <div
-            key={`h-${h}`}
-            className="absolute left-0 right-0 border-t border-gray-50"
-            style={{ top: minutesToPx(h * 60 + 30) }}
-          />
-        ))}
 
         {/* Blocks */}
         {dayBlocks.map(block => (
@@ -155,107 +217,194 @@ export default function FocusBoard({ initialBlocks }: Props) {
             onDragStart={handleBlockDragStart}
             onDelete={handleDelete}
             onLabelUpdate={handleLabelUpdate}
+            onTimeUpdate={handleTimeUpdate}
+            visualOffset={VISUAL_OFFSET}
           />
         ))}
       </div>
     )
   }
 
-  if (!mounted) return <div className="min-h-screen bg-[#fdfaf6]" />
+  if (!mounted) return <div className="min-h-screen bg-white" />
 
   return (
-    <div className="flex gap-4">
-      {/* ── Main Board ── */}
-      <div className="flex-1 overflow-x-auto">
-        {/* ─ Header row ─ */}
-        <div className="flex">
-          {/* Time ruler gutter */}
-          <div className="w-12 shrink-0" />
-          {isMobile ? (
-            /* Mobile: day tabs */
-            <div className="flex gap-1 mb-2 flex-1">
-              {DAYS.map((d, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActiveDay(i)}
-                  className={`flex-1 text-xs font-bold py-2 rounded-lg transition-colors ${
-                    activeDay === i
-                      ? 'bg-[#1a2b49] text-white'
-                      : 'bg-white text-gray-500 hover:bg-gray-100'
-                  }`}
-                >
-                  {d}
-                </button>
-              ))}
-            </div>
-          ) : (
-            /* Desktop: 7 column headers */
-            <div className="flex flex-1 gap-1">
-              {DAYS.map((d, i) => (
-                <div key={i} className="flex-1 min-w-0 relative group">
-                  <div className="text-center py-2">
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{d}</span>
-                    <div className="text-[10px] text-gray-300">{DAY_LABELS[i]}</div>
-                  </div>
-                  {/* Duplicate button */}
-                  <button
-                    onClick={() => setDuplicateMenu(duplicateMenu?.fromDay === i ? null : { fromDay: i })}
-                    className="absolute right-1 top-1 opacity-0 group-hover:opacity-100 transition-opacity text-[9px] bg-gray-100 hover:bg-gray-200 text-gray-500 rounded px-1 py-0.5"
-                    title="Sao chép ngày này sang ngày khác"
-                  >
-                    copy
-                  </button>
-                  {/* Duplicate popover */}
-                  {duplicateMenu?.fromDay === i && (
-                    <div className="absolute top-8 right-0 z-20 bg-white rounded-xl shadow-xl border border-gray-100 p-2 min-w-32">
-                      <p className="text-[10px] text-gray-400 mb-1 px-1">Sao chép sang:</p>
-                      {DAYS.map((td, ti) => ti !== i && (
-                        <button
-                          key={ti}
-                          onClick={() => handleDuplicate(i, ti)}
-                          className="w-full text-left text-xs px-2 py-1 rounded-lg hover:bg-gray-50 text-gray-700"
-                        >
-                          {DAY_LABELS[ti]}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+    <div className="flex flex-col min-h-screen bg-white">
+      {/* ── Sub Header / Navigation ── */}
+      <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+        <div className="flex items-center gap-8">
+          <h1 className="text-sm font-black text-[#1a2b49] uppercase tracking-tighter">Focus Protocol</h1>
+          
+          <nav className="flex items-center gap-6">
+            {['Schedule', 'Tasks', 'Analytics'].map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`text-xs font-bold transition-all relative py-1 ${
+                  activeTab === tab ? 'text-[#1a2b49]' : 'text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                {tab}
+                {activeTab === tab && (
+                  <div className="absolute -bottom-3 left-0 right-0 h-0.5 bg-[#1a2b49] rounded-full" />
+                )}
+              </button>
+            ))}
+          </nav>
         </div>
 
-        {/* ─ Board body ─ */}
-        <div className="flex border border-gray-100 rounded-2xl overflow-hidden bg-white shadow-sm">
-          {/* Time ruler */}
-          <div className="w-12 shrink-0 relative bg-[#fdfaf6] border-r border-gray-100" style={{ height: BOARD_HEIGHT }}>
-            {HOUR_MARKS.filter(h => h % 2 === 0).map(h => (
-              <div
-                key={h}
-                className="absolute right-2 text-[10px] text-gray-300 font-mono leading-none"
-                style={{ top: minutesToPx(h * 60) - 6 }}
-              >
-                {String(h).padStart(2, '0')}
-              </div>
-            ))}
-          </div>
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <button 
+              onClick={() => setShowSettings(!showSettings)}
+              className={`p-1.5 transition-colors rounded-lg ${showSettings ? 'bg-gray-100 text-[#1a2b49]' : 'text-gray-400 hover:text-gray-600'}`}
+            >
+              <Settings className="w-4 h-4" />
+            </button>
 
-          {/* Columns */}
-          {isMobile ? (
-            <div className="flex-1 relative" style={{ height: BOARD_HEIGHT }}>
-              {renderColumn(activeDay)}
-            </div>
-          ) : (
-            <div className="flex flex-1 divide-x divide-gray-100">
-              {DAYS.map((_, i) => renderColumn(i))}
-            </div>
-          )}
+            {showSettings && (
+              <div className="absolute right-0 top-10 w-56 bg-white border border-gray-200 rounded-xl shadow-xl p-4 z-40">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Cài đặt bảng</p>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-600 font-medium">Bắt đầu ngày:</span>
+                    <select 
+                      value={viewStartHour} 
+                      onChange={e => setViewStartHour(Number(e.target.value))}
+                      className="text-xs bg-gray-50 border-none rounded px-2 py-1 outline-none font-bold text-[#1a2b49]"
+                    >
+                      {Array.from({ length: 24 }, (_, i) => (
+                        <option key={i} value={i}>{String(i).padStart(2, '0')}:00</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* ── Block Palette ── */}
-      <BlockPalette onDragStart={handlePaletteDragStart} />
+      <div className="p-6 flex gap-6">
+        {/* ── Main Board ── */}
+        <div className="flex-1 overflow-x-auto no-scrollbar">
+          {/* ─ Header row ─ */}
+          <div className="flex">
+            {/* Time ruler gutter */}
+            <div className="w-20 shrink-0 mr-2" />
+            {isMobile ? (
+              /* Mobile: day tabs */
+              <div className="flex gap-1 mb-2 flex-1">
+                {DAYS.map((d, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveDay(i)}
+                    className={`flex-1 text-xs font-bold py-2 rounded-lg transition-colors ${
+                      activeDay === i
+                        ? 'bg-[#1a2b49] text-white'
+                        : 'bg-white text-gray-500 hover:bg-gray-100'
+                    }`}
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              /* Desktop: 7 column headers */
+              <div className="flex flex-1 gap-1">
+                {DAYS.map((d, i) => (
+                  <div key={i} className="flex-1 min-w-0 relative group">
+                    <div className="text-center py-2">
+                      <span className="text-sm font-bold text-[#242424] uppercase tracking-widest">{d}</span>
+                    </div>
+
+                    {/* Duplicate button */}
+                    <button
+                      onClick={() => setDuplicateMenu(duplicateMenu?.fromDay === i ? null : { fromDay: i })}
+                      className="absolute right-1 top-1 opacity-0 group-hover:opacity-100 transition-opacity text-[9px] bg-gray-50 hover:bg-gray-100 text-gray-400 rounded px-1 py-0.5"
+                      title="Sao chép ngày này sang ngày khác"
+                    >
+                      copy
+                    </button>
+                    {/* Duplicate popover */}
+                    {duplicateMenu?.fromDay === i && (
+                      <div className="absolute top-8 right-0 z-20 bg-white rounded-xl border border-gray-100 p-2 min-w-32">
+                        <p className="text-[10px] text-gray-400 mb-1 px-1">Sao chép sang:</p>
+                        {DAYS.map((td, ti) => ti !== i && (
+                          <button
+                            key={ti}
+                            onClick={() => handleDuplicate(i, ti)}
+                            className="w-full text-left text-xs px-2 py-1 rounded-lg hover:bg-gray-50 text-gray-700"
+                          >
+                            {DAYS[ti]}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ─ Board Content ─ */}
+          <div className="flex items-start">
+            {/* Time ruler (OUTSIDE the card) */}
+            <div className="w-20 shrink-0 relative mr-2" style={{ height: BOARD_H }}>
+              {Array.from({ length: 49 }).map((_, i) => {
+                const visualMins = i * 30;
+                const realMins = getRealMinutes(visualMins);
+                const hour = Math.floor(realMins / 60) % 24;
+                const isHalfHour = visualMins % 60 !== 0;
+                
+                return (
+                  <div
+                    key={i}
+                    className="absolute right-0 flex items-center -translate-y-1/2"
+                    style={{ top: minutesToPx(visualMins) }}
+                  >
+
+                    {!isHalfHour && (
+                      <span className="text-[10px] font-medium text-[#1a2b49] mr-3">
+                        {String(hour).padStart(2, '0')}:00
+                      </span>
+                    )}
+
+                    <div 
+                      className={`rounded-full ${isHalfHour ? 'w-2 h-[1.5px] bg-gray-200' : 'w-4 h-[1.5px] bg-gray-400'}`} 
+                    />
+
+                  </div>
+                );
+              })}
+            </div>
+
+
+            {/* Main Board Card with Divider */}
+            <div className="flex-1 flex border border-gray-300 rounded-lg overflow-hidden bg-white">
+              {/* Columns */}
+              {isMobile ? (
+                <div className="flex-1 relative" style={{ height: BOARD_H }}>
+                  {renderColumn(activeDay)}
+                </div>
+              ) : (
+                <div className="flex flex-1 divide-x divide-gray-100">
+                  {DAYS.map((_, i) => renderColumn(i))}
+                </div>
+              )}
+            </div>
+          </div>
+
+        </div>
+
+        {/* ── Block Palette ── */}
+        <BlockPalette 
+          onDragStart={handlePaletteDragStart} 
+          customDurations={customDurations}
+          onDurationChange={(type, dur) => setCustomDurations(prev => ({ ...prev, [type]: dur }))}
+        />
+      </div>
     </div>
   )
 }
+
+

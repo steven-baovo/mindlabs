@@ -10,7 +10,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </Link>
       </div>
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white/80 backdrop-blur-xl py-8 px-4 shadow-2xl sm:rounded-2xl sm:px-10 border border-gray-100">
+        <div className="bg-white/80 backdrop-blur-xl py-8 px-4 sm:rounded-2xl sm:px-10 border border-gray-100">
           {children}
         </div>
       </div>

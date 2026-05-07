@@ -8,10 +8,8 @@ export type BlockType =
   | 'deep_work'
   | 'light_work'
   | 'break'
-  | 'lunch'
   | 'exercise'
   | 'wind_down'
-  | 'sleep'
 
 export interface FocusBlock {
   id: string

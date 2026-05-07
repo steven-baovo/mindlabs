@@ -1,12 +1,12 @@
 import { BlockType } from '@/app/(frontend)/focus/actions'
+import { Layout, Coffee, Sun, Dumbbell, Moon, Zap } from 'lucide-react'
 
 export interface BlockConfig {
   type: BlockType
   label: string
-  color: string        // bg color class
-  border: string       // border color class
-  textColor: string    // text color class
-  icon: string         // emoji icon
+  bgColor: string       // bg color class
+  textColor: string     // text color class
+  icon: any             // Lucide icon component
   defaultDuration: number // in minutes
 }
 
@@ -14,85 +14,60 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
   morning_routine: {
     type: 'morning_routine',
     label: 'Bắt đầu ngày mới',
-    color: 'bg-amber-50',
-    border: 'border-amber-200',
-    textColor: 'text-amber-800',
-    icon: '🌅',
+    icon: Sun,
+    bgColor: 'bg-amber-50',
+    textColor: 'text-amber-700',
     defaultDuration: 90,
   },
   deep_work: {
     type: 'deep_work',
     label: 'Làm việc sâu',
-    color: 'bg-blue-50',
-    border: 'border-blue-200',
-    textColor: 'text-blue-800',
-    icon: '🎯',
+    icon: Layout,
+    bgColor: 'bg-blue-50',
+    textColor: 'text-blue-700',
     defaultDuration: 90,
   },
   light_work: {
     type: 'light_work',
     label: 'Làm việc nhẹ',
-    color: 'bg-green-50',
-    border: 'border-green-200',
-    textColor: 'text-green-800',
-    icon: '📋',
-    defaultDuration: 60,
+    icon: Coffee,
+    bgColor: 'bg-indigo-50',
+    textColor: 'text-indigo-700',
+    defaultDuration: 30,
   },
   break: {
     type: 'break',
-    label: 'Nghỉ ngơi',
-    color: 'bg-gray-50',
-    border: 'border-gray-200',
-    textColor: 'text-gray-600',
-    icon: '☕',
-    defaultDuration: 30,
-  },
-  lunch: {
-    type: 'lunch',
-    label: 'Nghỉ trưa',
-    color: 'bg-orange-50',
-    border: 'border-orange-200',
-    textColor: 'text-orange-800',
-    icon: '🍱',
-    defaultDuration: 60,
+    label: 'Nghỉ giải lao',
+    icon: Sun,
+    bgColor: 'bg-emerald-50',
+    textColor: 'text-emerald-700',
+    defaultDuration: 15,
   },
   exercise: {
     type: 'exercise',
     label: 'Tập thể dục',
-    color: 'bg-red-50',
-    border: 'border-red-200',
-    textColor: 'text-red-800',
-    icon: '🏃',
-    defaultDuration: 60,
+    icon: Dumbbell,
+    bgColor: 'bg-orange-50',
+    textColor: 'text-orange-700',
+    defaultDuration: 45,
   },
   wind_down: {
     type: 'wind_down',
-    label: 'Kết thúc ngày',
-    color: 'bg-purple-50',
-    border: 'border-purple-200',
-    textColor: 'text-purple-800',
-    icon: '🌙',
+    label: 'Thư giãn',
+    icon: Moon,
+    bgColor: 'bg-purple-50',
+    textColor: 'text-purple-700',
     defaultDuration: 60,
-  },
-  sleep: {
-    type: 'sleep',
-    label: 'Ngủ',
-    color: 'bg-indigo-100',
-    border: 'border-indigo-300',
-    textColor: 'text-indigo-900',
-    icon: '😴',
-    defaultDuration: 480,
   },
 }
 
 export const DAYS = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']
-export const DAY_LABELS = ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật']
 
 // Board settings
 export const MINUTES_PER_DAY = 1440
 export const START_HOUR = 0      // 00:00
 export const END_HOUR = 24       // 24:00
-export const PIXELS_PER_MINUTE = 1.2  // 1 minute = 1.2px → 1 hour = 72px
+export const PIXELS_PER_MINUTE = 1.2
 export const SNAP_MINUTES = 30   // Snap to 30-min grid
 
 export function minutesToPx(minutes: number): number {
