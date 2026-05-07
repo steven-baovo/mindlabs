@@ -2,13 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useAppTime } from '@/hooks/useAppTime'
-import { adminSetProgressDays, adminResetCheckIn, adminForceStartInFuture, adminHardReset } from '@/app/(frontend)/smoke/admin-actions'
 import { Terminal, Clock, Zap, RotateCcw, ChevronRight, X } from 'lucide-react'
 
 export default function DevPanel({ isAdmin }: { isAdmin: boolean }) {
   const [isOpen, setIsOpen] = useState(false)
   const { hour, setAppHour, isMocked } = useAppTime()
-  const [activeTab, setActiveTab] = useState<'smoke' | 'system'>('smoke')
+  const [activeTab, setActiveTab] = useState<'system'>('system')
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -48,12 +47,6 @@ export default function DevPanel({ isAdmin }: { isAdmin: boolean }) {
           </div>
 
           <div className="flex border-b border-gray-100">
-            <button 
-              onClick={() => setActiveTab('smoke')}
-              className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-tighter ${activeTab === 'smoke' ? 'text-[#1a2b49] border-b-2 border-[#1a2b49]' : 'text-gray-400'}`}
-            >
-              Smoke Module
-            </button>
             <button 
               onClick={() => setActiveTab('system')}
               className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-tighter ${activeTab === 'system' ? 'text-[#1a2b49] border-b-2 border-[#1a2b49]' : 'text-gray-400'}`}
@@ -101,59 +94,7 @@ export default function DevPanel({ isAdmin }: { isAdmin: boolean }) {
                   </p>
                 </div>
 
-                {activeTab === 'smoke' && (
-                  <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    <div className="space-y-2">
-                      <span className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-1">
-                        <Zap className="w-3 h-3 text-yellow-500" /> Fast Forward
-                      </span>
-                      <div className="grid grid-cols-2 gap-2">
-                        {[3, 7, 14, 21].map(d => (
-                          <button 
-                            key={d}
-                            onClick={async () => {
-                              const res = await adminSetProgressDays(d);
-                              if (res?.error) alert(res.error);
-                            }}
-                            className="py-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded text-[10px] font-medium transition-colors"
-                          >
-                            Nhảy Day {d}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
 
-                    <div className="space-y-2">
-                      <span className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-1">
-                        <RotateCcw className="w-3 h-3 text-blue-500" /> Reset Actions
-                      </span>
-                      <button 
-                        onClick={async () => {
-                          const res = await adminResetCheckIn()
-                          if (res?.error) alert(res.error)
-                          else window.location.reload()
-                        }}
-                        className="w-full py-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded text-[10px] font-medium text-left px-3 flex items-center justify-between group"
-                      >
-                        <span>Xóa Điểm danh hôm nay</span>
-                        <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </button>
-                      <button 
-                        onClick={async () => {
-                          if(confirm('Xóa sạch dữ liệu và bắt đầu lại từ đầu?')) {
-                            const res = await adminHardReset();
-                            if (res?.error) alert(res.error)
-                            else window.location.reload();
-                          }
-                        }}
-                        className="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 rounded text-[10px] font-medium text-left px-3 flex items-center justify-between group"
-                      >
-                        <span>Reset về Trạng thái Mới (New User)</span>
-                        <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </button>
-                    </div>
-                  </div>
-                )}
 
                 {activeTab === 'system' && (
                   <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">

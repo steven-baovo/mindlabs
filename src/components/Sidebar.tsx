@@ -28,13 +28,6 @@ const MENU_ITEMS = [
     isLabel: true 
   },
   { 
-    title: 'Smoke Protocol', 
-    icon: Wind, 
-    href: '/smoke',
-    color: 'text-orange-500',
-    description: 'Bỏ thuốc lá kỷ luật'
-  },
-  { 
     title: '21 Ngày Thói Quen', 
     icon: Calendar, 
     href: '/21days',
@@ -44,10 +37,9 @@ const MENU_ITEMS = [
   { 
     title: 'Focus Protocol', 
     icon: Brain, 
-    href: '#', 
+    href: '/focus', 
     color: 'text-green-500',
-    isComingSoon: true,
-    description: 'Tập trung sâu (Deep Work)'
+    description: 'Thời khóa biểu tuần tối giản'
   },
   { 
     title: 'KHÁM PHÁ', 
