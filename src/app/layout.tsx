@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Lora } from "next/font/google";
+import { Plus_Jakarta_Sans, Lora } from "next/font/google";
 import "./globals.css";
 
 import { createClient } from "@/lib/supabase/server";
 
-const inter = Inter({
-  variable: "--font-inter",
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta",
   subsets: ["vietnamese", "latin"],
 });
 
@@ -26,13 +26,13 @@ export default async function RootLayout({
 }>) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  
+
 
 
   return (
     <html
       lang="vi"
-      className={`${inter.variable} ${lora.variable} antialiased`}
+      className={`${plusJakartaSans.variable} ${lora.variable} antialiased`}
     >
       <body>
         {children}
