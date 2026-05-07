@@ -173,11 +173,6 @@ export default function BlockItem({ block, onDragStart, onDelete, onLabelUpdate,
           </div>
         )}
 
-        <div className="mt-auto flex items-center">
-          <div className={`w-6 h-6 rounded-full flex items-center justify-center bg-white/50 ${cfg.textColor}`}>
-            <cfg.icon className="w-3.5 h-3.5" />
-          </div>
-        </div>
       </div>
 
       <div
