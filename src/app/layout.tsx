@@ -27,9 +27,7 @@ export default async function RootLayout({
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
-  const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase())
-  // Always include your email as a hardcoded fallback for now to ensure access
-  const isAdmin = user?.email && (adminEmails.includes(user.email.toLowerCase()) || user.email === 'voquocbao1999@gmail.com')
+
 
   return (
     <html
