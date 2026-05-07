@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Lora } from "next/font/google";
 import "./globals.css";
-import DevPanel from "@/components/dev/DevPanel";
+
 import { createClient } from "@/lib/supabase/server";
 
 const inter = Inter({
@@ -38,7 +38,6 @@ export default async function RootLayout({
     >
       <body>
         {children}
-        <DevPanel isAdmin={isAdmin || process.env.NODE_ENV === 'development'} />
       </body>
     </html>
   );
