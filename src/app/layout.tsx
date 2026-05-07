@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Lexend_Deca } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
 import { createClient } from "@/lib/supabase/server";
 
-const lexendDeca = Lexend_Deca({
-  variable: "--font-lexend",
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta",
   subsets: ["vietnamese", "latin"],
 });
 
@@ -25,7 +25,7 @@ export default async function RootLayout({
   return (
     <html
       lang="vi"
-      className={`${lexendDeca.variable} antialiased`}
+      className={`${plusJakartaSans.variable} antialiased`}
     >
       <body>
         {children}

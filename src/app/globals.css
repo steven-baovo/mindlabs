@@ -13,8 +13,8 @@
   --color-foreground: var(--foreground);
   --color-secondary: var(--secondary);
   --color-border-medium: var(--border);
-  --font-sans: var(--font-lexend);
-  --font-serif: var(--font-lexend);
+  --font-sans: var(--font-plus-jakarta);
+  --font-serif: var(--font-plus-jakarta);
   --animate-spin-slow: spin 3s linear infinite;
 }
 
