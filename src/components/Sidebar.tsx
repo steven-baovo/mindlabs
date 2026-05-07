@@ -46,7 +46,7 @@ const MENU_ITEMS = [
 
 export default function Sidebar() {
   const pathname = usePathname()
-  const [isCollapsed, setIsCollapsed] = useState(true)
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
   return (
     <aside className={`hidden lg:flex flex-col bg-white border-r border-[#f2f2f2] h-[calc(100vh-56px)] sticky top-14 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'}`}>
