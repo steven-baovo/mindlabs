@@ -28,7 +28,8 @@ export default function BlockItem({ block, onDragStart, onDelete, onLabelUpdate,
   const timeInputRef = useRef<HTMLInputElement>(null)
 
   const height = minutesToPx(block.duration_minutes)
-  const top = minutesToPx(block.start_minutes - visualOffset)
+  const visualMinutes = (block.start_minutes - visualOffset + 1440) % 1440
+  const top = minutesToPx(visualMinutes)
 
   const [isDraggingLocal, setIsDraggingLocal] = useState(false)
 
