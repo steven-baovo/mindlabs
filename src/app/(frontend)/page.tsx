@@ -49,7 +49,7 @@ export default async function Home() {
             )}
           </div>
           <div>
-            <h3 className="font-lora text-xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors leading-tight mb-2 line-clamp-2">
+            <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors leading-tight mb-2 line-clamp-2">
               {post.title}
             </h3>
             <div className="flex items-center text-xs font-medium text-gray-500 gap-2">
@@ -73,7 +73,7 @@ export default async function Home() {
     <div className="w-full bg-white min-h-screen pb-20">
       {/* Header Welcome */}
       <section className="pt-16 pb-12 text-center container mx-auto px-4">
-        <h1 className="font-lora text-4xl md:text-5xl font-bold text-[#1a2b49] mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-[#1a2b49] mb-4">
           Welcome to your Health Habitat!
         </h1>
         <p className="text-gray-600 max-w-2xl mx-auto text-lg">
@@ -84,7 +84,7 @@ export default async function Home() {
       {/* Explore Popular Topics (Pill Buttons) */}
       <section className="py-8 container mx-auto px-4 text-center">
         <h2 className="text-sm font-bold tracking-widest text-[#1a2b49] uppercase mb-4">Explore</h2>
-        <h3 className="font-lora text-3xl font-bold text-[#1a2b49] mb-8">Popular Topics</h3>
+        <h3 className="text-3xl font-bold text-[#1a2b49] mb-8">Popular Topics</h3>
         <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
           {categories.map((cat, idx) => (
             <Link 
@@ -101,7 +101,7 @@ export default async function Home() {
       {/* Latest Articles Section */}
       <section className="py-12 container mx-auto px-4 max-w-6xl">
         <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
-          <h2 className="font-lora text-3xl font-bold text-[#1a2b49]">Latest Articles</h2>
+          <h2 className="text-3xl font-bold text-[#1a2b49]">Latest Articles</h2>
           <Link href="/blog" className="text-blue-600 hover:text-blue-800 font-medium text-sm">
             View All →
           </Link>
@@ -121,7 +121,7 @@ export default async function Home() {
         return (
           <section key={category} className="py-12 container mx-auto px-4 max-w-6xl">
             <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
-              <h2 className="font-lora text-3xl font-bold text-[#1a2b49]">{category}</h2>
+              <h2 className="text-3xl font-bold text-[#1a2b49]">{category}</h2>
               <Link href={`/blog?category=${category.toLowerCase().replace(' ', '-')}`} className="text-blue-600 hover:text-blue-800 font-medium text-sm">
                 View All {category} →
               </Link>

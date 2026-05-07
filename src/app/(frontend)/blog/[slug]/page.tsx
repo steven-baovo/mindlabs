@@ -66,7 +66,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
         </div>
       </div>
 
-      <div className="prose prose-slate prose-lg max-w-none font-serif text-gray-800 leading-relaxed mx-auto">
+      <div className="prose prose-slate prose-lg max-w-none text-gray-800 leading-relaxed mx-auto">
         {post.body ? (
           <PortableText value={post.body} />
         ) : (

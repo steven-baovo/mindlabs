@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Lora } from "next/font/google";
+import { Lexend_Deca } from "next/font/google";
 import "./globals.css";
 
 import { createClient } from "@/lib/supabase/server";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta",
-  subsets: ["vietnamese", "latin"],
-});
-
-const lora = Lora({
-  variable: "--font-lora",
+const lexendDeca = Lexend_Deca({
+  variable: "--font-lexend",
   subsets: ["vietnamese", "latin"],
 });
 
@@ -27,12 +22,10 @@ export default async function RootLayout({
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-
-
   return (
     <html
       lang="vi"
-      className={`${plusJakartaSans.variable} ${lora.variable} antialiased`}
+      className={`${lexendDeca.variable} antialiased`}
     >
       <body>
         {children}
