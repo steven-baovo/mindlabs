@@ -16,7 +16,7 @@ export default async function Header() {
           </Link>
           
           <div className="hidden md:flex items-center bg-[#f9f9f9] rounded-full px-3 py-1.5 w-64 border border-transparent focus-within:border-gray-200 transition-all">
-            <Search className="w-4 h-4 text-gray-400 mr-2" />
+            <Search strokeWidth={1.5} className="w-4 h-4 text-gray-400 mr-2" />
             <input 
               type="text" 
               placeholder="Search" 
@@ -29,12 +29,12 @@ export default async function Header() {
           {user ? (
             <>
               <Link href="/studio" className="hidden sm:flex items-center gap-2 text-gray-500 hover:text-[#242424] text-sm transition-colors">
-                <SquarePen className="w-5 h-5" />
+                <SquarePen strokeWidth={1.5} className="w-5 h-5" />
                 <span>Write</span>
               </Link>
               
               <button className="text-gray-500 hover:text-[#242424] transition-colors">
-                <Bell className="w-5 h-5" />
+                <Bell strokeWidth={1.5} className="w-5 h-5" />
               </button>
 
               <div className="flex items-center gap-2">

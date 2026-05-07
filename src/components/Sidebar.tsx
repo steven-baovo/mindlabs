@@ -67,7 +67,7 @@ export default function Sidebar() {
               } ${item.isComingSoon ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={item.title}
             >
-              <Icon className={`w-6 h-6 shrink-0 ${isActive ? 'text-[#242424]' : 'text-gray-400 group-hover:text-[#242424]'}`} />
+              <Icon strokeWidth={1.5} className={`w-6 h-6 shrink-0 ${isActive ? 'text-[#242424]' : 'text-gray-400 group-hover:text-[#242424]'}`} />
               
               {!isCollapsed && (
                 <span className={`text-sm font-medium truncate ${isActive ? 'font-bold' : ''}`}>
@@ -88,9 +88,9 @@ export default function Sidebar() {
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="flex items-center gap-4 px-2 py-2 text-gray-400 hover:text-[#242424] transition-colors w-full"
         >
-          {isCollapsed ? <ChevronRight className="w-5 h-5 mx-auto" /> : (
+          {isCollapsed ? <ChevronRight strokeWidth={1.5} className="w-5 h-5 mx-auto" /> : (
             <>
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
               <span className="text-xs font-medium uppercase tracking-widest">Collapse</span>
             </>
           )}
