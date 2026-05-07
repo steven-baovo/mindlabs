@@ -30,6 +30,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   font-weight: 300;
+  letter-spacing: 0.015em;
 }
 
 /* Hide scrollbar utility */
