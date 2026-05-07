@@ -8,7 +8,7 @@ export default function FrontendLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="min-h-screen flex flex-col bg-[#fdfaf6]">
+    <div className="min-h-screen flex flex-col bg-white">
       <Header />
       <div className="flex-1 flex container mx-auto max-w-7xl">
         <Sidebar />
