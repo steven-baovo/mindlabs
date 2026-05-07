@@ -137,7 +137,7 @@ export default function AccountForm({ user, profile }: { user: User, profile: an
           <button 
             type="submit" 
             disabled={profileSaving}
-            className="bg-[#242424] text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-black transition-all disabled:opacity-50"
+            className="bg-[#242424] text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-black transition-all disabled:opacity-50 cursor-pointer"
           >
             {profileSaving ? 'Đang lưu...' : 'Lưu thay đổi'}
           </button>
@@ -177,7 +177,7 @@ export default function AccountForm({ user, profile }: { user: User, profile: an
           <button 
             type="submit" 
             disabled={passwordSaving}
-            className="bg-white text-[#242424] border border-[#242424] px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-all disabled:opacity-50"
+            className="bg-white text-[#242424] border border-[#242424] px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-all disabled:opacity-50 cursor-pointer"
           >
             {passwordSaving ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}
           </button>

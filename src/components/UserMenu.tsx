@@ -33,7 +33,7 @@ export default function UserMenu({ user, profile }: UserMenuProps) {
     <div className="relative" ref={menuRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="w-8 h-8 bg-gray-100 border border-gray-200 text-[#242424] rounded-full flex items-center justify-center text-xs font-bold uppercase overflow-hidden hover:ring-2 hover:ring-[#242424] transition-all focus:outline-none"
+        className="w-8 h-8 bg-gray-100 border border-gray-200 text-[#242424] rounded-full flex items-center justify-center text-xs font-bold uppercase overflow-hidden hover:ring-2 hover:ring-[#242424] transition-all focus:outline-none cursor-pointer"
       >
         {profile?.avatar_url ? (
           <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
@@ -53,7 +53,7 @@ export default function UserMenu({ user, profile }: UserMenuProps) {
           
           <Link 
             href="/account" 
-            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-[#f9f9f9] transition-colors"
+            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-[#f9f9f9] transition-colors cursor-pointer"
             onClick={() => setIsOpen(false)}
           >
             <UserIcon className="w-4 h-4 text-gray-400" />
@@ -63,7 +63,7 @@ export default function UserMenu({ user, profile }: UserMenuProps) {
           <form action={logout}>
             <button 
               type="submit" 
-              className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+              className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
               Đăng xuất

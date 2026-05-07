@@ -60,7 +60,7 @@ export default function Sidebar() {
             <Link
               key={index}
               href={item.href || '#'}
-              className={`flex items-center gap-4 px-6 py-3 transition-colors group relative ${
+              className={`flex items-center gap-4 px-6 py-3 transition-colors group relative cursor-pointer ${
                 isActive 
                 ? 'text-[#242424]' 
                 : 'text-gray-400 hover:text-[#242424]'
@@ -86,7 +86,7 @@ export default function Sidebar() {
       <div className="p-4 border-t border-[#f2f2f2]">
         <button 
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="flex items-center gap-4 px-2 py-2 text-gray-400 hover:text-[#242424] transition-colors w-full"
+          className="flex items-center gap-4 px-2 py-2 text-gray-400 hover:text-[#242424] transition-colors w-full cursor-pointer"
         >
           {isCollapsed ? <ChevronRight strokeWidth={1.5} className="w-5 h-5 mx-auto" /> : (
             <>
