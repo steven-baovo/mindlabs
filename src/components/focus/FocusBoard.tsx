@@ -284,9 +284,9 @@ export default function FocusBoard({ initialBlocks }: Props) {
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden px-8">
+      <div className="flex flex-1 px-8">
         {/* ── Main Board (Full Width) ── */}
-        <div className="flex-1 overflow-x-auto no-scrollbar border-r border-gray-100 bg-white">
+        <div className="flex-1 border-r border-gray-100 bg-white">
           {/* ─ Header row ─ */}
           <div className="flex bg-white border-b border-gray-100">
             {/* Time ruler gutter */}
