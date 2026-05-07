@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Manrope } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
 import { createClient } from "@/lib/supabase/server";
 
-const manrope = Manrope({
-  variable: "--font-manrope",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["vietnamese", "latin"],
 });
 
@@ -25,7 +25,7 @@ export default async function RootLayout({
   return (
     <html
       lang="vi"
-      className={`${manrope.variable} antialiased`}
+      className={`${inter.variable} antialiased`}
     >
       <body>
         {children}

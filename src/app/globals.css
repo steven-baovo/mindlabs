@@ -13,8 +13,8 @@
   --color-foreground: var(--foreground);
   --color-secondary: var(--secondary);
   --color-border-medium: var(--border);
-  --font-sans: var(--font-manrope);
-  --font-serif: var(--font-manrope);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-inter);
   --animate-spin-slow: spin 3s linear infinite;
 }
 
