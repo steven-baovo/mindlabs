@@ -26,6 +26,7 @@ export default function FocusBoard({ initialBlocks }: Props) {
   const [activeDay, setActiveDay] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
   const [dragging, setDragging] = useState<{ block: FocusBlock; offsetY: number } | null>(null)
+  const [dragPreview, setDragPreview] = useState<{ dayIndex: number; startMinutes: number } | null>(null)
   const [duplicateMenu, setDuplicateMenu] = useState<{ fromDay: number } | null>(null)
   const [showSettings, setShowSettings] = useState(false)
   const [activeTab, setActiveTab] = useState('Schedule')
@@ -114,6 +115,7 @@ export default function FocusBoard({ initialBlocks }: Props) {
   // ─── Column Drop ─────────────────────────────────────────────────────
   const handleColumnDrop = useCallback(async (dayIndex: number, e: React.DragEvent) => {
     e.preventDefault()
+    setDragPreview(null)
     if (!dragging) return
 
     const col = columnRefs.current[dayIndex]
@@ -196,18 +198,46 @@ export default function FocusBoard({ initialBlocks }: Props) {
     setDuplicateMenu(null)
   }, [blocks])
 
+  const handleColumnDragOver = useCallback((dayIndex: number, e: React.DragEvent) => {
+    e.preventDefault()
+    if (!dragging) return
+
+    const col = columnRefs.current[dayIndex]
+    if (!col) return
+
+    const rect = col.getBoundingClientRect()
+    const rawY = e.clientY - rect.top - dragging.offsetY
+    const snapped = Math.round(rawY / (SNAP_MINUTES * PIXELS_PER_MINUTE)) * SNAP_MINUTES
+    
+    const visualStart = Math.max(0, Math.min(snapped, TOTAL_MINS - dragging.block.duration_minutes))
+    
+    setDragPreview({ dayIndex, startMinutes: getRealMinutes(visualStart) })
+  }, [dragging, viewStartHour])
+
   const renderColumn = (dayIndex: number) => {
     const dayBlocks = blocks.filter(b => b.day_of_week === dayIndex)
+    const isOver = dragPreview?.dayIndex === dayIndex
 
     return (
       <div
         key={dayIndex}
         className="flex-1 min-w-0 relative"
         ref={el => { columnRefs.current[dayIndex] = el }}
-        onDragOver={e => e.preventDefault()}
+        onDragOver={e => handleColumnDragOver(dayIndex, e)}
         onDrop={e => handleColumnDrop(dayIndex, e)}
+        onDragLeave={() => setDragPreview(null)}
         style={{ height: BOARD_H }}
       >
+        {/* Ghost Preview Block */}
+        {isOver && dragging && (
+          <div 
+            className="absolute left-1 right-1 rounded-lg border-2 border-dashed border-blue-200 bg-blue-50/30 z-0 pointer-events-none transition-all duration-150"
+            style={{ 
+              top: minutesToPx(getVisualMinutes(dragPreview.startMinutes)) + 1,
+              height: minutesToPx(dragging.block.duration_minutes) - 2
+            }}
+          />
+        )}
 
         {/* Blocks */}
         {dayBlocks.map(block => (

@@ -30,11 +30,18 @@ export default function BlockItem({ block, onDragStart, onDelete, onLabelUpdate,
   const height = minutesToPx(block.duration_minutes)
   const top = minutesToPx(block.start_minutes - visualOffset)
 
+  const [isDraggingLocal, setIsDraggingLocal] = useState(false)
+
   const handleDragStart = (e: React.DragEvent) => {
+    setIsDraggingLocal(true)
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
     const offsetY = e.clientY - rect.top
     e.dataTransfer.effectAllowed = 'move'
     onDragStart(block, offsetY)
+  }
+
+  const handleDragEnd = () => {
+    setIsDraggingLocal(false)
   }
 
   const handleLabelSubmit = () => {
@@ -95,14 +102,10 @@ export default function BlockItem({ block, onDragStart, onDelete, onLabelUpdate,
     <div
       draggable
       onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => { setShowActions(false); if (editing) handleLabelSubmit() }}
-      className={`
-        absolute left-1 right-1 rounded-lg border border-gray-100 cursor-grab active:cursor-grabbing 
-        overflow-hidden select-none transition-all duration-300 ease-in-out
-        ${cfg.bgColor}
-        ${showActions ? 'shadow-md scale-[1.02] z-10' : 'z-1'}
-      `}
+      className={`absolute left-1 right-1 rounded-lg border border-gray-100 cursor-grab active:cursor-grabbing overflow-hidden select-none transition-all duration-300 ease-in-out ${cfg.bgColor} ${showActions ? 'shadow-md scale-[1.02] z-10' : 'z-1'} ${isDraggingLocal ? 'opacity-20' : 'opacity-100'}`}
       style={{ 
         top: top + 1, 
         height: Math.max(height, 24) - 2, 
