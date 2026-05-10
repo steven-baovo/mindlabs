@@ -106,7 +106,7 @@ export default function AccountForm({ user, profile }: { user: User, profile: an
         </div>
       </section>
 
-      <hr className="border-[#f2f2f2]" />
+      <hr className="border-[#e5e5e5]" />
 
       {/* Profile Details */}
       <section>
@@ -144,7 +144,7 @@ export default function AccountForm({ user, profile }: { user: User, profile: an
         </form>
       </section>
 
-      <hr className="border-[#f2f2f2]" />
+      <hr className="border-[#e5e5e5]" />
 
       {/* Security */}
       <section>

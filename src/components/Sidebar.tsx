@@ -5,12 +5,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { 
   Home, 
-  BookOpen, 
-  Brain, 
   Calendar,
-  Compass,
   Bookmark,
-  User,
   ChevronLeft,
   ChevronRight,
   Network
@@ -24,18 +20,8 @@ const MENU_ITEMS = [
   },
   { 
     title: 'Clarity Planner', 
-    icon: Brain, 
-    href: '/clarity',
-  },
-  { 
-    title: '21-Day Habit', 
     icon: Calendar, 
-    href: '/21days',
-  },
-  { 
-    title: 'Explore', 
-    icon: Compass, 
-    href: '/blog',
+    href: '/clarity',
   },
   { 
     title: 'Canvas', 
@@ -55,7 +41,7 @@ export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false)
 
   return (
-    <aside className={`hidden lg:flex flex-col bg-white border-r border-[#f2f2f2] h-[calc(100vh-56px)] sticky top-14 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'}`}>
+    <aside className={`hidden lg:flex flex-col bg-white border-r border-[#e5e5e5] h-[calc(100vh-56px)] sticky top-14 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'}`}>
       
       <div className="flex-1 py-6 flex flex-col gap-2">
         {MENU_ITEMS.map((item, index) => {
@@ -89,7 +75,7 @@ export default function Sidebar() {
         })}
       </div>
 
-      <div className="p-4 border-t border-[#f2f2f2]">
+      <div className="p-4 border-t border-[#e5e5e5]">
         <button 
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="flex items-center gap-4 px-2 py-2 text-gray-400 hover:text-[#242424] transition-colors w-full cursor-pointer"
