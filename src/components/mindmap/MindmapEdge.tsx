@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, CSSProperties } from 'react'
 import {
   BaseEdge,
   EdgeLabelRenderer,
@@ -22,12 +22,15 @@ export default function MindmapEdge({
   targetY,
   sourcePosition,
   targetPosition,
-  style = {},
+  style,
   markerEnd,
   markerStart,
   selected,
   data,
 }: EdgeProps) {
+  const edgeData = data as { label?: string; pathType?: string; direction?: string } | undefined
+  const edgeStyle = style as CSSProperties | undefined
+
   const { setEdges } = useReactFlow()
   const [activeMenu, setActiveMenu] = useState<'color' | 'direction' | 'path' | 'edit' | null>(null)
   const zoom = useStore((s) => s.transform[2])
@@ -45,9 +48,9 @@ export default function MindmapEdge({
   let labelX = 0
   let labelY = 0
 
-  if (data?.pathType === 'straight') {
+  if (edgeData?.pathType === 'straight') {
     [edgePath, labelX, labelY] = getStraightPath(pathParams)
-  } else if (data?.pathType === 'smoothstep') {
+  } else if (edgeData?.pathType === 'smoothstep') {
     [edgePath, labelX, labelY] = getSmoothStepPath({ ...pathParams, borderRadius: 16 })
   } else {
     [edgePath, labelX, labelY] = getBezierPath(pathParams)
@@ -101,7 +104,7 @@ export default function MindmapEdge({
     setEdges((es) =>
       es.map((e) => {
         if (e.id === id) {
-          return { ...e, data: { ...e.data, label: newLabel } }
+          return { ...e, data: { ...(e.data as any), label: newLabel } }
         }
         return e
       })
@@ -119,10 +122,10 @@ export default function MindmapEdge({
 
   return (
     <>
-      <BaseEdge path={edgePath} markerEnd={markerEnd} markerStart={markerStart} style={style} />
+      <BaseEdge path={edgePath} markerEnd={markerEnd} markerStart={markerStart} style={edgeStyle} />
       
       {/* Hiển thị label (Ghi chú) trên đường dẫn */}
-      {data?.label && activeMenu !== 'edit' && (
+      {edgeData?.label && activeMenu !== 'edit' && (
         <EdgeLabelRenderer>
           <div
             style={{
@@ -133,7 +136,7 @@ export default function MindmapEdge({
             className="nodrag nopan bg-white px-2 py-0.5 rounded border border-gray-200 text-xs text-gray-700 shadow-sm whitespace-nowrap"
             onClick={() => setActiveMenu('edit')}
           >
-            {data.label}
+            {edgeData.label}
           </div>
         </EdgeLabelRenderer>
       )}
@@ -143,7 +146,7 @@ export default function MindmapEdge({
           <div
             style={{
               position: 'absolute',
-              transform: `translate(-50%, -50%) translate(${labelX}px,${labelY - (data?.label ? 30 : 0)}px) scale(${1 / zoom})`,
+              transform: `translate(-50%, -50%) translate(${labelX}px,${labelY - (edgeData?.label ? 30 : 0)}px) scale(${1 / zoom})`,
               pointerEvents: 'all',
             }}
             className="nodrag nopan relative"
@@ -153,7 +156,7 @@ export default function MindmapEdge({
                 <input
                   autoFocus
                   type="text"
-                  defaultValue={(data?.label as string) || ''}
+                  defaultValue={(edgeData?.label as string) || ''}
                   onBlur={(e) => {
                     updateLabel(e.target.value)
                     setActiveMenu(null)
@@ -198,7 +201,7 @@ export default function MindmapEdge({
                           style={{ backgroundColor: c.value }}
                           title={c.name}
                         >
-                          {style?.stroke === c.value && <Check className="w-3 h-3 text-white mix-blend-difference" />}
+                          {edgeStyle?.stroke === c.value && <Check className="w-3 h-3 text-white mix-blend-difference" />}
                         </button>
                       ))}
                     </div>

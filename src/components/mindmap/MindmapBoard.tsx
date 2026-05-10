@@ -109,7 +109,7 @@ export default function MindmapBoard({
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (pathMenuRef.current && !pathMenuRef.current.contains(event.target as Node)) {
+      if (pathMenuRef.current && !pathMenuRef.current.contains(event.target as any)) {
         setIsPathMenuOpen(false)
       }
     }
