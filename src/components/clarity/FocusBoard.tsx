@@ -290,7 +290,7 @@ export default function FocusBoard({ initialBlocks }: Props) {
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* ── Sub Header / Navigation ── */}
-      <div className="bg-white border-b border-gray-200 px-8 py-3 flex items-center justify-between sticky top-0 z-30">
+      <div className="bg-white border-b border-[#e5e5e5] px-8 py-3 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-8">
           <h1 className="text-sm font-black text-[#1a2b49] uppercase tracking-tighter">Clarity Planner</h1>
           
@@ -322,7 +322,7 @@ export default function FocusBoard({ initialBlocks }: Props) {
             </button>
 
             {showSettings && (
-              <div className="absolute right-0 top-10 w-56 bg-white border border-gray-200 rounded-xl shadow-xl p-4 z-40">
+              <div className="absolute right-0 top-10 w-56 bg-white border border-[#e5e5e5] rounded-xl shadow-xl p-4 z-40">
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Cài đặt bảng</p>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -346,9 +346,9 @@ export default function FocusBoard({ initialBlocks }: Props) {
 
       <div className="flex flex-1 px-8">
         {/* ── Main Board (Full Width) ── */}
-        <div className="flex-1 border-r border-gray-100 bg-white">
+        <div className="flex-1 border-r border-[#e5e5e5] bg-white">
           {/* ─ Header row ─ */}
-          <div className="flex bg-white border-b border-gray-100">
+          <div className="flex bg-white border-b border-[#e5e5e5]">
             {/* Time ruler gutter */}
             <div className="w-16 shrink-0" />
             {isMobile ? (
@@ -444,7 +444,7 @@ export default function FocusBoard({ initialBlocks }: Props) {
         </div>
 
         {/* ── Block Palette Sidebar (Sticky) ── */}
-        <div className="w-48 bg-gray-50/20 p-5 border-l border-gray-100 hidden lg:block sticky top-14 self-start h-[calc(100vh-56px)] overflow-y-auto overflow-x-hidden no-scrollbar">
+        <div className="w-48 bg-gray-50/20 p-5 border-l border-[#e5e5e5] hidden lg:block sticky top-14 self-start h-[calc(100vh-56px)] overflow-y-auto overflow-x-hidden no-scrollbar">
           <BlockPalette 
             onDragStart={handlePaletteDragStart} 
             customDurations={customDurations}

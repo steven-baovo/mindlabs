@@ -12,10 +12,10 @@ export default async function MindmapPage() {
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 py-12 bg-white min-h-screen">
-      <div className="flex items-center justify-between mb-12 border-b border-gray-100 pb-6">
+      <div className="flex items-center justify-between mb-12 border-b border-[#e5e5e5] pb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Canvas</h1>
-          <p className="text-gray-500 mt-2 text-sm">Visual thinking and spatial organization.</p>
+          <p className="text-gray-500 mt-2 text-sm">Không gian thuần túy cho những suy nghĩ mạch lạc</p>
         </div>
         <CreateMindmapButton />
       </div>
@@ -27,7 +27,7 @@ export default async function MindmapPage() {
       )}
 
       {mindmaps && mindmaps.length === 0 && !error && (
-        <div className="text-center py-20 border-2 border-dashed border-gray-100 rounded-2xl bg-gray-50/50">
+        <div className="text-center py-20 border-2 border-dashed border-[#e5e5e5] rounded-2xl bg-gray-50/50">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-sm mb-4">
             <Plus className="w-5 h-5 text-gray-400" />
           </div>
@@ -45,9 +45,9 @@ export default async function MindmapPage() {
             <Link
               key={mindmap.id}
               href={`/mindmap/${mindmap.id}`}
-              className="group block border border-gray-100 rounded-xl p-6 hover:shadow-md hover:border-gray-200 transition-all bg-white"
+              className="group block border border-[#e5e5e5] rounded-xl p-6 hover:shadow-md hover:border-gray-200 transition-all bg-white"
             >
-              <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary transition-colors mb-2">
                 {mindmap.title}
               </h3>
               <div className="flex items-center text-xs text-gray-400 gap-4 mt-6">

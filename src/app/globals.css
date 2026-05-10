@@ -6,12 +6,14 @@
   --foreground: #242424;
   --secondary: #6b6b6b;
   --border: #e5e5e5;
+  --primary: #00A693;
 }
 
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-secondary: var(--secondary);
+  --color-primary: var(--primary);
   --color-border-medium: var(--border);
   --font-sans: var(--font-inter);
   --font-serif: var(--font-inter);
@@ -39,6 +41,7 @@ body {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;

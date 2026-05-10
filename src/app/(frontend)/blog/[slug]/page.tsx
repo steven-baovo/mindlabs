@@ -74,7 +74,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
         )}
       </div>
       
-      <div className="mt-16 pt-8 border-t border-gray-100 flex justify-center">
+      <div className="mt-16 pt-8 border-t border-[#e5e5e5] flex justify-center">
         <Link href="/blog" className="text-gray-500 text-sm font-medium hover:text-gray-900 transition-colors">
           &larr; Quay lại danh sách bài viết
         </Link>

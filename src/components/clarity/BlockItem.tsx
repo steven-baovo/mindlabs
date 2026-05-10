@@ -122,7 +122,7 @@ export default function BlockItem({ block, onDragStart, onDelete, onLabelUpdate,
       onDragEnd={handleDragEnd}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => { setShowActions(false); if (editing) handleLabelSubmit() }}
-      className={`absolute left-1 right-1 rounded-lg border border-gray-100 cursor-grab active:cursor-grabbing overflow-hidden select-none transition-all duration-300 ease-in-out ${bgColor} ${showActions ? 'shadow-md scale-[1.02] z-10' : 'z-1'} ${isDraggingLocal ? 'opacity-20' : 'opacity-100'}`}
+      className={`absolute left-1 right-1 rounded-lg border border-[#e5e5e5] cursor-grab active:cursor-grabbing overflow-hidden select-none transition-all duration-300 ease-in-out ${bgColor} ${showActions ? 'shadow-md scale-[1.02] z-10' : 'z-1'} ${isDraggingLocal ? 'opacity-20' : 'opacity-100'}`}
       style={{ 
         top: top + 1, 
         height: Math.max(height, 24) - 2, 

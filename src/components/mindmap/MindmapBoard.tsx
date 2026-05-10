@@ -17,19 +17,25 @@ import {
   useReactFlow,
   MarkerType,
   ConnectionMode,
-  SelectionMode
+  SelectionMode,
+  NodeChange
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import TextNode from './TextNode'
 import { updateMindmap } from '@/app/(frontend)/mindmap/actions'
-import { CheckCircle2, Loader2, ArrowLeft, SquarePlus, Image as ImageIcon, Link as LinkIcon, Hand, MousePointer2 } from 'lucide-react'
+import { CheckCircle2, Loader2, ArrowLeft, SquarePlus, Image as ImageIcon, Link as LinkIcon, Hand, MousePointer2, Activity } from 'lucide-react'
 import Link from 'next/link'
+import MindmapEdge from './MindmapEdge'
 
 import { HelperLinesRenderer } from './HelperLinesRenderer'
 import { getHelperLines, HelperLines } from './helperLines'
 
 const nodeTypes = {
   textNode: TextNode,
+}
+
+const edgeTypes = {
+  mindmapEdge: MindmapEdge,
 }
 
 interface MindmapBoardProps {
@@ -39,13 +45,7 @@ interface MindmapBoardProps {
   initialEdges: Edge[]
 }
 
-const defaultEdgeOptions = {
-  type: 'default',
-  style: {
-    strokeWidth: 1,
-    stroke: '#94A3B8',
-  },
-}
+
 
 export default function MindmapBoard({
   mindmapId,
@@ -53,15 +53,31 @@ export default function MindmapBoard({
   initialNodes,
   initialEdges,
 }: MindmapBoardProps) {
+  const upgradedInitialEdges = initialEdges.map(edge => {
+    if (edge.type === 'default' || !edge.type) {
+      return {
+        ...edge,
+        type: 'mindmapEdge',
+        data: edge.data || { direction: 'one' },
+        style: edge.style || { stroke: '#94A3B8', strokeWidth: 1.5 },
+        markerEnd: edge.markerEnd || { type: MarkerType.ArrowClosed, color: '#94A3B8' }
+      }
+    }
+    return edge
+  })
+  
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+  const [edges, setEdges, onEdgesChange] = useEdgesState(upgradedInitialEdges)
   const [title, setTitle] = useState(initialTitle)
   const [isSaving, setIsSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [isPanMode, setIsPanMode] = useState(false)
   const [helperLines, setHelperLines] = useState<HelperLines>({})
+  const [edgePathType, setEdgePathType] = useState('bezier')
+  const [isPathMenuOpen, setIsPathMenuOpen] = useState(false)
+  const pathMenuRef = useRef<HTMLDivElement>(null)
   
-  const { screenToFlowPosition } = useReactFlow()
+  const { screenToFlowPosition, getNodes } = useReactFlow()
   
   // Track if changes have been made to trigger save
   const hasChangesRef = useRef(false)
@@ -71,43 +87,83 @@ export default function MindmapBoard({
     (params: Connection | Edge) => {
       setEdges((eds) => addEdge({ 
         ...params, 
-        type: 'default',
-        style: { stroke: '#94A3B8', strokeWidth: 1 },
+        type: 'mindmapEdge',
+        data: { direction: 'one', pathType: edgePathType },
+        style: { stroke: '#94A3B8', strokeWidth: 1.5 },
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          color: '#94A3B8',
+        },
       } as Edge, eds))
       hasChangesRef.current = true
     },
-    [setEdges]
+    [setEdges, edgePathType]
   )
 
-  const handleNodesChange = useCallback((changes: any) => {
-    onNodesChange(changes)
+  const updateGlobalPathType = (type: string) => {
+    setEdgePathType(type)
+    setEdges((eds) => eds.map(e => ({ ...e, data: { ...e.data, pathType: type } })))
+    setIsPathMenuOpen(false)
     hasChangesRef.current = true
-  }, [onNodesChange])
+  }
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (pathMenuRef.current && !pathMenuRef.current.contains(event.target as Node)) {
+        setIsPathMenuOpen(false)
+      }
+    }
+
+    if (isPathMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isPathMenuOpen])
+
+  const handleNodesChange = useCallback((changes: NodeChange[]) => {
+    let currentHelperLines = {}
+    let hasDraggingPositionChange = false
+
+    const nextChanges = changes.map((change) => {
+      if (change.type === 'position' && change.position) {
+        const currentNodes = getNodes()
+        const node = currentNodes.find((n) => n.id === change.id)
+        if (node) {
+          const { snappedPosition, helperLines: lines } = getHelperLines(
+            { ...node, position: change.position },
+            currentNodes,
+            20,
+            16
+          )
+          
+          if (change.dragging) {
+            currentHelperLines = lines
+            hasDraggingPositionChange = true
+          }
+          
+          return {
+            ...change,
+            position: snappedPosition,
+          }
+        }
+      }
+      return change
+    })
+    
+    if (hasDraggingPositionChange) {
+      setHelperLines(currentHelperLines)
+    }
+
+    onNodesChange(nextChanges)
+    hasChangesRef.current = true
+  }, [onNodesChange, getNodes])
 
   const handleEdgesChange = useCallback((changes: any) => {
     onEdgesChange(changes)
     hasChangesRef.current = true
   }, [onEdgesChange])
-
-  const onNodeDrag = useCallback(
-    (_: React.MouseEvent, node: Node) => {
-      const { snappedPosition, helperLines: lines } = getHelperLines(node, nodes, 20, 24)
-      setHelperLines(lines)
-
-      setNodes((nds) =>
-        nds.map((n) => {
-          if (n.id === node.id) {
-            return {
-              ...n,
-              position: snappedPosition,
-            }
-          }
-          return n
-        })
-      )
-    },
-    [nodes, setNodes]
-  )
 
   const onNodeDragStop = useCallback(() => {
     setHelperLines({})
@@ -159,7 +215,7 @@ export default function MindmapBoard({
   return (
     <div className="w-full h-full bg-white flex flex-col relative">
       {/* Top Header overlay */}
-      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-white/80 backdrop-blur-md border-b border-gray-100 pointer-events-auto">
+      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2 bg-white/80 backdrop-blur-md border-b border-[#e5e5e5] pointer-events-auto">
         <div className="flex items-center gap-4">
           <Link href="/mindmap" className="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors">
             <ArrowLeft className="w-5 h-5" />
@@ -173,7 +229,7 @@ export default function MindmapBoard({
           />
         </div>
         
-        <div className="flex items-center text-sm text-gray-500 gap-2 px-3 py-1.5 bg-gray-50 rounded-full border border-gray-100">
+        <div className="flex items-center text-sm text-gray-500 gap-2 px-3 py-1 bg-gray-50 rounded-full border border-[#e5e5e5]">
           {isSaving ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
@@ -198,10 +254,9 @@ export default function MindmapBoard({
           onNodesChange={handleNodesChange}
           onEdgesChange={handleEdgesChange}
           onConnect={onConnect}
-          onNodeDrag={onNodeDrag}
           onNodeDragStop={onNodeDragStop}
           nodeTypes={nodeTypes}
-          defaultEdgeOptions={defaultEdgeOptions}
+          edgeTypes={edgeTypes}
           connectionMode={ConnectionMode.Loose}
           panOnDrag={isPanMode}
           selectionOnDrag={!isPanMode}
@@ -215,14 +270,7 @@ export default function MindmapBoard({
         >
           <HelperLinesRenderer horizontal={helperLines.horizontal} vertical={helperLines.vertical} />
           <style dangerouslySetInnerHTML={{ __html: `
-            .react-flow__edge-path {
-              stroke: #94A3B8 !important;
-              stroke-width: 1 !important;
-              stroke-opacity: 1 !important;
-            }
-            .react-flow__arrowhead {
-              display: none !important;
-            }
+
             ${!isPanMode ? `
               .react-flow__pane {
                 cursor: default !important;
@@ -238,9 +286,9 @@ export default function MindmapBoard({
               }
             ` : ''}
           ` }} />
-          <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#e5e5e5" />
+          <Background variant={BackgroundVariant.Dots} gap={16} size={1.2} color="#cbd5e1" />
           <Controls 
-            className="!bg-white !border-gray-200 !shadow-sm !rounded-xl overflow-hidden [&>button]:!border-gray-100 [&>button]:hover:!bg-gray-50"
+            className="!bg-white !border-gray-200 !shadow-sm !rounded-xl overflow-hidden [&>button]:!border-[#e5e5e5] [&>button]:hover:!bg-gray-50"
             position="bottom-right" 
             showInteractive={false}
           />
@@ -266,20 +314,20 @@ export default function MindmapBoard({
             <div className="flex bg-gray-100 p-1 rounded-lg gap-1">
               <button
                 onClick={() => setIsPanMode(false)}
-                className={`p-1.5 rounded-md transition-colors relative group ${!isPanMode ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'}`}
+                className={`p-1.5 rounded-md transition-colors relative group ${!isPanMode ? 'bg-white shadow-md text-blue-600 border border-blue-100' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-200'}`}
                 title="Select Mode (V)"
               >
-                <MousePointer2 className="w-4 h-4" />
+                <MousePointer2 className="w-4 h-4" strokeWidth={2.5} />
                 <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
                   Select
                 </span>
               </button>
               <button
                 onClick={() => setIsPanMode(true)}
-                className={`p-1.5 rounded-md transition-colors relative group ${isPanMode ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'}`}
+                className={`p-1.5 rounded-md transition-colors relative group ${isPanMode ? 'bg-white shadow-md text-blue-600 border border-blue-100' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-200'}`}
                 title="Pan Mode (Space)"
               >
-                <Hand className="w-4 h-4" />
+                <Hand className="w-4 h-4" strokeWidth={2.5} />
                 <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
                   Pan (Hold Space)
                 </span>
@@ -288,18 +336,32 @@ export default function MindmapBoard({
             
             <div className="w-px h-6 bg-gray-200 mx-1"></div>
 
-            <button
-              className="p-2.5 rounded-lg hover:bg-gray-100 text-gray-400 cursor-not-allowed transition-colors relative group"
-              title="Add Note (Coming soon)"
-            >
-              <LinkIcon className="w-5 h-5" />
-            </button>
-            <button
-              className="p-2.5 rounded-lg hover:bg-gray-100 text-gray-400 cursor-not-allowed transition-colors relative group"
-              title="Add Image (Coming soon)"
-            >
-              <ImageIcon className="w-5 h-5" />
-            </button>
+            <div className="relative" ref={pathMenuRef}>
+              <button
+                onClick={() => setIsPathMenuOpen(!isPathMenuOpen)}
+                className={`p-2.5 rounded-lg transition-colors group ${isPathMenuOpen ? 'bg-gray-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                title="Edge Style"
+              >
+                <Activity className="w-5 h-5 text-gray-600" />
+                <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                  Edge Style
+                </span>
+              </button>
+              {isPathMenuOpen && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white border border-gray-200 shadow-xl rounded-xl p-1.5 flex flex-col gap-1 z-50 w-36 animate-in fade-in zoom-in slide-in-from-bottom-2 duration-200">
+                  <button onClick={() => updateGlobalPathType('bezier')} className={`px-3 py-2 text-sm rounded-lg text-left transition-colors ${edgePathType === 'bezier' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}>
+                    Curved
+                  </button>
+                  <button onClick={() => updateGlobalPathType('smoothstep')} className={`px-3 py-2 text-sm rounded-lg text-left transition-colors ${edgePathType === 'smoothstep' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}>
+                    Structured
+                  </button>
+                  <button onClick={() => updateGlobalPathType('straight')} className={`px-3 py-2 text-sm rounded-lg text-left transition-colors ${edgePathType === 'straight' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}>
+                    Straight
+                  </button>
+                </div>
+              )}
+            </div>
+
           </Panel>
         </ReactFlow>
       </div>

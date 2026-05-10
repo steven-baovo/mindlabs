@@ -27,7 +27,7 @@ export default async function BlogHub() {
         {allPosts.length > 0 ? (
           allPosts.map((post: any) => (
             <Link key={post._id} href={`/blog/${post.slug.current}`} className="group block">
-              <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all h-full flex flex-col">
+              <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-[#e5e5e5] hover:shadow-lg transition-all h-full flex flex-col">
                 <div className="p-6 flex-1 flex flex-col">
                   {post.category && (
                     <span className="text-xs font-semibold uppercase tracking-wider text-blue-600 mb-2">
