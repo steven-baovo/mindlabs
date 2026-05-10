@@ -91,7 +91,7 @@ export default function FocusBoard({ initialBlocks }: Props) {
   }, [customDurations])
 
   // ─── Resolve Pushing (Domino Effect) ────────────────────────────────
-  const resolvePushing = useCallback(async (allBlocks: FocusBlock[], dayIndex: number) => {
+  const resolvePushing = useCallback((allBlocks: FocusBlock[], dayIndex: number) => {
     // Sort blocks by visual position
     const dayBlocks = [...allBlocks.filter(b => b.day_of_week === dayIndex)]
       .sort((a, b) => getVisualMinutes(a.start_minutes) - getVisualMinutes(b.start_minutes))
@@ -123,12 +123,12 @@ export default function FocusBoard({ initialBlocks }: Props) {
       }))
       // Batch update to DB
       const updates = updatedDayBlocks.map(b => ({ id: b.id, start_minutes: b.start_minutes }))
-      await updateBlocks(updates)
+      updateBlocks(updates).catch(console.error)
     }
   }, [viewStartHour])
 
   // ─── Column Drop ─────────────────────────────────────────────────────
-  const handleColumnDrop = useCallback(async (dayIndex: number, e: React.DragEvent) => {
+  const handleColumnDrop = useCallback((dayIndex: number, e: React.DragEvent) => {
     e.preventDefault()
     setDragPreview(null)
     if (!dragging) return
@@ -145,23 +145,37 @@ export default function FocusBoard({ initialBlocks }: Props) {
 
     let newBlocks = [...blocks]
     if (dragging.block.id.startsWith('phantom-')) {
-      const result = await saveBlock({
+      const tempId = `temp-${Date.now()}`
+      const optimisticBlock: FocusBlock = {
+        ...dragging.block,
+        id: tempId,
+        day_of_week: dayIndex,
+        start_minutes: start,
+      }
+      
+      newBlocks = [...blocks, optimisticBlock]
+      setBlocks(newBlocks)
+      resolvePushing(newBlocks, dayIndex)
+
+      saveBlock({
         day_of_week: dayIndex,
         start_minutes: start,
         duration_minutes: dragging.block.duration_minutes,
         block_type: dragging.block.block_type,
-      })
-      if (result.data) {
-        newBlocks = [...blocks, result.data]
-        setBlocks(newBlocks)
-        resolvePushing(newBlocks, dayIndex)
-      }
+      }).then(result => {
+        if (result.data) {
+          setBlocks(prev => prev.map(b => b.id === tempId ? result.data! : b))
+        } else {
+          setBlocks(prev => prev.filter(b => b.id !== tempId))
+        }
+      }).catch(console.error)
     } else {
       const updated = { ...dragging.block, day_of_week: dayIndex, start_minutes: start }
       newBlocks = blocks.map(b => b.id === updated.id ? updated : b)
       setBlocks(newBlocks)
-      await updateBlock(dragging.block.id, { day_of_week: dayIndex, start_minutes: start })
       resolvePushing(newBlocks, dayIndex)
+      
+      updateBlock(dragging.block.id, { day_of_week: dayIndex, start_minutes: start }).catch(console.error)
     }
     setDragging(null)
   }, [dragging, blocks, resolvePushing, viewStartHour])
@@ -172,35 +186,36 @@ export default function FocusBoard({ initialBlocks }: Props) {
   }, [])
 
   // ─── Delete Block ─────────────────────────────────────────────────────
-  const handleDelete = useCallback(async (id: string) => {
+  const handleDelete = useCallback((id: string) => {
     setBlocks(prev => prev.filter(b => b.id !== id))
-    await deleteBlock(id)
+    deleteBlock(id).catch(console.error)
   }, [])
 
   // ─── Update Label ─────────────────────────────────────────────────────
-  const handleLabelUpdate = useCallback(async (id: string, label: string) => {
+  const handleLabelUpdate = useCallback((id: string, label: string) => {
     setBlocks(prev => prev.map(b => b.id === id ? { ...b, custom_label: label } : b))
-    await updateBlock(id, { custom_label: label })
+    updateBlock(id, { custom_label: label }).catch(console.error)
   }, [])
 
   // ─── Update Time (Manual or Resize) ──────────────────────────────────
-  const handleTimeUpdate = useCallback(async (id: string, start: number, duration: number) => {
+  const handleTimeUpdate = useCallback((id: string, start: number, duration: number) => {
     const updatedBlocks = blocks.map(b => b.id === id ? { ...b, start_minutes: start, duration_minutes: duration } : b)
     setBlocks(updatedBlocks)
-    await updateBlock(id, { start_minutes: start, duration_minutes: duration })
     
     // Trigger pushing
     const target = updatedBlocks.find(b => b.id === id)
     if (target) {
       resolvePushing(updatedBlocks, target.day_of_week)
     }
+
+    updateBlock(id, { start_minutes: start, duration_minutes: duration }).catch(console.error)
   }, [blocks, resolvePushing])
 
 
   // ─── Duplicate Day ────────────────────────────────────────────────────
-  const handleDuplicate = useCallback(async (fromDay: number, toDay: number) => {
+  const handleDuplicate = useCallback((fromDay: number, toDay: number) => {
     const sourceBlocks = blocks.filter(b => b.day_of_week === fromDay)
-    await duplicateDay(fromDay, toDay)
+    duplicateDay(fromDay, toDay).catch(console.error)
     setBlocks(prev => {
       const withoutTarget = prev.filter(b => b.day_of_week !== toDay)
       const cloned = sourceBlocks.map(b => ({

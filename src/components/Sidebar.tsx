@@ -12,7 +12,8 @@ import {
   Bookmark,
   User,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Network
 } from 'lucide-react'
 
 const MENU_ITEMS = [
@@ -35,6 +36,11 @@ const MENU_ITEMS = [
     title: 'Explore', 
     icon: Compass, 
     href: '/blog',
+  },
+  { 
+    title: 'Canvas', 
+    icon: Network, 
+    href: '/mindmap',
   },
   { 
     title: 'Library', 
