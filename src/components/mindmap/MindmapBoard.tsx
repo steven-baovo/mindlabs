@@ -16,7 +16,8 @@ import {
   Panel,
   useReactFlow,
   MarkerType,
-  ConnectionMode
+  ConnectionMode,
+  SelectionMode
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import TextNode from './TextNode'
@@ -72,7 +73,7 @@ export default function MindmapBoard({
         ...params, 
         type: 'default',
         style: { stroke: '#94A3B8', strokeWidth: 1 },
-      }, eds))
+      } as Edge, eds))
       hasChangesRef.current = true
     },
     [setEdges]
@@ -205,7 +206,7 @@ export default function MindmapBoard({
           panOnDrag={isPanMode}
           selectionOnDrag={!isPanMode}
           panActivationKeyCode="Space"
-          selectionMode="partial"
+          selectionMode={SelectionMode.Partial}
           fitView
           className="bg-white"
           minZoom={0.2}

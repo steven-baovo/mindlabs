@@ -32,8 +32,8 @@ export default function TextNode({ id, data, selected }: { id: string; data: any
 
       <Handle type="target" position={Position.Top} className="w-2 h-2 !bg-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />
       <Handle type="source" position={Position.Bottom} className="w-2 h-2 !bg-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <Handle type="target" position={Position.Left} id="left-target" className="w-2 h-2 !bg-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <Handle type="source" position={Position.Right} id="right-source" className="w-2 h-2 !bg-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <Handle type="target" position={Position.Left} id="left" className="w-2 h-2 !bg-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <Handle type="source" position={Position.Right} id="right" className="w-2 h-2 !bg-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />
 
       <textarea
         ref={textareaRef}
