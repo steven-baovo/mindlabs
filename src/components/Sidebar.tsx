@@ -9,7 +9,8 @@ import {
   Bookmark,
   ChevronLeft,
   ChevronRight,
-  Network
+  Network,
+  FileText
 } from 'lucide-react'
 
 const MENU_ITEMS = [
@@ -27,6 +28,11 @@ const MENU_ITEMS = [
     title: 'Canvas', 
     icon: Network, 
     href: '/mindmap',
+  },
+  { 
+    title: 'Mindnote', 
+    icon: FileText, 
+    href: '/mindnote',
   },
   { 
     title: 'Library', 
