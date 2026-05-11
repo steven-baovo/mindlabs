@@ -1,4 +1,5 @@
 'use client'
+import { useState, useEffect } from 'react'
 
 import { useEditor, EditorContent } from '@tiptap/react'
 import { BubbleMenu } from '@tiptap/react/menus'
@@ -32,6 +33,8 @@ interface ZenEditorProps {
 }
 
 const ZenEditor = ({ initialContent, onChange, placeholder = 'Bắt đầu viết...' }: ZenEditorProps) => {
+  const [menuPos, setMenuPos] = useState<{ x: number; y: number } | null>(null)
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -63,8 +66,26 @@ const ZenEditor = ({ initialContent, onChange, placeholder = 'Bắt đầu viế
       attributes: {
         class: 'prose prose-lg max-w-none focus:outline-none min-h-[500px] pt-12 pb-[70vh]',
       },
+      handleDOMEvents: {
+        contextmenu: (view, event) => {
+          event.preventDefault()
+          setMenuPos({ x: event.clientX, y: event.clientY })
+          return true
+        },
+        mousedown: () => {
+          if (menuPos) setMenuPos(null)
+          return false
+        }
+      }
     },
   })
+
+  // Close menu on escape or click outside
+  useEffect(() => {
+    const handleScroll = () => setMenuPos(null)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   if (!editor) {
     return null
@@ -80,84 +101,108 @@ const ZenEditor = ({ initialContent, onChange, placeholder = 'Bắt đầu viế
 
   return (
     <div className="relative w-full">
-      {/* Bubble Menu for Text Selection */}
-      <BubbleMenu 
-        editor={editor} 
-        options={{ offset: 10, placement: 'top' }}
-        className="flex items-center gap-1 bg-white/90 backdrop-blur-md border border-border-medium p-1.5 rounded-xl shadow-2xl animate-in fade-in zoom-in duration-200"
-      >
-        {/* Headings */}
-        <div className="flex items-center gap-0.5 mr-1 pr-1 border-r border-border-medium">
-          {[1, 2, 3, 4, 5].map((level) => (
+      {/* Custom Context Menu */}
+      {menuPos && (
+        <div 
+          className="fixed z-[100] flex items-center gap-1 bg-white/95 backdrop-blur-md border border-border-medium p-1.5 rounded-xl shadow-2xl animate-in fade-in zoom-in duration-200"
+          style={{ 
+            top: menuPos.y - 50, // Slightly above the cursor
+            left: Math.min(menuPos.x, typeof window !== 'undefined' ? window.innerWidth - 450 : menuPos.x) 
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Headings */}
+          <div className="flex items-center gap-0.5 mr-1 pr-1 border-r border-border-medium">
+            {[1, 2, 3, 4, 5].map((level) => (
+              <button
+                key={level}
+                onClick={() => {
+                  editor.chain().focus().toggleHeading({ level: level as any }).run()
+                  setMenuPos(null)
+                }}
+                className={`w-8 h-8 flex items-center justify-center rounded text-[10px] font-bold transition-colors ${editor.isActive('heading', { level }) ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-secondary'}`}
+              >
+                H{level}
+              </button>
+            ))}
+          </div>
+
+          {/* Basic Formatting */}
+          <div className="flex items-center gap-0.5 mr-1 pr-1 border-r border-border-medium">
             <button
-              key={level}
-              onClick={() => editor.chain().focus().toggleHeading({ level: level as any }).run()}
-              className={`w-8 h-8 flex items-center justify-center rounded text-[10px] font-bold transition-colors ${editor.isActive('heading', { level }) ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-secondary'}`}
+              onClick={() => {
+                editor.chain().focus().toggleBold().run()
+                setMenuPos(null)
+              }}
+              className={`p-1.5 rounded transition-colors ${editor.isActive('bold') ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-secondary'}`}
             >
-              H{level}
+              <Bold className="w-4 h-4" />
             </button>
-          ))}
-        </div>
-
-        {/* Basic Formatting */}
-        <div className="flex items-center gap-0.5 mr-1 pr-1 border-r border-border-medium">
-          <button
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            className={`p-1.5 rounded transition-colors ${editor.isActive('bold') ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-secondary'}`}
-          >
-            <Bold className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={`p-1.5 rounded transition-colors ${editor.isActive('italic') ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-secondary'}`}
-          >
-            <Italic className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
-            className={`p-1.5 rounded transition-colors ${editor.isActive('underline') ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-secondary'}`}
-          >
-            <UnderlineIcon className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Font Size Control */}
-        <div className="flex items-center gap-0.5 mr-1 pr-1 border-r border-border-medium">
-          <button
-            onClick={() => {
-              const currentSize = (editor.getAttributes('textStyle').fontSize as string) || '16px'
-              const newSize = parseInt(currentSize) + 2 + 'px'
-              editor.chain().focus().setFontSize(newSize).run()
-            }}
-            className="p-1.5 rounded hover:bg-gray-100 text-secondary"
-          >
-            <Plus className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => {
-              const currentSize = (editor.getAttributes('textStyle').fontSize as string) || '16px'
-              const newSize = Math.max(8, parseInt(currentSize) - 2) + 'px'
-              editor.chain().focus().setFontSize(newSize).run()
-            }}
-            className="p-1.5 rounded hover:bg-gray-100 text-secondary"
-          >
-            <Minus className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Color Picker (Simplified) */}
-        <div className="flex items-center gap-1 ml-1">
-          {COLORS.map((c) => (
             <button
-              key={c.color}
-              onClick={() => c.color === 'inherit' ? editor.chain().focus().unsetColor().run() : editor.chain().focus().setColor(c.color).run()}
-              className="w-4 h-4 rounded-full border border-border-medium transition-transform hover:scale-125"
-              style={{ backgroundColor: c.color === 'inherit' ? '#eee' : c.color }}
-              title={c.name}
-            />
-          ))}
+              onClick={() => {
+                editor.chain().focus().toggleItalic().run()
+                setMenuPos(null)
+              }}
+              className={`p-1.5 rounded transition-colors ${editor.isActive('italic') ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-secondary'}`}
+            >
+              <Italic className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => {
+                editor.chain().focus().toggleUnderline().run()
+                setMenuPos(null)
+              }}
+              className={`p-1.5 rounded transition-colors ${editor.isActive('underline') ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-secondary'}`}
+            >
+              <UnderlineIcon className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Font Size Control */}
+          <div className="flex items-center gap-0.5 mr-1 pr-1 border-r border-border-medium">
+            <button
+              onClick={() => {
+                const currentSize = (editor.getAttributes('textStyle').fontSize as string) || '16px'
+                const newSize = parseInt(currentSize) + 2 + 'px'
+                editor.chain().focus().setFontSize(newSize).run()
+              }}
+              className="p-1.5 rounded hover:bg-gray-100 text-secondary"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => {
+                const currentSize = (editor.getAttributes('textStyle').fontSize as string) || '16px'
+                const newSize = Math.max(8, parseInt(currentSize) - 2) + 'px'
+                editor.chain().focus().setFontSize(newSize).run()
+              }}
+              className="p-1.5 rounded hover:bg-gray-100 text-secondary"
+            >
+              <Minus className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Color Picker (Simplified) */}
+          <div className="flex items-center gap-1 ml-1">
+            {COLORS.map((c) => (
+              <button
+                key={c.color}
+                onClick={() => {
+                  if (c.color === 'inherit') {
+                    editor.chain().focus().unsetColor().run()
+                  } else {
+                    editor.chain().focus().setColor(c.color).run()
+                  }
+                  setMenuPos(null)
+                }}
+                className="w-4 h-4 rounded-full border border-border-medium transition-transform hover:scale-125"
+                style={{ backgroundColor: c.color === 'inherit' ? '#eee' : c.color }}
+                title={c.name}
+              />
+            ))}
+          </div>
         </div>
-      </BubbleMenu>
+      )}
 
       {/* Main Editor Area */}
       <EditorContent editor={editor} />
