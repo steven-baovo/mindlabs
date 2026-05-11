@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import ZenEditor from './ZenEditor'
-import NoteHeader from './NoteHeader'
+import NoteSidebar from './NoteSidebar'
 import { updateNote } from '@/app/(frontend)/mindnote/actions'
-import { useDebounce } from '@/hooks/use-debounce' // I should create this hook if it doesn't exist
 
 interface NoteEditorClientProps {
   note: any
@@ -37,18 +36,25 @@ const NoteEditorClient = ({ note }: NoteEditorClientProps) => {
   }, [title, content, note.title, note.content, handleSave])
 
   return (
-    <div className="min-h-screen bg-white">
-      <NoteHeader 
-        title={title} 
-        onTitleChange={setTitle} 
-        isSaving={isSaving} 
-      />
-      <main className="max-w-4xl mx-auto px-6">
-        <ZenEditor 
-          initialContent={content} 
-          onChange={setContent} 
-        />
-      </main>
+    <div className="bg-white">
+      <div className="flex w-full items-start">
+        <main className="flex-1 px-6 pt-12 pb-32">
+          <div className="max-w-4xl mx-auto">
+            <ZenEditor 
+              initialContent={content} 
+              onChange={setContent} 
+            />
+          </div>
+        </main>
+        
+        <div className="sticky top-0 h-[calc(100vh-56px)] shrink-0 border-l border-border-medium/20">
+          <NoteSidebar 
+            activeTitle={title} 
+            onTitleChange={setTitle} 
+            isSaving={isSaving} 
+          />
+        </div>
+      </div>
     </div>
   )
 }
