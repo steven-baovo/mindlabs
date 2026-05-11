@@ -61,7 +61,7 @@ const ZenEditor = ({ initialContent, onChange, placeholder = 'Bắt đầu viế
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-lg max-w-none focus:outline-none min-h-[500px] py-12',
+        class: 'prose prose-lg max-w-none focus:outline-none min-h-[500px] pt-12 pb-[50vh]',
       },
     },
   })
