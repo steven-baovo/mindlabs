@@ -12,13 +12,18 @@ import {
   Italic, 
   Underline as UnderlineIcon, 
   List, 
-  ListOrdered, 
   Heading1, 
   Heading2, 
-  Quote,
-  Link as LinkIcon,
+  Heading3, 
+  Type,
+  Palette,
+  Plus,
+  Minus,
   Image as ImageIcon
 } from 'lucide-react'
+import { TextStyle } from '@tiptap/extension-text-style'
+import { Color } from '@tiptap/extension-color'
+import { FontSize } from '@/lib/tiptap-extensions'
 
 interface ZenEditorProps {
   initialContent?: any
@@ -31,9 +36,8 @@ const ZenEditor = ({ initialContent, onChange, placeholder = 'Bắt đầu viế
     extensions: [
       StarterKit.configure({
         heading: {
-          levels: [1, 2, 3],
+          levels: [1, 2, 3, 4, 5],
         },
-        // In v3, some extensions might be included that weren't in v2
       }),
       Placeholder.configure({
         placeholder: placeholder,
@@ -46,6 +50,9 @@ const ZenEditor = ({ initialContent, onChange, placeholder = 'Bắt đầu viế
         },
       }),
       Underline,
+      TextStyle,
+      Color,
+      FontSize,
     ],
     content: (initialContent && Object.keys(initialContent).length > 0) ? initialContent : undefined,
     immediatelyRender: false,
@@ -63,45 +70,93 @@ const ZenEditor = ({ initialContent, onChange, placeholder = 'Bắt đầu viế
     return null
   }
 
+  const COLORS = [
+    { name: 'Default', color: 'inherit' },
+    { name: 'Primary', color: '#00A693' },
+    { name: 'Red', color: '#ef4444' },
+    { name: 'Blue', color: '#3b82f6' },
+    { name: 'Gray', color: '#6b6b6b' },
+  ]
+
   return (
     <div className="relative w-full">
       {/* Bubble Menu for Text Selection */}
       <BubbleMenu 
         editor={editor} 
         options={{ offset: 10, placement: 'top' }}
-        className="flex items-center gap-1 bg-white/80 backdrop-blur-md border border-border-medium p-1 rounded-lg shadow-xl"
+        className="flex items-center gap-1 bg-white/90 backdrop-blur-md border border-border-medium p-1.5 rounded-xl shadow-2xl animate-in fade-in zoom-in duration-200"
       >
-        <button
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`p-1.5 rounded transition-colors ${editor.isActive('bold') ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-secondary'}`}
-        >
-          <Bold className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`p-1.5 rounded transition-colors ${editor.isActive('italic') ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-secondary'}`}
-        >
-          <Italic className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleUnderline().run()}
-          className={`p-1.5 rounded transition-colors ${editor.isActive('underline') ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-secondary'}`}
-        >
-          <UnderlineIcon className="w-4 h-4" />
-        </button>
-        <div className="w-px h-4 bg-border-medium mx-1" />
-        <button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          className={`p-1.5 rounded transition-colors ${editor.isActive('heading', { level: 1 }) ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-secondary'}`}
-        >
-          <Heading1 className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`p-1.5 rounded transition-colors ${editor.isActive('bulletList') ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-secondary'}`}
-        >
-          <List className="w-4 h-4" />
-        </button>
+        {/* Headings */}
+        <div className="flex items-center gap-0.5 mr-1 pr-1 border-r border-border-medium">
+          {[1, 2, 3, 4, 5].map((level) => (
+            <button
+              key={level}
+              onClick={() => editor.chain().focus().toggleHeading({ level: level as any }).run()}
+              className={`w-8 h-8 flex items-center justify-center rounded text-[10px] font-bold transition-colors ${editor.isActive('heading', { level }) ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-secondary'}`}
+            >
+              H{level}
+            </button>
+          ))}
+        </div>
+
+        {/* Basic Formatting */}
+        <div className="flex items-center gap-0.5 mr-1 pr-1 border-r border-border-medium">
+          <button
+            onClick={() => editor.chain().focus().toggleBold().run()}
+            className={`p-1.5 rounded transition-colors ${editor.isActive('bold') ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-secondary'}`}
+          >
+            <Bold className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleItalic().run()}
+            className={`p-1.5 rounded transition-colors ${editor.isActive('italic') ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-secondary'}`}
+          >
+            <Italic className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleUnderline().run()}
+            className={`p-1.5 rounded transition-colors ${editor.isActive('underline') ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-secondary'}`}
+          >
+            <UnderlineIcon className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Font Size Control */}
+        <div className="flex items-center gap-0.5 mr-1 pr-1 border-r border-border-medium">
+          <button
+            onClick={() => {
+              const currentSize = (editor.getAttributes('textStyle').fontSize as string) || '16px'
+              const newSize = parseInt(currentSize) + 2 + 'px'
+              editor.chain().focus().setFontSize(newSize).run()
+            }}
+            className="p-1.5 rounded hover:bg-gray-100 text-secondary"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => {
+              const currentSize = (editor.getAttributes('textStyle').fontSize as string) || '16px'
+              const newSize = Math.max(8, parseInt(currentSize) - 2) + 'px'
+              editor.chain().focus().setFontSize(newSize).run()
+            }}
+            className="p-1.5 rounded hover:bg-gray-100 text-secondary"
+          >
+            <Minus className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Color Picker (Simplified) */}
+        <div className="flex items-center gap-1 ml-1">
+          {COLORS.map((c) => (
+            <button
+              key={c.color}
+              onClick={() => c.color === 'inherit' ? editor.chain().focus().unsetColor().run() : editor.chain().focus().setColor(c.color).run()}
+              className="w-4 h-4 rounded-full border border-border-medium transition-transform hover:scale-125"
+              style={{ backgroundColor: c.color === 'inherit' ? '#eee' : c.color }}
+              title={c.name}
+            />
+          ))}
+        </div>
       </BubbleMenu>
 
       {/* Main Editor Area */}

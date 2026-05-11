@@ -50,11 +50,11 @@ export async function loadNote(id: string) {
   return { data, error: error?.message }
 }
 
-export async function createNote() {
+export async function createNote(formData?: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) return { error: 'Unauthorized' }
+  if (!user) throw new Error('Unauthorized')
 
   const { data, error } = await supabase
     .from('mind_notes')
@@ -62,7 +62,7 @@ export async function createNote() {
     .select()
     .single()
 
-  if (error) return { error: error.message }
+  if (error) throw new Error(error.message)
 
   revalidatePath('/mindnote')
   redirect(`/mindnote/${data.id}`)
@@ -81,7 +81,7 @@ export async function updateNote(id: string, updates: any) {
   return { success: true }
 }
 
-export async function deleteNote(id: string) {
+export async function deleteNote(id: string, formData?: FormData) {
   const supabase = await createClient()
   
   const { error } = await supabase
@@ -89,7 +89,7 @@ export async function deleteNote(id: string) {
     .delete()
     .eq('id', id)
 
-  if (error) return { error: error.message }
+  if (error) throw new Error(error.message)
   
   revalidatePath('/mindnote')
   redirect('/mindnote')
