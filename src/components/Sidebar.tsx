@@ -10,7 +10,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Network,
-  FileText
+  FileText,
+  Sparkles
 } from 'lucide-react'
 
 const MENU_ITEMS = [
@@ -33,6 +34,11 @@ const MENU_ITEMS = [
     title: 'Mindnote', 
     icon: FileText, 
     href: '/mindnote',
+  },
+  { 
+    title: 'mindAI', 
+    icon: Sparkles, 
+    href: '/mindai',
   },
   { 
     title: 'Library', 
