@@ -1,8 +1,16 @@
 'use client'
 
 import { X, Copy, Download, Share2, FileText } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
+import dynamic from 'next/dynamic'
 import remarkGfm from 'remark-gfm'
+
+const ReactMarkdown = dynamic(() => import('react-markdown'), {
+  loading: () => <div className="animate-pulse space-y-4">
+    <div className="h-4 bg-gray-100 rounded w-3/4"></div>
+    <div className="h-4 bg-gray-100 rounded w-1/2"></div>
+    <div className="h-4 bg-gray-100 rounded w-5/6"></div>
+  </div>
+})
 
 interface ArtifactPanelProps {
   content: string | null

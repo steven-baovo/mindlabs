@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { User as UserIcon, LogOut, Settings } from 'lucide-react'
 import { logout } from '@/app/auth/actions'
 
@@ -36,7 +37,13 @@ export default function UserMenu({ user, profile }: UserMenuProps) {
         className="w-8 h-8 bg-gray-100 border border-gray-200 text-[#242424] rounded-full flex items-center justify-center text-xs font-bold uppercase overflow-hidden hover:ring-2 hover:ring-[#242424] transition-all focus:outline-none cursor-pointer"
       >
         {profile?.avatar_url ? (
-          <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+          <Image 
+            src={profile.avatar_url} 
+            alt="Avatar" 
+            width={32} 
+            height={32} 
+            className="w-full h-full object-cover" 
+          />
         ) : (
           profile?.display_name?.[0] || user.email?.[0] || '?'
         )}
