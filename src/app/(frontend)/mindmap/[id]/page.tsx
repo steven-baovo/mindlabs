@@ -21,7 +21,7 @@ export default async function MindmapWorkspacePage({ params }: { params: Promise
   const initialEdges = Array.isArray(mindmap.edges) ? mindmap.edges : []
 
   return (
-    <MindmapWorkspaceClient initialTitle={mindmap.title} mindmapId={mindmap.id}>
+    <MindmapWorkspaceClient>
       {/* Hide global footer on this page */}
       <style dangerouslySetInnerHTML={{ __html: `
         footer { display: none !important; }
