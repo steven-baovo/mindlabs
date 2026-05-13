@@ -1,58 +1,56 @@
-import { createNote } from './actions'
-import { createMindmap } from '../mindmap/actions'
-import { redirect } from 'next/navigation'
 import { FileText, Network } from 'lucide-react'
-
-export const metadata = {
-  title: 'Workspace | Mindlabs',
-}
-
-async function handleCreateNote() {
-  'use server'
-  await createNote()
-}
-
-async function handleCreateMap() {
-  'use server'
-  const { data } = await createMindmap()
-  if (data) redirect(`/mindmap/${data.id}`)
-}
+import { createNote } from '@/app/(frontend)/mindnote/actions'
+import { createMindmap } from '@/app/(frontend)/mindmap/actions'
 
 export default function WorkspaceDashboardPage() {
+  const handleCreateNoteAction = async () => {
+    'use server'
+    await createNote()
+  }
+
+  const handleCreateMapAction = async () => {
+    'use server'
+    await createMindmap()
+  }
+
   return (
-    <main className="flex-1 flex flex-col items-center justify-center gap-8 bg-white px-6 h-full min-h-[calc(100vh-56px)]">
-      <div className="text-center mb-2">
-        <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Workspace</h1>
-        <p className="text-gray-400 text-sm mt-1 font-light">Bắt đầu một ý tưởng mới hoặc tiếp tục công việc của bạn</p>
+    <main className="flex-1 flex flex-col items-center justify-center bg-white px-6 h-full min-h-[calc(100vh-56px)]">
+      <div className="text-center max-w-2xl mb-16">
+        <h1 className="text-4xl font-black text-foreground tracking-tight mb-4">
+          Personal Workspace
+        </h1>
+        <p className="text-secondary text-sm font-medium opacity-70">
+          Select a tool to begin your creative session.
+        </p>
       </div>
 
-      <div className="flex gap-4">
-        <form action={handleCreateNote}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
+        <form action={handleCreateNoteAction} className="h-full">
           <button
             type="submit"
-            className="group flex flex-col items-center gap-3 px-10 py-8 bg-white border border-[#e5e5e5] rounded-2xl hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 cursor-pointer"
+            className="w-full group flex items-center gap-6 p-6 bg-white border border-border-main rounded-card hover:border-primary/40 hover:bg-background/50 transition-all duration-300 cursor-pointer text-left"
           >
-            <div className="w-12 h-12 rounded-xl bg-gray-50 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
-              <FileText className="w-6 h-6 text-gray-400 group-hover:text-primary transition-colors" />
+            <div className="w-12 h-12 rounded-main bg-background border border-border-main flex items-center justify-center group-hover:bg-white transition-colors">
+              <FileText className="w-5 h-5 text-secondary group-hover:text-primary transition-colors" />
             </div>
-            <div className="text-center">
-              <p className="text-sm font-semibold text-gray-700">Ghi chú mới</p>
-              <p className="text-xs text-gray-400 mt-0.5">Bắt đầu viết ngay</p>
+            <div>
+              <p className="text-lg font-bold text-foreground">New Note</p>
+              <p className="text-xs text-secondary mt-0.5">Start a simple text document.</p>
             </div>
           </button>
         </form>
 
-        <form action={handleCreateMap}>
+        <form action={handleCreateMapAction} className="h-full">
           <button
             type="submit"
-            className="group flex flex-col items-center gap-3 px-10 py-8 bg-white border border-[#e5e5e5] rounded-2xl hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 cursor-pointer"
+            className="w-full group flex items-center gap-6 p-6 bg-white border border-border-main rounded-card hover:border-primary/30 hover:bg-background transition-all duration-300 cursor-pointer text-left"
           >
-            <div className="w-12 h-12 rounded-xl bg-gray-50 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
-              <Network className="w-6 h-6 text-gray-400 group-hover:text-primary transition-colors" />
+            <div className="w-12 h-12 rounded-main bg-background border border-border-main flex items-center justify-center group-hover:bg-white transition-colors">
+              <Network className="w-5 h-5 text-secondary group-hover:text-primary transition-colors" />
             </div>
-            <div className="text-center">
-              <p className="text-sm font-semibold text-gray-700">Canvas mới</p>
-              <p className="text-xs text-gray-400 mt-0.5">Vẽ sơ đồ tư duy</p>
+            <div>
+              <p className="text-lg font-bold text-foreground">New Canvas</p>
+              <p className="text-xs text-secondary mt-0.5">Create a visual mindmap.</p>
             </div>
           </button>
         </form>
@@ -60,4 +58,3 @@ export default function WorkspaceDashboardPage() {
     </main>
   )
 }
-

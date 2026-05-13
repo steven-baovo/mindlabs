@@ -1,18 +1,15 @@
 'use client'
 
-import { useState, useEffect, useTransition } from 'react'
+import { useState, useEffect } from 'react'
 import {
   FileText,
   Network,
   Plus,
-  Loader2,
-  Cloud,
-  CloudCheck,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useParams, usePathname } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { loadAllResources, Resource } from '@/app/(frontend)/workspace/actions'
 import { createNote } from '@/app/(frontend)/mindnote/actions'
 import { createMindmap } from '@/app/(frontend)/mindmap/actions'
@@ -30,14 +27,10 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
   const [resources, setResources] = useState<Resource[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const [isPendingNote, startNoteTransition] = useTransition()
-  const [isPendingMap, startMapTransition] = useTransition()
-  const params = useParams()
-  const pathname = usePathname()
-  const router = useRouter()
-
   const [editingId, setEditingId] = useState<string | null>(null)
   const [tempTitle, setTempTitle] = useState('')
+  const params = useParams()
+  const router = useRouter()
 
   const currentId = params?.id as string | undefined
 
@@ -56,7 +49,6 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
 
   useEffect(() => {
     const fetchResources = async () => {
-      if (resources.length === 0) setIsLoading(true)
       const { data } = await loadAllResources()
       setResources(data)
       setIsLoading(false)
@@ -74,17 +66,13 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
 
   const isActive = (resource: Resource) => currentId === resource.id
 
-  const handleCreateNote = () => {
-    startNoteTransition(async () => {
-      await createNote()
-    })
+  const handleCreateNote = async () => {
+    await createNote()
   }
 
-  const handleCreateMap = () => {
-    startMapTransition(async () => {
-      const { data } = await createMindmap()
-      if (data) router.push(`/mindmap/${data.id}`)
-    })
+  const handleCreateMap = async () => {
+    const { data } = await createMindmap()
+    if (data) router.push(`/mindmap/${data.id}`)
   }
 
   const handleStartEditing = (resource: Resource) => {
@@ -95,7 +83,6 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
   const handleFinishEditing = async (resource: Resource) => {
     if (!editingId) return
     const newTitle = tempTitle.trim() || 'Untitled'
-    
     if (resource.id === currentId) {
       onTitleChange?.(newTitle)
     } else {
@@ -107,115 +94,82 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
   return (
     <aside
       className={`
-        sticky top-0 h-[calc(100vh-56px)] shrink-0 border-l border-[#e5e5e5]
-        bg-white flex flex-col transition-all duration-300 ease-in-out
-        ${isCollapsed ? 'w-20' : 'w-72'}
+        sticky top-0 h-[calc(100vh-56px)] shrink-0 border-l border-border-main
+        bg-white flex flex-col transition-all duration-300
+        ${isCollapsed ? 'w-16' : 'w-64'}
       `}
     >
-      {isCollapsed ? (
-        <div className="flex flex-col items-center gap-3 pt-4">
-          <button
-            onClick={handleCreateNote}
-            disabled={isPendingNote}
-            className="p-2 text-gray-400 hover:text-[#242424] hover:bg-gray-50 rounded-md transition-colors"
-          >
-            {isPendingNote ? <Loader2 className="w-5 h-5 animate-spin" /> : <FileText className="w-5 h-5" />}
-          </button>
-          <button
-            onClick={handleCreateMap}
-            disabled={isPendingMap}
-            className="p-2 text-gray-400 hover:text-[#242424] hover:bg-gray-50 rounded-md transition-colors"
-          >
-            {isPendingMap ? <Loader2 className="w-5 h-5 animate-spin" /> : <Network className="w-5 h-5" />}
-          </button>
+      {!isCollapsed && (
+        <div className="px-5 py-4 flex justify-between items-center border-b border-border-main">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-secondary">Resources</span>
+          {isSaving && <span className="text-[10px] text-primary animate-pulse font-medium">Saving...</span>}
         </div>
-      ) : (
-        <>
-          <div className="px-6 py-4 border-b border-[#e5e5e5] flex gap-3">
-            <button
-              onClick={handleCreateNote}
-              disabled={isPendingNote}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-gray-50 text-[#242424] hover:bg-[#242424] hover:text-white rounded-lg text-xs font-bold transition-all border border-[#e5e5e5]"
-            >
-              {isPendingNote ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-              NOTE
-            </button>
-            <button
-              onClick={handleCreateMap}
-              disabled={isPendingMap}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-gray-50 text-[#242424] hover:bg-[#242424] hover:text-white rounded-lg text-xs font-bold transition-all border border-[#e5e5e5]"
-            >
-              {isPendingMap ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-              CANVAS
-            </button>
-          </div>
-
-          <div className="flex-1 overflow-y-auto py-2 no-scrollbar">
-            {isLoading ? (
-              <div className="flex flex-col gap-1.5 px-3 pt-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-10 bg-gray-200/50 animate-pulse rounded-lg" />
-                ))}
-              </div>
-            ) : resources.length === 0 ? (
-              <div className="text-center py-12 text-gray-400 text-xs px-4">
-                Chưa có ghi chú hay canvas nào
-              </div>
-            ) : (
-              resources.map((resource) => {
-                const href = resource.type === 'note' ? `/mindnote/${resource.id}` : `/mindmap/${resource.id}`
-                const active = isActive(resource)
-                const Icon = resource.type === 'note' ? FileText : Network
-                const isEditing = editingId === resource.id
-
-                return (
-                  <div
-                    key={`${resource.type}-${resource.id}`}
-                    onDoubleClick={() => handleStartEditing(resource)}
-                    className={`flex items-center gap-4 px-6 py-4 transition-colors group relative cursor-pointer ${
-                      active ? 'bg-gray-50/50 text-[#242424]' : 'text-gray-400 hover:text-[#242424] hover:bg-gray-50/30'
-                    }`}
-                  >
-                    <Link href={href} className="absolute inset-0 z-0" />
-                    <Icon strokeWidth={1.5} className={`w-5 h-5 shrink-0 z-10 ${active ? 'text-[#242424]' : 'text-gray-400 group-hover:text-[#242424]'}`} />
-                    {isEditing ? (
-                      <input
-                        autoFocus
-                        value={tempTitle}
-                        onChange={(e) => setTempTitle(e.target.value)}
-                        onBlur={() => handleFinishEditing(resource)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleFinishEditing(resource)}
-                        className="text-sm font-bold bg-white border border-primary/20 rounded px-1 -ml-1 flex-1 z-20 outline-none ring-2 ring-primary/10"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    ) : (
-                      <span className={`text-sm font-medium line-clamp-1 flex-1 z-10 transition-all ${active ? 'font-bold' : ''}`}>
-                        {resource.title}
-                      </span>
-                    )}
-                    {active && (
-                      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[#242424] rounded-l-full z-10 shadow-[0_0_8px_rgba(0,0,0,0.1)]" />
-                    )}
-                  </div>
-                )
-              })
-            )}
-          </div>
-        </>
       )}
 
-      <div className="p-4 border-t border-[#e5e5e5] mt-auto">
+      <div className="flex-1 overflow-y-auto no-scrollbar py-4 px-2.5 flex flex-col gap-1">
+        {!isCollapsed && (
+          <div className="flex gap-2 mb-4 px-1">
+            <button onClick={handleCreateNote} className="flex-1 flex items-center justify-center gap-1.5 py-1.5 bg-white border border-border-main rounded-main text-[11px] font-bold hover:border-foreground transition-all shadow-sm">
+              <Plus strokeWidth={2} className="w-3.5 h-3.5" /> Note
+            </button>
+            <button onClick={handleCreateMap} className="flex-1 flex items-center justify-center gap-1.5 py-1.5 bg-white border border-border-main rounded-main text-[11px] font-bold hover:border-foreground transition-all shadow-sm">
+              <Plus strokeWidth={2} className="w-3.5 h-3.5" /> Map
+            </button>
+          </div>
+        )}
+
+        {isLoading ? (
+          <div className="px-2 space-y-2">
+            {[1, 2, 3].map(i => <div key={i} className="h-9 bg-gray-100 rounded-main animate-pulse" />)}
+          </div>
+        ) : (
+          resources.map((resource) => {
+            const active = isActive(resource)
+            const Icon = resource.type === 'note' ? FileText : Network
+            const isEditing = editingId === resource.id
+
+            return (
+              <div
+                key={resource.id}
+                onDoubleClick={() => handleStartEditing(resource)}
+                className={`flex items-center gap-3 px-3 py-2 transition-all group relative rounded-main cursor-pointer ${
+                  active ? 'bg-active-bg text-foreground font-bold border border-border-main shadow-sm' : 'text-secondary hover:bg-hover-bg hover:text-foreground'
+                }`}
+              >
+                <Link href={resource.type === 'note' ? `/mindnote/${resource.id}` : `/mindmap/${resource.id}`} className="absolute inset-0" />
+                <Icon strokeWidth={active ? 2 : 1.5} className={`w-4 h-4 shrink-0 ${active ? 'text-primary' : 'text-secondary/70 group-hover:text-foreground'}`} />
+                {isEditing ? (
+                  <input
+                    autoFocus
+                    value={tempTitle}
+                    onChange={(e) => setTempTitle(e.target.value)}
+                    onBlur={() => handleFinishEditing(resource)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleFinishEditing(resource)}
+                    className="text-[13px] bg-white border border-border-main rounded px-1.5 py-0.5 flex-1 z-10 outline-none ring-1 ring-primary/20"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                ) : (
+                  <span className="text-[13px] truncate flex-1">{resource.title}</span>
+                )}
+                {active && (
+                  <div className="absolute right-[-1px] top-1/2 -translate-y-1/2 w-[2px] h-4 bg-primary rounded-l-full" />
+                )}
+              </div>
+            )
+          })
+        )}
+      </div>
+
+      <div className="p-4 border-t border-border-main">
         <button 
           onClick={toggleCollapse}
-          className="flex items-center gap-4 px-2 py-2 text-gray-400 hover:text-[#242424] transition-colors w-full cursor-pointer"
+          className="flex items-center justify-center p-1.5 text-secondary hover:text-foreground hover:bg-hover-bg rounded-main transition-colors w-full cursor-pointer"
         >
-          {isCollapsed ? (
-            <ChevronLeft strokeWidth={1.5} className="w-5 h-5 mx-auto" />
-          ) : (
-            <>
-              <span className="text-xs font-medium uppercase tracking-widest flex-1 text-right">Collapse</span>
-              <ChevronRight strokeWidth={1.5} className="w-5 h-5" />
-            </>
+          {isCollapsed ? <ChevronLeft strokeWidth={1.5} className="w-4 h-4" /> : (
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Collapse</span>
+              <ChevronRight strokeWidth={1.5} className="w-4 h-4" />
+            </div>
           )}
         </button>
       </div>
