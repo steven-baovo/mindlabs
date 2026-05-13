@@ -54,28 +54,6 @@ export default function ArtifactPanel({ content, isOpen, onClose }: ArtifactPane
                 </ReactMarkdown>
               </div>
             </div>
-            
-            <div className="mt-8 p-6 bg-gradient-to-br from-gray-900 to-black rounded-2xl text-white">
-              <h3 className="text-white text-base font-bold mb-2">Next Steps</h3>
-              <ul className="text-gray-300 text-xs space-y-2 list-none p-0">
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                  Review the hooks and adjust to your personal brand voice.
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                  Prepare visuals according to the recommended format.
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                  Schedule posts using the Content Pillar ratios.
-                </li>
-              </ul>
-              <button className="w-full mt-6 py-2.5 bg-white text-black rounded-xl text-xs font-bold hover:bg-gray-100 transition-all flex items-center justify-center gap-2">
-                <Share2 className="w-3.5 h-3.5" />
-                Share Strategy
-              </button>
-            </div>
           </div>
         ) : (
           <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 space-y-4">

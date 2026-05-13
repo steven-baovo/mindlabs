@@ -9,6 +9,7 @@ import {
   useNodesState,
   useEdgesState,
   addEdge,
+  reconnectEdge,
   Connection,
   Edge,
   Node,
@@ -23,9 +24,9 @@ import {
 import '@xyflow/react/dist/style.css'
 import TextNode from './TextNode'
 import { updateMindmap } from '@/app/(frontend)/mindmap/actions'
-import { CheckCircle2, Loader2, ArrowLeft, SquarePlus, Image as ImageIcon, Link as LinkIcon, Hand, MousePointer2, Activity } from 'lucide-react'
-import Link from 'next/link'
+import { SquarePlus, Hand, MousePointer2, Activity } from 'lucide-react'
 import MindmapEdge from './MindmapEdge'
+import { useWorkspace } from '@/contexts/WorkspaceContext'
 
 import { HelperLinesRenderer } from './HelperLinesRenderer'
 import { getHelperLines, HelperLines } from './helperLines'
@@ -53,6 +54,16 @@ export default function MindmapBoard({
   initialNodes,
   initialEdges,
 }: MindmapBoardProps) {
+  const { title, setTitle, setIsSaving } = useWorkspace()
+
+  // Init title khi mount, cleanup khi unmount
+  useEffect(() => {
+    setTitle(initialTitle)
+    return () => {
+      setTitle('')
+      setIsSaving(false)
+    }
+  }, [mindmapId, initialTitle, setTitle, setIsSaving])
   const upgradedInitialEdges = initialEdges.map(edge => {
     if (edge.type === 'default' || !edge.type) {
       return {
@@ -68,16 +79,18 @@ export default function MindmapBoard({
   
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(upgradedInitialEdges)
-  const [title, setTitle] = useState(initialTitle)
-  const [isSaving, setIsSaving] = useState(false)
-  const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [isPanMode, setIsPanMode] = useState(false)
   const [helperLines, setHelperLines] = useState<HelperLines>({})
   const [edgePathType, setEdgePathType] = useState('bezier')
   const [isPathMenuOpen, setIsPathMenuOpen] = useState(false)
   const pathMenuRef = useRef<HTMLDivElement>(null)
   
-  const { screenToFlowPosition, getNodes } = useReactFlow()
+  const connectingNodeId = useRef<string | null>(null)
+  const connectingHandleId = useRef<string | null>(null)
+  const connectionMadeRef = useRef(false)
+  const isReconnecting = useRef(false)
+  
+  const { screenToFlowPosition, getNodes, addNodes } = useReactFlow()
   
   // Track if changes have been made to trigger save
   const hasChangesRef = useRef(false)
@@ -85,6 +98,7 @@ export default function MindmapBoard({
 
   const onConnect = useCallback(
     (params: Connection | Edge) => {
+      connectionMadeRef.current = true
       setEdges((eds) => addEdge({ 
         ...params, 
         type: 'mindmapEdge',
@@ -98,6 +112,99 @@ export default function MindmapBoard({
       hasChangesRef.current = true
     },
     [setEdges, edgePathType]
+  )
+
+  const onConnectStart = useCallback((_: any, { nodeId, handleId }: { nodeId: string | null, handleId: string | null }) => {
+    connectingNodeId.current = nodeId
+    connectingHandleId.current = handleId
+    connectionMadeRef.current = false
+  }, [])
+
+  const onConnectEnd = useCallback(
+    (event: MouseEvent | TouchEvent) => {
+      const sourceId = connectingNodeId.current
+      const sourceHandleId = connectingHandleId.current
+      const wasConnectionMade = connectionMadeRef.current
+
+      if (!sourceId || wasConnectionMade || isReconnecting.current) {
+        connectingNodeId.current = null
+        connectingHandleId.current = null
+        connectionMadeRef.current = false
+        return
+      }
+
+      const targetIsPane = (event.target as Element).classList.contains('react-flow__pane')
+
+      if (targetIsPane) {
+        const { clientX, clientY } = 'changedTouches' in event 
+          ? (event as TouchEvent).changedTouches[0] 
+          : (event as MouseEvent)
+        
+        // Approximate node default size (min-w-[200px], min-h-[48px] + padding)
+        const NODE_W = 200
+        const NODE_H = 80
+
+        // Offset position so the handle of the new card aligns with the drop point
+        // Target handle is the opposite of the source handle
+        const positionOffset: Record<string, { x: number; y: number }> = {
+          // source=right → target=left → new card appears to the right, left-edge at cursor
+          right: { x: 0, y: -NODE_H / 2 },
+          // source=left → target=right → new card appears to the left, right-edge at cursor
+          left: { x: -NODE_W, y: -NODE_H / 2 },
+          // source=bottom → target=top → new card appears below, top-edge at cursor
+          bottom: { x: -NODE_W / 2, y: 0 },
+          // source=top → target=bottom → new card appears above, bottom-edge at cursor
+          top: { x: -NODE_W / 2, y: -NODE_H },
+        }
+
+        const offset = (sourceHandleId && positionOffset[sourceHandleId]) || { x: -NODE_W / 2, y: -NODE_H / 2 }
+        const dropPosition = screenToFlowPosition({ x: clientX, y: clientY })
+
+        const id = `node-${Date.now()}`
+        const newNode: Node = {
+          id,
+          type: 'textNode',
+          position: {
+            x: dropPosition.x + offset.x,
+            y: dropPosition.y + offset.y,
+          },
+          data: { label: '' },
+        }
+
+        // Pick the opposite handle as target based on the source handle direction
+        const oppositeHandle: Record<string, string> = {
+          right: 'left',
+          left: 'right',
+          bottom: 'top',
+          top: 'bottom',
+        }
+        const targetHandle = (sourceHandleId && oppositeHandle[sourceHandleId]) || 'top'
+
+        setNodes((nds) => nds.concat(newNode))
+        setEdges((eds) =>
+          eds.concat({
+            id: `edge-${sourceId}-${id}`,
+            source: sourceId,
+            sourceHandle: sourceHandleId,
+            target: id,
+            targetHandle,
+            type: 'mindmapEdge',
+            data: { direction: 'one', pathType: edgePathType },
+            style: { stroke: '#94A3B8', strokeWidth: 1.5 },
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color: '#94A3B8',
+            },
+          } as Edge)
+        )
+        hasChangesRef.current = true
+      }
+      
+      connectingNodeId.current = null
+      connectingHandleId.current = null
+      connectionMadeRef.current = false
+    },
+    [screenToFlowPosition, setNodes, setEdges, edgePathType]
   )
 
   const updateGlobalPathType = (type: string) => {
@@ -169,6 +276,72 @@ export default function MindmapBoard({
     setHelperLines({})
   }, [])
 
+  // Edge reconnection: cầm đầu/đuôi edge để kéo sang node khác
+  const edgeReconnectSuccessful = useRef(true)
+
+  const onReconnect = useCallback(
+    (oldEdge: Edge, newConnection: Connection) => {
+      edgeReconnectSuccessful.current = true
+      setEdges((els) => reconnectEdge(oldEdge, newConnection, els))
+      hasChangesRef.current = true
+    },
+    [setEdges]
+  )
+
+  const onReconnectStart = useCallback(() => {
+    isReconnecting.current = true
+    edgeReconnectSuccessful.current = false
+  }, [])
+
+  const onReconnectEnd = useCallback(
+    (_: MouseEvent | TouchEvent, edge: Edge) => {
+      // Nếu thả vào vùng trống (không nối được) → giữ nguyên edge cũ
+      // Không xóa edge, chỉ reset flag
+      edgeReconnectSuccessful.current = true
+      // Reset sau 1 tick để onConnectEnd (nếu fire sau) kịp đọc
+      setTimeout(() => { isReconnecting.current = false }, 0)
+    },
+    [setEdges]
+  )
+
+  const onPaneDoubleClick = useCallback(
+    (event: React.MouseEvent) => {
+      // Only create a node if clicking on the pane background, not on a node or edge
+      const target = event.target as Element
+      const isPane = target.classList.contains('react-flow__pane') ||
+                     target.classList.contains('react-flow__background')
+
+      if (!isPane) return
+
+      event.preventDefault()
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      })
+
+      const newNode: Node = {
+        id: `node-${Date.now()}`,
+        type: 'textNode',
+        position,
+        data: { label: '' },
+      }
+
+      setNodes((nds) => [...nds, newNode])
+      hasChangesRef.current = true
+    },
+    [screenToFlowPosition, setNodes]
+  )
+
+  const onPaneClick = useCallback(
+    (event: React.MouseEvent) => {
+      // Fallback for double click if onPaneDoubleClick is blocked
+      if (event.detail === 2) {
+        onPaneDoubleClick(event)
+      }
+    },
+    [onPaneDoubleClick]
+  )
+
   // Add a new node to the center of the viewport
   const addCard = useCallback(() => {
     const position = screenToFlowPosition({
@@ -198,63 +371,32 @@ export default function MindmapBoard({
       setIsSaving(true)
       await updateMindmap(mindmapId, { nodes, edges, title })
       setIsSaving(false)
-      setLastSaved(new Date())
       hasChangesRef.current = false
     }, 1500) // 1.5s debounce
 
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
     }
-  }, [nodes, edges, title, mindmapId])
-
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value)
-    hasChangesRef.current = true
-  }
+  }, [nodes, edges, title, mindmapId, setIsSaving])
 
   return (
     <div className="w-full h-full bg-white flex flex-col relative">
-      {/* Top Header overlay */}
-      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2 bg-white/80 backdrop-blur-md border-b border-[#e5e5e5] pointer-events-auto">
-        <div className="flex items-center gap-4">
-          <Link href="/mindmap" className="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors">
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <input 
-            type="text" 
-            value={title}
-            onChange={handleTitleChange}
-            className="text-xl font-bold bg-transparent border-none outline-none text-gray-800 placeholder-gray-300 focus:ring-2 focus:ring-blue-100 rounded px-2 py-1"
-            placeholder="Canvas Title"
-          />
-        </div>
-        
-        <div className="flex items-center text-sm text-gray-500 gap-2 px-3 py-1 bg-gray-50 rounded-full border border-[#e5e5e5]">
-          {isSaving ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-              Saving...
-            </>
-          ) : lastSaved ? (
-            <>
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              Saved at {lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </>
-          ) : (
-            'All changes saved'
-          )}
-        </div>
-      </div>
 
       {/* Canvas */}
-      <div className="flex-1 w-full h-full relative">
+      <div className="flex-1 w-full h-full relative" onDoubleClick={onPaneDoubleClick}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
           onNodesChange={handleNodesChange}
           onEdgesChange={handleEdgesChange}
           onConnect={onConnect}
+          onConnectStart={onConnectStart}
+          onConnectEnd={onConnectEnd}
           onNodeDragStop={onNodeDragStop}
+          onReconnect={onReconnect}
+          onReconnectStart={onReconnectStart}
+          onReconnectEnd={onReconnectEnd}
+          reconnectRadius={20}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           connectionMode={ConnectionMode.Loose}
@@ -263,6 +405,7 @@ export default function MindmapBoard({
           panActivationKeyCode="Space"
           selectionMode={SelectionMode.Partial}
           fitView
+          zoomOnDoubleClick={false}
           className="bg-white"
           minZoom={0.2}
           maxZoom={4}

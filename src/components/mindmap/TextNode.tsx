@@ -76,7 +76,7 @@ export default function TextNode({ id, data, selected }: { id: string; data: any
   return (
     <>
       <NodeToolbar isVisible={selected} position={Position.Top} offset={10}>
-          <div className="flex items-center gap-0.5 bg-white border border-gray-200 shadow-xl rounded-lg p-0.5 animate-in fade-in zoom-in duration-200">
+        <div className="flex items-center gap-0.5 bg-white border border-gray-200 shadow-xl rounded-lg p-0.5 animate-in fade-in zoom-in duration-200">
           <button
             onClick={deleteNode}
             className="p-1 hover:bg-red-50 text-gray-500 hover:text-red-600 rounded-md transition-colors"
@@ -84,7 +84,7 @@ export default function TextNode({ id, data, selected }: { id: string; data: any
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
-          
+
           <div className="w-px h-4 bg-gray-200 mx-0.5" />
 
           <div className="relative">
@@ -124,13 +124,13 @@ export default function TextNode({ id, data, selected }: { id: string; data: any
           >
             <Edit2 className="w-3.5 h-3.5" />
           </button>
-          </div>
+        </div>
       </NodeToolbar>
 
-      <NodeResizer 
-        isVisible={selected} 
-        minWidth={200} 
-        minHeight={48} 
+      <NodeResizer
+        isVisible={selected}
+        minWidth={200}
+        minHeight={48}
         handleClassName="opacity-0"
         lineClassName="opacity-0"
       />
@@ -138,34 +138,34 @@ export default function TextNode({ id, data, selected }: { id: string; data: any
       <div
         onDoubleClick={handleDoubleClick}
         className={`group relative w-full h-full min-w-[200px] min-h-[48px] flex items-center justify-center rounded-lg transition-colors py-2 px-4 ${selected ? 'border-2 shadow-md' : 'border hover:border-gray-400'}`}
-        style={{ 
+        style={{
           borderColor: selected ? (data.color?.border || '#8b5cf6') : (data.color?.border || '#94A3B8'),
           backgroundColor: data.color?.bg || '#ffffff',
           boxShadow: selected ? `0 0 0 4px ${(data.color?.border || '#8b5cf6')}20` : undefined
         }}
       >
-      {/* Handles - Use only source handles with Loose mode to allow dragging from any side */}
-      <Handle id="top" type="source" position={Position.Top} className="w-3 h-3 bg-blue-500 border-2 border-white transition-all opacity-0 group-hover:opacity-100 z-50 hover:scale-150" />
-      <Handle id="bottom" type="source" position={Position.Bottom} className="w-3 h-3 bg-blue-500 border-2 border-white transition-all opacity-0 group-hover:opacity-100 z-50 hover:scale-150" />
-      <Handle id="left" type="source" position={Position.Left} className="w-3 h-3 bg-blue-500 border-2 border-white transition-all opacity-0 group-hover:opacity-100 z-50 hover:scale-150" />
-      <Handle id="right" type="source" position={Position.Right} className="w-3 h-3 bg-blue-500 border-2 border-white transition-all opacity-0 group-hover:opacity-100 z-50 hover:scale-150" />
+        {/* Handles - Use only source handles with Loose mode to allow dragging from any side */}
+        <Handle id="top" type="source" position={Position.Top} className={`border-2 border-white transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: data.color?.border || '#94A3B8', width: '10px', height: '10px' }} />
+        <Handle id="bottom" type="source" position={Position.Bottom} className={`border-2 border-white transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: data.color?.border || '#94A3B8', width: '10px', height: '10px' }} />
+        <Handle id="left" type="source" position={Position.Left} className={`border-2 border-white transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: data.color?.border || '#94A3B8', width: '10px', height: '10px' }} />
+        <Handle id="right" type="source" position={Position.Right} className={`border-2 border-white transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: data.color?.border || '#94A3B8', width: '10px', height: '10px' }} />
 
-      <textarea
-        ref={textareaRef}
-        readOnly={!isEditing}
-        className={`w-full resize-none outline-none bg-transparent text-gray-800 text-sm leading-relaxed overflow-hidden ${!isEditing ? 'cursor-default select-none pointer-events-none' : 'cursor-text'}`}
-        value={data.label}
-        onChange={onChange}
-        onBlur={onBlur}
-        placeholder={isEditing ? "Type something..." : ""}
-        rows={1}
-        onPointerDownCapture={(e) => {
-          if (isEditing) {
-            // Allow text selection inside the textarea only when editing
-            e.stopPropagation()
-          }
-        }}
-      />
+        <textarea
+          ref={textareaRef}
+          readOnly={!isEditing}
+          className={`w-full resize-none outline-none bg-transparent text-gray-800 text-sm leading-relaxed overflow-hidden ${!isEditing ? 'cursor-default select-none pointer-events-none' : 'cursor-text'}`}
+          value={data.label}
+          onChange={onChange}
+          onBlur={onBlur}
+          placeholder={isEditing ? "Type something..." : ""}
+          rows={1}
+          onPointerDownCapture={(e) => {
+            if (isEditing) {
+              // Allow text selection inside the textarea only when editing
+              e.stopPropagation()
+            }
+          }}
+        />
       </div>
     </>
   )

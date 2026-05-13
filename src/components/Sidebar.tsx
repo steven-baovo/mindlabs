@@ -26,11 +26,6 @@ const MENU_ITEMS = [
     href: '/clarity',
   },
   { 
-    title: 'Canvas', 
-    icon: Network, 
-    href: '/mindmap',
-  },
-  { 
     title: 'Mindnote', 
     icon: FileText, 
     href: '/mindnote',

@@ -2,6 +2,7 @@ import { loadMindmap } from '../actions'
 import { notFound } from 'next/navigation'
 import MindmapBoard from '@/components/mindmap/MindmapBoard'
 import { ReactFlowProvider } from '@xyflow/react'
+import MindmapWorkspaceClient from '@/components/mindmap/MindmapWorkspaceClient'
 
 export const metadata = {
   title: 'Canvas | Mindlabs',
@@ -20,7 +21,7 @@ export default async function MindmapWorkspacePage({ params }: { params: Promise
   const initialEdges = Array.isArray(mindmap.edges) ? mindmap.edges : []
 
   return (
-    <div className="w-full h-[calc(100vh-56px)] overflow-hidden relative">
+    <MindmapWorkspaceClient initialTitle={mindmap.title} mindmapId={mindmap.id}>
       {/* Hide global footer on this page */}
       <style dangerouslySetInnerHTML={{ __html: `
         footer { display: none !important; }
@@ -35,6 +36,7 @@ export default async function MindmapWorkspacePage({ params }: { params: Promise
           initialEdges={initialEdges}
         />
       </ReactFlowProvider>
-    </div>
+    </MindmapWorkspaceClient>
   )
 }
+
