@@ -36,11 +36,12 @@ export default function Sidebar({ user, profile }: SidebarProps) {
   const pathname = usePathname()
   
   // Initialize collapsed state based on route
-  const isWorkspaceInitial = pathname.includes('/mindnote/') || pathname.includes('/mindmap/')
+  const isWorkspaceInitial = pathname ? (pathname.includes('/mindnote/') || pathname.includes('/mindmap/')) : false
   const [isCollapsed, setIsCollapsed] = useState(isWorkspaceInitial)
 
   // Automatically collapse on workspace routes when navigating
   useEffect(() => {
+    if (!pathname) return
     const isWorkspaceRoute = pathname.includes('/mindnote/') || pathname.includes('/mindmap/')
     setIsCollapsed(isWorkspaceRoute)
   }, [pathname])

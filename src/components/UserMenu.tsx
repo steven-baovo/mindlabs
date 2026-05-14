@@ -55,7 +55,7 @@ export default function UserMenu({ user, profile }: UserMenuProps) {
             <p className="text-xs text-gray-500 font-medium truncate">
               {profile?.display_name || 'Người dùng'}
             </p>
-            <p className="text-[10px] text-gray-400 truncate">{user.email}</p>
+            <p className="text-[10px] text-gray-400 truncate">{user?.email}</p>
           </div>
           
           <Link 
