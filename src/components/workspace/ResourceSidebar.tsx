@@ -94,8 +94,8 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
   return (
     <aside
       className={`
-        sticky top-0 h-[calc(100vh-56px)] shrink-0 border-r border-border-main
-        bg-white flex flex-col transition-all duration-300
+        h-full shrink-0 bg-white rounded-2xl shadow-sm border border-white/50
+        flex flex-col transition-all duration-300 relative overflow-hidden
         ${isCollapsed ? 'w-16' : 'w-64'}
       `}
     >

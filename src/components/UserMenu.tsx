@@ -50,7 +50,7 @@ export default function UserMenu({ user, profile }: UserMenuProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-[#e5e5e5] py-2 z-[60] animate-in fade-in zoom-in duration-200 origin-top-right">
+        <div className="absolute left-full ml-4 bottom-0 w-64 bg-white rounded-2xl shadow-2xl border border-[#f0f0f0] py-2 z-[60] animate-in fade-in zoom-in duration-200 origin-bottom-left">
           <div className="px-4 py-2 border-b border-[#e5e5e5] mb-1">
             <p className="text-xs text-gray-500 font-medium truncate">
               {profile?.display_name || 'Người dùng'}

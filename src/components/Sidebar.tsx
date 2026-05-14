@@ -1,187 +1,151 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, Home, FileText, Sparkles, Cloud, CloudCheck, Calendar } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { 
+  Home, 
+  Search,
+  Bell,
+  Settings,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  Sparkles,
+  Calendar
+} from 'lucide-react'
 import UserMenu from './UserMenu'
-import { useWorkspace } from '@/contexts/WorkspaceContext'
 
-const DEEP_WORKSPACE = /^\/(mindnote|mindmap)\/[\w-]+/
+interface SidebarProps {
+  user: any
+  profile: any
+}
 
-const NAV_ITEMS = [
-  { name: 'Home', icon: Home, href: '/' },
-  { name: 'Mindnote', icon: FileText, href: '/mindnote' },
-  { name: 'MindAI', icon: Sparkles, href: '/mindai' },
-  { name: 'Clarity', icon: Calendar, href: '/clarity' },
+const PRIMARY_MENU = [
+  { title: 'Home', icon: Home, href: '/' },
+  { title: 'Search', icon: Search, href: '#' },
 ]
 
-export default function Sidebar() {
+const TOOLS_MENU = [
+  { title: 'Clarity Planner', icon: Calendar, href: '/clarity' },
+  { title: 'Mindnote', icon: FileText, href: '/mindnote' },
+  { title: 'mindAI', icon: Sparkles, href: '/mindai' },
+]
+
+export default function Sidebar({ user, profile }: SidebarProps) {
   const pathname = usePathname()
-  const { isSaving } = useWorkspace()
-  const [isExpanded, setIsExpanded] = useState(false)
-  const [user, setUser] = useState<any>(null)
-  const [profile, setProfile] = useState<any>(null)
-  const supabase = createClient()
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
-  useEffect(() => {
-    async function getUser() {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-      if (user) {
-        const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-        setProfile(data)
-      }
-    }
-    getUser()
-  }, [])
+  const renderMenuItem = (item: any, index: number) => {
+    const Icon = item.icon
+    const isActive = pathname === item.href
 
-  // Only render in deep workspace (specific document open)
-  if (!DEEP_WORKSPACE.test(pathname)) return null
-
-  const backHref = pathname.startsWith('/mindmap/') ? '/mindmap' : '/mindnote'
+    return (
+      <Link
+        key={index}
+        href={item.href || '#'}
+        className={`
+          flex items-center transition-all group relative rounded-xl py-2
+          ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'}
+          ${isActive 
+            ? 'bg-[#f5f5f5] text-foreground font-semibold' 
+            : 'text-secondary hover:text-foreground hover:bg-[#f9f9f9]'}
+          cursor-pointer
+        `}
+        title={item.title}
+      >
+        <Icon strokeWidth={isActive ? 2.5 : 1.5} className={`w-[18px] h-[18px] shrink-0 ${isActive ? 'text-primary' : 'text-secondary/70 group-hover:text-foreground'}`} />
+        
+        {!isCollapsed && (
+          <span className="text-[13px] tracking-tight truncate">
+            {item.title}
+          </span>
+        )}
+      </Link>
+    )
+  }
 
   return (
-    <motion.div
-      initial={{ x: -80, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: -80, opacity: 0 }}
-      transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="fixed left-4 top-1/2 -translate-y-1/2 z-[90] pointer-events-auto"
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
-    >
-      {/* Hover trigger hint — vệt mờ tinh tế khi collapsed */}
-      <AnimatePresence>
-        {!isExpanded && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute -left-1 inset-y-4 w-[3px] bg-primary/25 rounded-full"
-          />
-        )}
-      </AnimatePresence>
-
-      <motion.div
-        animate={{ width: isExpanded ? 200 : 60 }}
-        transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="overflow-hidden glass rounded-[28px] shadow-2xl border-white/30 flex flex-col py-5 gap-1"
-        style={{ minHeight: 320 }}
-      >
-        {/* Back button */}
-        <Link
-          href={backHref}
-          className="mx-2 flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-black/5 transition-all group mb-2"
-          title="Back"
-        >
-          <ChevronLeft strokeWidth={1.5} className="w-5 h-5 text-primary shrink-0" />
-          <AnimatePresence>
-            {isExpanded && (
-              <motion.span
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -8 }}
-                transition={{ duration: 0.2, delay: 0.05 }}
-                className="text-premium text-foreground whitespace-nowrap overflow-hidden"
-              >
-                Back
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </Link>
-
-        {/* Divider */}
-        <div className="mx-4 h-px bg-border-main/40 mb-1" />
-
-        {/* Nav Items */}
-        <div className="flex flex-col gap-0.5 px-2">
-          {NAV_ITEMS.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                title={item.name}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-all relative group ${
-                  isActive
-                    ? 'bg-foreground/[0.06] text-foreground'
-                    : 'text-secondary hover:bg-black/5 hover:text-foreground'
-                }`}
-              >
-                {/* Active indicator */}
-                {isActive && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-primary rounded-r-full" />
-                )}
-                <item.icon
-                  strokeWidth={isActive ? 2 : 1.5}
-                  className={`w-5 h-5 shrink-0 ${isActive ? 'text-primary' : 'text-secondary/70 group-hover:text-foreground'}`}
-                />
-                <AnimatePresence>
-                  {isExpanded && (
-                    <motion.span
-                      initial={{ opacity: 0, x: -8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -8 }}
-                      transition={{ duration: 0.2, delay: 0.08 }}
-                      className="text-[12px] font-bold tracking-tight whitespace-nowrap overflow-hidden"
-                    >
-                      {item.name}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </Link>
-            )
-          })}
-        </div>
-
-        {/* Divider */}
-        <div className="mx-4 h-px bg-border-main/40 mt-1" />
-
-        {/* Save Status */}
-        <div className="mx-2 flex items-center gap-3 px-3 py-2.5 rounded-2xl text-secondary mt-1">
-          {isSaving ? (
-            <Cloud strokeWidth={1.5} className="w-5 h-5 text-primary animate-pulse shrink-0" />
-          ) : (
-            <CloudCheck strokeWidth={1.5} className="w-5 h-5 text-emerald-500 shrink-0" />
-          )}
-          <AnimatePresence>
-            {isExpanded && (
-              <motion.span
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -8 }}
-                transition={{ duration: 0.2, delay: 0.1 }}
-                className="text-premium text-secondary whitespace-nowrap"
-              >
-                {isSaving ? 'Saving...' : 'All saved'}
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* User */}
-        {user && (
-          <div className="mx-2 flex items-center gap-3 px-2 py-2 rounded-2xl mt-auto">
-            <UserMenu user={user} profile={profile} />
-            <AnimatePresence>
-              {isExpanded && (
-                <motion.span
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -8 }}
-                  transition={{ duration: 0.2, delay: 0.12 }}
-                  className="text-[11px] font-bold text-foreground truncate whitespace-nowrap max-w-[100px]"
-                >
-                  {profile?.display_name || user?.email?.split('@')[0]}
-                </motion.span>
-              )}
-            </AnimatePresence>
+    <aside className={`
+      hidden lg:flex flex-col bg-white rounded-2xl h-full transition-all duration-300 z-50 shadow-sm border border-white/50 relative
+      ${isCollapsed ? 'w-[64px]' : 'w-[240px]'}
+    `}>
+      {/* Logo & Toggle Section */}
+      <div className={`h-16 flex items-center mb-2 ${isCollapsed ? 'justify-center px-0' : 'justify-between px-6'}`}>
+        <Link href="/" className="flex items-center gap-2 group overflow-hidden shrink-0">
+          <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shrink-0">
+             <div className="w-4 h-4 bg-white rounded-sm rotate-45" />
           </div>
+          {!isCollapsed && (
+            <span className="text-lg font-black tracking-tighter text-foreground whitespace-nowrap">
+              Mindlabs
+            </span>
+          )}
+        </Link>
+        
+        {!isCollapsed && (
+          <button 
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="p-1.5 text-secondary/30 hover:text-foreground transition-colors cursor-pointer"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
         )}
-      </motion.div>
-    </motion.div>
+      </div>
+
+      {/* Main Navigation */}
+      <div className="flex-1 overflow-y-auto no-scrollbar px-2 flex flex-col gap-1 pt-4">
+        <div className="mb-6">
+          {PRIMARY_MENU.map((item, index) => renderMenuItem(item, index))}
+        </div>
+
+        <div className="flex flex-col gap-1">
+          {!isCollapsed && (
+            <div className="px-3 mb-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary/40">Tools</span>
+            </div>
+          )}
+          {TOOLS_MENU.map((item, index) => renderMenuItem(item, index))}
+        </div>
+      </div>
+
+      {/* Bottom Section */}
+      <div className="p-2 border-t border-[#f5f5f5] flex flex-col gap-1">
+        <button className={`flex items-center transition-all rounded-xl py-2 text-secondary hover:text-foreground hover:bg-[#f9f9f9] w-full cursor-pointer ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'}`}>
+           <Bell className="w-[18px] h-[18px] shrink-0" />
+           {!isCollapsed && <span className="text-[13px]">Notifications</span>}
+        </button>
+        
+        <button className={`flex items-center transition-all rounded-xl py-2 text-secondary hover:text-foreground hover:bg-[#f9f9f9] w-full cursor-pointer ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'}`}>
+           <Settings className="w-[18px] h-[18px] shrink-0" />
+           {!isCollapsed && <span className="text-[13px]">Settings</span>}
+        </button>
+
+        <div className="mt-2 pt-2 border-t border-[#f5f5f5]">
+           <div className={`flex items-center rounded-xl py-2 hover:bg-[#f9f9f9] transition-all ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-2'}`}>
+             <UserMenu user={user} profile={profile} />
+             {!isCollapsed && (
+               <div className="flex flex-col min-w-0">
+                 <span className="text-[12px] font-bold truncate text-foreground leading-tight">
+                   {profile?.display_name || 'User'}
+                 </span>
+                 <span className="text-[10px] text-secondary/60 truncate leading-tight">
+                   {user?.email}
+                 </span>
+               </div>
+             )}
+           </div>
+        </div>
+
+        {isCollapsed && (
+          <button 
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="mt-2 flex items-center justify-center p-2 text-secondary/40 hover:text-foreground transition-colors w-full cursor-pointer"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+    </aside>
   )
 }
