@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createMindmap } from '@/app/(frontend)/mindmap/actions'
+import { createMindmap } from '@/app/(frontend)/mindspace/canvas/actions'
 import { Plus } from 'lucide-react'
 
 export default function CreateMindmapButton() {
@@ -13,7 +13,7 @@ export default function CreateMindmapButton() {
     setIsPending(true)
     const { data, error } = await createMindmap('Untitled Canvas')
     if (data && !error) {
-      router.push(`/mindmap/${data.id}`)
+      router.push(`/mindspace/canvas/${data.id}`)
     } else {
       console.error(error)
       setIsPending(false)
