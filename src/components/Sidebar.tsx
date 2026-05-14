@@ -132,19 +132,42 @@ export default function Sidebar({ user, profile }: SidebarProps) {
         </button>
 
         <div className="mt-2 pt-2 border-t border-[#f5f5f5]">
-           <div className={`flex items-center rounded-xl py-2 hover:bg-[#f9f9f9] transition-all ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-2'}`}>
-             <UserMenu user={user} profile={profile} />
-             {!isCollapsed && (
-               <div className="flex flex-col min-w-0">
-                 <span className="text-[12px] font-bold truncate text-foreground leading-tight">
-                   {profile?.display_name || 'User'}
-                 </span>
-                 <span className="text-[10px] text-secondary/60 truncate leading-tight">
-                   {user?.email}
-                 </span>
-               </div>
-             )}
-           </div>
+           {user ? (
+             <div className={`flex items-center rounded-xl py-2 hover:bg-[#f9f9f9] transition-all ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-2'}`}>
+               <UserMenu user={user} profile={profile} />
+               {!isCollapsed && (
+                 <div className="flex flex-col min-w-0">
+                   <span className="text-[12px] font-bold truncate text-foreground leading-tight">
+                     {profile?.display_name || 'User'}
+                   </span>
+                   <span className="text-[10px] text-secondary/60 truncate leading-tight">
+                     {user?.email}
+                   </span>
+                 </div>
+               )}
+             </div>
+           ) : (
+             <div className={`flex flex-col gap-1 ${isCollapsed ? 'items-center' : 'px-1'}`}>
+                <Link 
+                  href="/login" 
+                  className={`flex items-center transition-all rounded-xl py-2 text-primary font-bold hover:bg-primary/5 ${isCollapsed ? 'justify-center w-8 h-8' : 'gap-3 px-3 w-full'}`}
+                  title="Login"
+                >
+                  <div className={`w-5 h-5 flex items-center justify-center ${isCollapsed ? '' : 'shrink-0'}`}>
+                    <span className="text-[10px]">IN</span>
+                  </div>
+                  {!isCollapsed && <span className="text-[13px]">Login</span>}
+                </Link>
+                {!isCollapsed && (
+                  <Link 
+                    href="/register" 
+                    className="flex items-center gap-3 px-3 py-2 bg-primary text-white rounded-xl text-[13px] font-bold hover:opacity-90 transition-all text-center justify-center mt-1"
+                  >
+                    Sign up
+                  </Link>
+                )}
+             </div>
+           )}
         </div>
 
         {isCollapsed && (
