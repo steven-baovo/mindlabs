@@ -8,20 +8,33 @@ export const revalidate = 60
 
 export default async function Home() {
   // Fetch real posts from Sanity (if any)
-  const sanityPosts = await client.fetch(`*[_type == "post"] | order(publishedAt desc) {
-    _id,
-    title,
-    slug,
-    publishedAt,
-    excerpt,
-    "category": categories[0]->title,
-    "imageUrl": mainImage.asset->url,
-    "type": "article"
-  }`)
+  let sanityPosts = []
+  try {
+    sanityPosts = await client.fetch(`*[_type == "post"] | order(publishedAt desc) {
+      _id,
+      title,
+      slug,
+      publishedAt,
+      excerpt,
+      "category": categories[0]->title,
+      "imageUrl": mainImage.asset->url,
+      "type": "article"
+    }`)
+  } catch (error) {
+    console.error("Sanity fetch failed:", error)
+  }
 
   const allPosts = [...sanityPosts, ...mockPosts]
   
   // Categorize
+  if (allPosts.length === 0) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center">
+        <p className="text-secondary">Chưa có bài viết nào.</p>
+      </div>
+    )
+  }
+
   const featuredPost = allPosts[0]
   const recentArticles = allPosts.filter(p => p.type !== 'audio' && p._id !== featuredPost._id).slice(0, 4)
   const podcastPosts = allPosts.filter(p => p.type === 'audio').slice(0, 3)

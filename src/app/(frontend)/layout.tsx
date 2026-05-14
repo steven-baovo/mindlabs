@@ -13,7 +13,7 @@ export default async function FrontendLayout({
 
   let profile = null
   if (user) {
-    const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+    const { data } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle()
     profile = data
   }
 
