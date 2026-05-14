@@ -59,13 +59,13 @@ export default function Sidebar({ user, profile }: SidebarProps) {
           flex items-center transition-all group relative rounded-xl py-2
           ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'}
           ${isActive 
-            ? 'bg-[#f5f5f5] text-foreground font-semibold' 
+            ? 'bg-[#f5f5f5] text-foreground font-medium' 
             : 'text-secondary hover:text-foreground hover:bg-[#f9f9f9]'}
           cursor-pointer
         `}
         title={item.title}
       >
-        <Icon strokeWidth={isActive ? 2.5 : 1.5} className={`w-[18px] h-[18px] shrink-0 ${isActive ? 'text-primary' : 'text-secondary/70 group-hover:text-foreground'}`} />
+        <Icon strokeWidth={isActive ? 2.0 : 1.5} className={`w-[18px] h-[18px] shrink-0 ${isActive ? 'text-primary' : 'text-secondary/70 group-hover:text-foreground'}`} />
         
         {!isCollapsed && (
           <span className="text-[13px] tracking-tight truncate">
@@ -80,7 +80,7 @@ export default function Sidebar({ user, profile }: SidebarProps) {
     <aside 
       onClick={() => setIsCollapsed(!isCollapsed)}
       className={`
-        hidden lg:flex flex-col bg-white rounded-2xl h-full transition-all duration-300 z-50 shadow-sm border border-white/50 relative cursor-col-resize
+        hidden lg:flex flex-col bg-white rounded-2xl h-full transition-all duration-300 z-50 relative cursor-col-resize
         ${isCollapsed ? 'w-[52px]' : 'w-[220px]'}
       `}
     >

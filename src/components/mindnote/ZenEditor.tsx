@@ -207,19 +207,6 @@ const ZenEditor = ({ initialContent, onChange, placeholder = 'Bắt đầu viế
       {/* Main Editor Area */}
       <EditorContent editor={editor} />
 
-      {/* Floating Action Menu (Optional - but keeps it clean) */}
-      <div className="fixed bottom-12 right-12 flex flex-col gap-3">
-        <button 
-          onClick={() => {
-            const url = window.prompt('URL hình ảnh:')
-            if (url) editor.chain().focus().setImage({ src: url }).run()
-          }}
-          className="p-3 bg-white border border-border-medium rounded-full shadow-lg hover:shadow-xl transition-all text-secondary hover:text-primary"
-          title="Thêm hình ảnh"
-        >
-          <ImageIcon className="w-5 h-5" />
-        </button>
-      </div>
     </div>
   )
 }

@@ -435,11 +435,6 @@ export default function MindmapBoard({
             position="bottom-right" 
             showInteractive={false}
           />
-          <MiniMap 
-            className="!bg-white !border-gray-200 !shadow-sm !rounded-xl overflow-hidden mb-4"
-            nodeColor="#cbd5e1"
-            maskColor="rgba(250, 250, 250, 0.7)"
-          />
           
           <Panel position="bottom-center" className="mb-6 flex items-center gap-2 bg-white/90 backdrop-blur-md p-1.5 rounded-xl border border-gray-200 shadow-lg">
             <button

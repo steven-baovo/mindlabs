@@ -27,7 +27,7 @@ export default async function FrontendLayout({
         </div>
 
         {/* Main Content Island */}
-        <div className="flex-1 flex flex-col h-full bg-white rounded-2xl shadow-sm overflow-hidden border border-white/50 relative">
+        <div className="flex-1 flex flex-col h-full bg-white rounded-2xl overflow-hidden relative">
           <main className="flex-1 min-w-0 h-full overflow-y-auto no-scrollbar relative">
             <div className="w-full h-full">
               {children}

@@ -95,7 +95,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
     <aside
       onClick={toggleCollapse}
       className={`
-        h-full shrink-0 bg-white rounded-2xl shadow-sm border border-white/50
+        h-full shrink-0 bg-white rounded-2xl
         flex flex-col transition-all duration-300 relative overflow-hidden cursor-col-resize
         ${isCollapsed ? 'w-[52px]' : 'w-[220px]'}
       `}
@@ -143,11 +143,13 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
                 onDoubleClick={() => handleStartEditing(resource)}
                 className={`flex items-center transition-all group relative rounded-xl py-2 cursor-pointer
                   ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'}
-                  ${active ? 'bg-active-bg text-foreground font-bold border border-border-main shadow-sm' : 'text-secondary hover:bg-hover-bg hover:text-foreground'}
+                  ${active 
+                    ? 'bg-[#f5f5f5] text-foreground font-medium' 
+                    : 'text-secondary hover:bg-[#f9f9f9] hover:text-foreground'}
                 `}
               >
                 <Link href={resource.type === 'note' ? `/mindnote/${resource.id}` : `/mindmap/${resource.id}`} className="absolute inset-0" />
-                <Icon strokeWidth={active ? 2 : 1.5} className={`w-4 h-4 shrink-0 ${active ? 'text-primary' : 'text-secondary/70 group-hover:text-foreground'}`} />
+                <Icon strokeWidth={active ? 2.0 : 1.5} className={`w-[18px] h-[18px] shrink-0 ${active ? 'text-primary' : 'text-secondary/70 group-hover:text-foreground'}`} />
                 
                 {!isCollapsed && (
                   <>
@@ -162,7 +164,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
                         onClick={(e) => e.stopPropagation()}
                       />
                     ) : (
-                      <span className="text-[13px] truncate flex-1">{resource.title}</span>
+                      <span className="text-[13px] tracking-tight truncate flex-1">{resource.title}</span>
                     )}
                   </>
                 )}
