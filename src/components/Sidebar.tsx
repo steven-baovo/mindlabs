@@ -55,13 +55,11 @@ export default function Sidebar({ user, profile }: SidebarProps) {
         key={index}
         href={item.href || '#'}
         onClick={(e) => e.stopPropagation()}
-        className={`
-          flex items-center transition-all group relative rounded-xl py-2
+        className={`flex items-center transition-all group relative rounded-xl py-2 cursor-pointer
           ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'}
           ${isActive 
             ? 'bg-[#f5f5f5] text-foreground font-medium' 
             : 'text-secondary hover:text-foreground hover:bg-[#f9f9f9]'}
-          cursor-pointer
         `}
         title={item.title}
       >
@@ -126,9 +124,7 @@ export default function Sidebar({ user, profile }: SidebarProps) {
 
         <div className="flex flex-col gap-1">
           {!isCollapsed && (
-            <div className="px-3 mb-2">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary/40">Tools</span>
-            </div>
+            <div className="mx-3 my-4 border-t border-[#f5f5f5]" />
           )}
           {TOOLS_MENU.map((item, index) => renderMenuItem(item, index))}
         </div>

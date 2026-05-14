@@ -29,6 +29,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [tempTitle, setTempTitle] = useState('')
+  const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false)
   const params = useParams()
   const router = useRouter()
 
@@ -44,6 +45,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
       localStorage.setItem(STORAGE_KEY, String(next))
       return next
     })
+    setIsCreateMenuOpen(false)
   }
 
   useEffect(() => {
@@ -112,16 +114,60 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
       <div 
         className="flex-1 overflow-y-auto no-scrollbar py-4 px-2 flex flex-col gap-1"
       >
-        {!isCollapsed && (
+        {isCollapsed ? (
+          <div className="flex flex-col items-center mb-4 relative">
+            <button 
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsCreateMenuOpen(!isCreateMenuOpen)
+              }}
+              className={`w-8 h-8 flex items-center justify-center rounded-xl bg-[#f5f5f5] text-foreground hover:bg-[#eeeeee] transition-all ${isCreateMenuOpen ? 'ring-2 ring-primary/20' : ''}`}
+            >
+              <Plus strokeWidth={2.5} className={`w-4 h-4 transition-transform duration-200 ${isCreateMenuOpen ? 'rotate-45' : ''}`} />
+            </button>
+            
+            {isCreateMenuOpen && (
+              <div 
+                className="absolute left-full ml-2 top-0 bg-white border border-[#f5f5f5] rounded-xl shadow-xl p-1.5 flex flex-col gap-1 z-[100] w-32 animate-in fade-in zoom-in slide-in-from-left-2 duration-200"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button 
+                  onClick={() => {
+                    handleCreateNote()
+                    setIsCreateMenuOpen(false)
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 hover:bg-[#f9f9f9] rounded-lg text-[12px] font-medium text-secondary hover:text-foreground transition-colors"
+                >
+                  <FileText className="w-3.5 h-3.5" /> New Note
+                </button>
+                <button 
+                  onClick={() => {
+                    handleCreateMap()
+                    setIsCreateMenuOpen(false)
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 hover:bg-[#f9f9f9] rounded-lg text-[12px] font-medium text-secondary hover:text-foreground transition-colors"
+                >
+                  <Network className="w-3.5 h-3.5" /> New Map
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
           <div 
             className="flex gap-2 mb-4 px-1"
             onClick={(e) => e.stopPropagation()}
           >
-            <button onClick={handleCreateNote} className="flex-1 flex items-center justify-center gap-1.5 py-1.5 bg-white border border-border-main rounded-main text-[11px] font-bold hover:border-foreground transition-all shadow-sm">
-              <Plus strokeWidth={2} className="w-3.5 h-3.5" /> Note
+            <button 
+              onClick={handleCreateNote} 
+              className="flex-1 flex items-center justify-center gap-2 py-2 bg-[#f5f5f5] text-foreground rounded-xl text-[13px] font-medium hover:bg-[#eeeeee] transition-all"
+            >
+              <Plus strokeWidth={2} className="w-4 h-4" /> Note
             </button>
-            <button onClick={handleCreateMap} className="flex-1 flex items-center justify-center gap-1.5 py-1.5 bg-white border border-border-main rounded-main text-[11px] font-bold hover:border-foreground transition-all shadow-sm">
-              <Plus strokeWidth={2} className="w-3.5 h-3.5" /> Map
+            <button 
+              onClick={handleCreateMap} 
+              className="flex-1 flex items-center justify-center gap-2 py-2 bg-[#f5f5f5] text-foreground rounded-xl text-[13px] font-medium hover:bg-[#eeeeee] transition-all"
+            >
+              <Plus strokeWidth={2} className="w-4 h-4" /> Map
             </button>
           </div>
         )}
