@@ -4,9 +4,10 @@ import { usePathname } from 'next/navigation'
 import ResourceSidebar from './ResourceSidebar'
 import { useWorkspace } from '@/contexts/WorkspaceContext'
 
-// Regex: chỉ show title section khi đang ở trang resource cụ thể
-const RESOURCE_ROUTE = /^\/(mindnote|mindmap)\/[\w-]+/
+// Show ResourceSidebar on /mindnote, /mindmap, and any child routes
 const WORKSPACE_ROUTE = /^\/(mindnote|mindmap)/
+// Only pass activeTitle/isSaving when inside a specific document
+const RESOURCE_ROUTE = /^\/(mindnote|mindmap)\/[\w-]+/
 
 export default function WorkspaceLayoutSidebar() {
   const pathname = usePathname()
@@ -19,8 +20,8 @@ export default function WorkspaceLayoutSidebar() {
   return (
     <ResourceSidebar
       activeTitle={isResourcePage ? title : undefined}
-      onTitleChange={setTitle}
-      isSaving={isSaving}
+      onTitleChange={isResourcePage ? setTitle : undefined}
+      isSaving={isResourcePage ? isSaving : false}
     />
   )
 }

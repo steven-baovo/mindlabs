@@ -49,13 +49,24 @@ const NoteEditorClient = ({ note }: NoteEditorClientProps) => {
   }, [title, content, note.title, note.content, handleSave])
 
   return (
-    <div className="bg-white h-full">
-      <main className="flex-1 px-6 pt-12 pb-32 min-w-0">
+    <div className="min-h-full bg-white">
+      <main className="flex-1 px-4 lg:px-24 pt-20 pb-32 min-w-0">
         <div className="max-w-4xl mx-auto">
-          <ZenEditor
-            initialContent={content}
-            onChange={setContent}
+          {/* Immersive Title Input */}
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => handleTitleChange(e.target.value)}
+            placeholder="Untitled Note"
+            className="w-full text-5xl font-black tracking-tighter text-foreground border-none outline-none mb-12 placeholder:text-black/5"
           />
+          
+          <div className="prose prose-lg max-w-none">
+            <ZenEditor
+              initialContent={content}
+              onChange={setContent}
+            />
+          </div>
         </div>
       </main>
     </div>

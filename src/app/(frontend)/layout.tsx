@@ -1,8 +1,6 @@
 import Header from "@/components/Header";
-import Sidebar from "@/components/Sidebar";
 import { WorkspaceProvider } from "@/contexts/WorkspaceContext";
-import WorkspaceLayoutSidebar from "@/components/workspace/WorkspaceLayoutSidebar";
-import FloatingSaveStatus from "@/components/workspace/FloatingSaveStatus";
+import WorkspaceLayoutWrapper from "@/components/workspace/WorkspaceLayoutWrapper";
 
 export default function FrontendLayout({
   children,
@@ -11,15 +9,11 @@ export default function FrontendLayout({
 }>) {
   return (
     <WorkspaceProvider>
-      <div className="flex flex-col min-h-screen bg-white overflow-hidden">
+      <div className="min-h-screen bg-[#fcfdfe]">
         <Header />
-        <div className="flex flex-1 relative">
-          <Sidebar />
-          <main className="flex-1 min-w-0 lg:max-w-none h-[calc(100vh-56px)] overflow-y-auto no-scrollbar relative">
-            {children}
-          </main>
-          <WorkspaceLayoutSidebar />
-        </div>
+        <WorkspaceLayoutWrapper>
+          {children}
+        </WorkspaceLayoutWrapper>
       </div>
     </WorkspaceProvider>
   );

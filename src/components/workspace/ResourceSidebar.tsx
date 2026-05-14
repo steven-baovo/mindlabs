@@ -94,7 +94,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
   return (
     <aside
       className={`
-        sticky top-0 h-[calc(100vh-56px)] shrink-0 border-l border-border-main
+        sticky top-0 h-[calc(100vh-56px)] shrink-0 border-r border-border-main
         bg-white flex flex-col transition-all duration-300
         ${isCollapsed ? 'w-16' : 'w-64'}
       `}
@@ -150,7 +150,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
                   <span className="text-[13px] truncate flex-1">{resource.title}</span>
                 )}
                 {active && (
-                  <div className="absolute right-[-1px] top-1/2 -translate-y-1/2 w-[2px] h-4 bg-primary rounded-l-full" />
+                  <div className="absolute left-[-1px] top-1/2 -translate-y-1/2 w-[2px] h-4 bg-primary rounded-r-full" />
                 )}
               </div>
             )
@@ -163,10 +163,10 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
           onClick={toggleCollapse}
           className="flex items-center justify-center p-1.5 text-secondary hover:text-foreground hover:bg-hover-bg rounded-main transition-colors w-full cursor-pointer"
         >
-          {isCollapsed ? <ChevronLeft strokeWidth={1.5} className="w-4 h-4" /> : (
+          {isCollapsed ? <ChevronRight strokeWidth={1.5} className="w-4 h-4" /> : (
             <div className="flex items-center gap-2">
+              <ChevronLeft strokeWidth={1.5} className="w-4 h-4" />
               <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Collapse</span>
-              <ChevronRight strokeWidth={1.5} className="w-4 h-4" />
             </div>
           )}
         </button>

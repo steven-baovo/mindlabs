@@ -4,7 +4,7 @@
 // Title/isSaving state được quản lý bởi MindmapBoard → WorkspaceContext → WorkspaceLayoutSidebar
 export default function MindmapWorkspaceClient({ children }: { children: React.ReactNode }) {
   return (
-    <div className="w-full h-[calc(100vh-56px)] overflow-hidden">
+    <div className="w-full h-[calc(100vh-80px)] overflow-hidden bg-[#fcfdfe]">
       {children}
     </div>
   )

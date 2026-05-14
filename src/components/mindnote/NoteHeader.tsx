@@ -11,40 +11,40 @@ interface NoteHeaderProps {
 
 const NoteHeader = ({ title, onTitleChange, isSaving = false }: NoteHeaderProps) => {
   return (
-    <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-border-medium/20 h-12 flex items-center">
-      <div className="w-full px-4 flex items-center justify-between">
+    <header className="sticky top-0 z-30 glass border-b border-border-main/20 h-14 flex items-center px-4">
+      <div className="w-full flex items-center justify-between">
         <div className="flex items-center gap-3 flex-1 overflow-hidden">
           <Link 
             href="/mindnote"
-            className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-secondary shrink-0"
+            className="p-2 hover:bg-black/5 rounded-xl transition-colors text-secondary shrink-0"
             title="Quay lại"
           >
             <ChevronLeft className="w-4 h-4" />
           </Link>
           
-          <div className="flex items-center gap-2 text-gray-400 text-xs shrink-0">
+          <div className="flex items-center gap-2 text-premium opacity-40 shrink-0">
             <span>Mindnote</span>
             <span>/</span>
           </div>
-
+ 
           <input
             type="text"
             value={title}
             onChange={(e) => onTitleChange(e.target.value)}
             placeholder="Tiêu đề ghi chú..."
-            className="bg-transparent text-sm font-medium focus:outline-none placeholder:text-gray-300 w-full truncate text-secondary"
+            className="bg-transparent text-sm font-black tracking-tight focus:outline-none placeholder:text-gray-300 w-full truncate text-secondary"
           />
         </div>
         
         <div className="flex items-center gap-4 shrink-0">
-          <div className="flex items-center gap-1.5 text-[10px] font-medium transition-all">
+          <div className="flex items-center gap-1.5 text-premium transition-all">
             {isSaving ? (
               <div className="flex items-center gap-1.5 text-primary animate-pulse">
                 <Cloud className="w-3 h-3" />
                 <span>Đang lưu</span>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 text-emerald-500">
+              <div className="flex items-center gap-1.5 text-emerald-500/80">
                 <CloudCheck className="w-3 h-3" />
                 <span>Đã lưu</span>
               </div>
