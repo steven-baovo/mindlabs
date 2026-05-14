@@ -68,7 +68,7 @@ export default function Sidebar({ user, profile }: SidebarProps) {
   return (
     <aside className={`
       hidden lg:flex flex-col bg-white rounded-2xl h-full transition-all duration-300 z-50 shadow-sm border border-white/50 relative
-      ${isCollapsed ? 'w-[64px]' : 'w-[240px]'}
+      ${isCollapsed ? 'w-[52px]' : 'w-[220px]'}
     `}>
       {/* Logo & Toggle Section */}
       <div className={`h-16 flex items-center mb-2 ${isCollapsed ? 'justify-center px-0' : 'justify-between px-6'}`}>
