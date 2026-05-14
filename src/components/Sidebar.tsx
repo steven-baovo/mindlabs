@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { 
@@ -34,7 +34,16 @@ const TOOLS_MENU = [
 
 export default function Sidebar({ user, profile }: SidebarProps) {
   const pathname = usePathname()
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  
+  // Initialize collapsed state based on route
+  const isWorkspaceInitial = pathname.includes('/mindnote/') || pathname.includes('/mindmap/')
+  const [isCollapsed, setIsCollapsed] = useState(isWorkspaceInitial)
+
+  // Automatically collapse on workspace routes when navigating
+  useEffect(() => {
+    const isWorkspaceRoute = pathname.includes('/mindnote/') || pathname.includes('/mindmap/')
+    setIsCollapsed(isWorkspaceRoute)
+  }, [pathname])
 
   const renderMenuItem = (item: any, index: number) => {
     const Icon = item.icon

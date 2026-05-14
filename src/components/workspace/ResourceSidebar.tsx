@@ -35,8 +35,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
   const currentId = params?.id as string | undefined
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored === 'true') setIsCollapsed(true)
+    // Starts expanded by default
   }, [])
 
   const toggleCollapse = () => {
@@ -76,6 +75,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
   }
 
   const handleStartEditing = (resource: Resource) => {
+    if (isCollapsed) return
     setEditingId(resource.id)
     setTempTitle(resource.title)
   }
@@ -105,7 +105,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto no-scrollbar py-4 px-2.5 flex flex-col gap-1">
+      <div className="flex-1 overflow-y-auto no-scrollbar py-4 px-2 flex flex-col gap-1">
         {!isCollapsed && (
           <div className="flex gap-2 mb-4 px-1">
             <button onClick={handleCreateNote} className="flex-1 flex items-center justify-center gap-1.5 py-1.5 bg-white border border-border-main rounded-main text-[11px] font-bold hover:border-foreground transition-all shadow-sm">
@@ -131,26 +131,34 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
               <div
                 key={resource.id}
                 onDoubleClick={() => handleStartEditing(resource)}
-                className={`flex items-center gap-3 px-3 py-2 transition-all group relative rounded-main cursor-pointer ${active ? 'bg-active-bg text-foreground font-bold border border-border-main shadow-sm' : 'text-secondary hover:bg-hover-bg hover:text-foreground'
-                  }`}
+                className={`flex items-center transition-all group relative rounded-xl py-2 cursor-pointer
+                  ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'}
+                  ${active ? 'bg-active-bg text-foreground font-bold border border-border-main shadow-sm' : 'text-secondary hover:bg-hover-bg hover:text-foreground'}
+                `}
               >
                 <Link href={resource.type === 'note' ? `/mindnote/${resource.id}` : `/mindmap/${resource.id}`} className="absolute inset-0" />
                 <Icon strokeWidth={active ? 2 : 1.5} className={`w-4 h-4 shrink-0 ${active ? 'text-primary' : 'text-secondary/70 group-hover:text-foreground'}`} />
-                {isEditing ? (
-                  <input
-                    autoFocus
-                    value={tempTitle}
-                    onChange={(e) => setTempTitle(e.target.value)}
-                    onBlur={() => handleFinishEditing(resource)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleFinishEditing(resource)}
-                    className="text-[13px] bg-white border border-border-main rounded px-1.5 py-0.5 flex-1 z-10 outline-none ring-1 ring-primary/20"
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                ) : (
-                  <span className="text-[13px] truncate flex-1">{resource.title}</span>
+                
+                {!isCollapsed && (
+                  <>
+                    {isEditing ? (
+                      <input
+                        autoFocus
+                        value={tempTitle}
+                        onChange={(e) => setTempTitle(e.target.value)}
+                        onBlur={() => handleFinishEditing(resource)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleFinishEditing(resource)}
+                        className="text-[13px] bg-white border border-border-main rounded px-1.5 py-0.5 flex-1 z-10 outline-none ring-1 ring-primary/20"
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    ) : (
+                      <span className="text-[13px] truncate flex-1">{resource.title}</span>
+                    )}
+                  </>
                 )}
+
                 {active && (
-                  <div className="absolute left-[-1px] top-1/2 -translate-y-1/2 w-[2px] h-4 bg-primary rounded-r-full" />
+                  <div className={`absolute top-1/2 -translate-y-1/2 w-[2px] h-4 bg-primary rounded-full ${isCollapsed ? 'left-1' : 'left-[-1px]'}`} />
                 )}
               </div>
             )
