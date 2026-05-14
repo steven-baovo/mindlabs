@@ -9,7 +9,7 @@ import { logout } from '@/app/auth/actions'
 interface UserMenuProps {
   user: {
     email?: string
-  }
+  } | null
   profile?: {
     avatar_url?: string
     display_name?: string
@@ -45,7 +45,7 @@ export default function UserMenu({ user, profile }: UserMenuProps) {
             className="w-full h-full object-cover" 
           />
         ) : (
-          profile?.display_name?.[0] || user.email?.[0] || '?'
+          profile?.display_name?.[0] || user?.email?.[0] || '?'
         )}
       </button>
 
