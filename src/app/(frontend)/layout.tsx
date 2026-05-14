@@ -1,4 +1,5 @@
 import Sidebar from "@/components/Sidebar";
+export const dynamic = 'force-dynamic'
 import { WorkspaceProvider } from "@/contexts/WorkspaceContext";
 import WorkspaceLayoutSidebar from "@/components/workspace/WorkspaceLayoutSidebar";
 import { createClient } from '@/lib/supabase/server';
