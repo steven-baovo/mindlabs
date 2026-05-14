@@ -7,8 +7,9 @@ import { Mic, Zap, BookOpen, Share2, Play } from 'lucide-react'
 export const revalidate = 60
 
 export default async function Home() {
-  // Fetch real posts from Sanity (if any)
-  let sanityPosts = []
+  // Fetch real posts from Sanity (temporarily disabled to debug 500 error)
+  let sanityPosts: any[] = []
+  /*
   try {
     sanityPosts = await client.fetch(`*[_type == "post"] | order(publishedAt desc) {
       _id,
@@ -23,6 +24,7 @@ export default async function Home() {
   } catch (error) {
     console.error("Sanity fetch failed:", error)
   }
+  */
 
   const allPosts = [...sanityPosts, ...mockPosts]
   
