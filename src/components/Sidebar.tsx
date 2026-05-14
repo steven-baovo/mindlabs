@@ -80,7 +80,7 @@ export default function Sidebar({ user, profile }: SidebarProps) {
     <aside 
       onClick={() => setIsCollapsed(!isCollapsed)}
       className={`
-        hidden lg:flex flex-col bg-white rounded-2xl h-full transition-all duration-300 z-50 shadow-sm border border-white/50 relative cursor-pointer
+        hidden lg:flex flex-col bg-white rounded-2xl h-full transition-all duration-300 z-50 shadow-sm border border-white/50 relative cursor-col-resize
         ${isCollapsed ? 'w-[52px]' : 'w-[220px]'}
       `}
     >

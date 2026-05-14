@@ -93,21 +93,30 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
 
   return (
     <aside
+      onClick={toggleCollapse}
       className={`
         h-full shrink-0 bg-white rounded-2xl shadow-sm border border-white/50
-        flex flex-col transition-all duration-300 relative overflow-hidden
+        flex flex-col transition-all duration-300 relative overflow-hidden cursor-col-resize
         ${isCollapsed ? 'w-[52px]' : 'w-[220px]'}
       `}
     >
       {!isCollapsed && isSaving && (
-        <div className="absolute top-2 right-2 z-10">
+        <div 
+          className="absolute top-2 right-2 z-10"
+          onClick={(e) => e.stopPropagation()}
+        >
           <span className="text-[10px] text-primary animate-pulse font-medium bg-white/80 backdrop-blur px-2 py-1 rounded-full border border-border-main shadow-sm">Saving...</span>
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto no-scrollbar py-4 px-2 flex flex-col gap-1">
+      <div 
+        className="flex-1 overflow-y-auto no-scrollbar py-4 px-2 flex flex-col gap-1"
+      >
         {!isCollapsed && (
-          <div className="flex gap-2 mb-4 px-1">
+          <div 
+            className="flex gap-2 mb-4 px-1"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button onClick={handleCreateNote} className="flex-1 flex items-center justify-center gap-1.5 py-1.5 bg-white border border-border-main rounded-main text-[11px] font-bold hover:border-foreground transition-all shadow-sm">
               <Plus strokeWidth={2} className="w-3.5 h-3.5" /> Note
             </button>
@@ -130,6 +139,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
             return (
               <div
                 key={resource.id}
+                onClick={(e) => e.stopPropagation()}
                 onDoubleClick={() => handleStartEditing(resource)}
                 className={`flex items-center transition-all group relative rounded-xl py-2 cursor-pointer
                   ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'}
@@ -164,20 +174,6 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
             )
           })
         )}
-      </div>
-
-      <div className="p-4 border-t border-border-main">
-        <button
-          onClick={toggleCollapse}
-          className="flex items-center justify-center p-1.5 text-secondary hover:text-foreground hover:bg-hover-bg rounded-main transition-colors w-full cursor-pointer"
-        >
-          {isCollapsed ? <ChevronRight strokeWidth={1.5} className="w-4 h-4" /> : (
-            <div className="flex items-center gap-2">
-              <ChevronLeft strokeWidth={1.5} className="w-4 h-4" />
-              <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Collapse</span>
-            </div>
-          )}
-        </button>
       </div>
     </aside>
   )
