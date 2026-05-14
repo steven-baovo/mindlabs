@@ -3,8 +3,8 @@
 import { usePathname } from 'next/navigation'
 import WorkspaceLayoutSidebar from './WorkspaceLayoutSidebar'
 
-const DEEP_WORKSPACE = /^\/(mindnote|mindmap)\/.+/
-const LIST_ROUTE = /^\/(mindnote|mindmap)$/
+const DEEP_WORKSPACE = /^\/mindspace\/(note|canvas)\/.+/
+const LIST_ROUTE = /^\/mindspace$/
 
 export default function WorkspaceLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()

@@ -15,7 +15,7 @@ const NoteHeader = ({ title, onTitleChange, isSaving = false }: NoteHeaderProps)
       <div className="w-full flex items-center justify-between">
         <div className="flex items-center gap-3 flex-1 overflow-hidden">
           <Link 
-            href="/mindnote"
+            href="/mindspace"
             className="p-2 hover:bg-black/5 rounded-xl transition-colors text-secondary shrink-0"
             title="Quay lại"
           >
@@ -23,7 +23,7 @@ const NoteHeader = ({ title, onTitleChange, isSaving = false }: NoteHeaderProps)
           </Link>
           
           <div className="flex items-center gap-2 text-premium opacity-40 shrink-0">
-            <span>Mindnote</span>
+            <span>MindSpace</span>
             <span>/</span>
           </div>
  

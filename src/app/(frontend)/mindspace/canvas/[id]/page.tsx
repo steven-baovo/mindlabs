@@ -50,4 +50,3 @@ export default async function MindmapWorkspacePage({ params }: { params: Promise
     </MindmapWorkspaceClient>
   )
 }
-

@@ -3,7 +3,8 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { signup } from '@/app/auth/actions'
-import { ArrowRight, Mail, Lock, Loader2, UserPlus, Eye, EyeOff } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowRight, Mail, Lock, Loader2, UserPlus, Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react'
 
 export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null)
@@ -16,10 +17,10 @@ export default function RegisterPage() {
     setIsLoading(true)
     setError(null)
     setSuccess(null)
-    
+
     const formData = new FormData(e.currentTarget)
     const result = await signup(formData)
-    
+
     if (result?.error) {
       setError(result.error)
     } else if (result?.success) {
@@ -29,36 +30,57 @@ export default function RegisterPage() {
   }
 
   return (
-    <>
-      <div className="sm:mx-auto sm:w-full sm:max-w-md mb-8 text-center">
-        <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-          Tạo tài khoản mới
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+      className="flex flex-col"
+    >
+      <div className="mb-10">
+        <h2 className="text-3xl font-black tracking-tighter text-foreground mb-2">
+          Tham gia Mindlabs
         </h2>
-        <p className="mt-2 text-sm text-gray-600">
-          Bắt đầu hành trình cùng hệ sinh thái Mindlabs
+        <p className="text-[13px] font-medium text-secondary/60">
+          Bắt đầu hành trình sáng tạo không giới hạn
         </p>
       </div>
 
-      <form className="space-y-6" onSubmit={handleSubmit}>
-        {error && (
-          <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm font-medium border border-red-100">
-            {error}
-          </div>
-        )}
-        
-        {success && (
-          <div className="bg-green-50 text-green-600 p-3 rounded-md text-sm font-medium border border-green-100">
-            {success}
-          </div>
-        )}
+      <form className="space-y-5" onSubmit={handleSubmit}>
+        <AnimatePresence mode="wait">
+          {error && (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-red-500/5 border border-red-500/10 text-red-600 p-4 rounded-2xl text-[12px] font-bold flex items-center gap-3"
+            >
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              {error}
+            </motion.div>
+          )}
 
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Địa chỉ Email
+          {success && (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-emerald-500/5 border border-emerald-500/10 text-emerald-600 p-4 rounded-2xl text-[12px] font-bold flex items-center gap-3"
+            >
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              {success}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="space-y-1.5">
+          <label htmlFor="email" className="block text-[11px] font-black uppercase tracking-widest text-secondary/50 ml-1">
+            Email Address
           </label>
-          <div className="mt-1 relative rounded-md">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Mail className="h-5 w-5 text-gray-400" />
+          <div className="relative group/input">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+              <Mail className="h-4 w-4 text-secondary/30 group-focus-within/input:text-primary transition-colors" />
             </div>
             <input
               id="email"
@@ -66,19 +88,19 @@ export default function RegisterPage() {
               type="email"
               autoComplete="email"
               required
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white/50 backdrop-blur-sm transition-all"
-              placeholder="you@example.com"
+              className="block w-full pl-12 pr-4 py-3 bg-black/5 border border-transparent rounded-2xl focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all text-[13px] font-medium text-foreground outline-none placeholder:text-secondary/20"
+              placeholder="name@example.com"
             />
           </div>
         </div>
 
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-            Mật khẩu
+        <div className="space-y-1.5">
+          <label htmlFor="password" className="block text-[11px] font-black uppercase tracking-widest text-secondary/50 ml-1">
+            Password
           </label>
-          <div className="mt-1 relative rounded-md">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Lock className="h-5 w-5 text-gray-400" />
+          <div className="relative group/input">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+              <Lock className="h-4 w-4 text-secondary/30 group-focus-within/input:text-primary transition-colors" />
             </div>
             <input
               id="password"
@@ -86,50 +108,47 @@ export default function RegisterPage() {
               type={showPassword ? 'text' : 'password'}
               autoComplete="new-password"
               required
-              className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white/50 backdrop-blur-sm transition-all"
-              placeholder="Ít nhất 6 ký tự"
               minLength={6}
+              className="block w-full pl-12 pr-12 py-3 bg-black/5 border border-transparent rounded-2xl focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all text-[13px] font-medium text-foreground outline-none placeholder:text-secondary/20"
+              placeholder="At least 6 characters"
             />
             <button
               type="button"
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+              className="absolute inset-y-0 right-4 flex items-center text-secondary/20 hover:text-secondary/40 focus:outline-none transition-colors"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? (
-                <EyeOff className="h-5 w-5" />
-              ) : (
-                <Eye className="h-5 w-5" />
-              )}
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
         </div>
 
-        <div>
+        <div className="pt-2">
           <button
             type="submit"
             disabled={isLoading || !!success}
-            className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all disabled:opacity-70"
+            className="w-full flex justify-center items-center py-4 px-4 rounded-2xl text-[13px] font-black uppercase tracking-[0.2em] text-white bg-foreground hover:bg-foreground/90 active:scale-[0.98] transition-all disabled:opacity-50 relative overflow-hidden group/btn"
           >
             {isLoading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              <>
-                <UserPlus className="mr-2 w-4 h-4" />
-                Đăng ký tài khoản
-              </>
+              <span className="flex items-center gap-2 relative z-10">
+                Create Account
+                <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+              </span>
             )}
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-primary/20 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-1000" />
           </button>
         </div>
       </form>
 
-      <div className="mt-6 text-center">
-        <p className="text-sm text-gray-600">
+      <div className="mt-10 text-center">
+        <p className="text-[12px] font-medium text-secondary/40">
           Đã có tài khoản?{' '}
-          <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+          <Link href="/login" className="font-bold text-foreground hover:text-primary transition-colors">
             Đăng nhập ngay
           </Link>
         </p>
       </div>
-    </>
+    </motion.div>
   )
 }

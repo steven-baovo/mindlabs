@@ -1,19 +1,110 @@
-'use client'
-
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import {
   FileText,
   Network,
   Plus,
   ChevronLeft,
   ChevronRight,
+  GripVertical,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { loadAllResources, Resource } from '@/app/(frontend)/workspace/actions'
-import { createNote } from '@/app/(frontend)/mindnote/actions'
-import { createMindmap } from '@/app/(frontend)/mindmap/actions'
+import { loadAllResources, Resource, updateSidebarOrder } from '@/app/(frontend)/workspace/actions'
+import { createNote } from '@/app/(frontend)/mindspace/actions'
+import { createMindmap } from '@/app/(frontend)/mindspace/canvas/actions'
 import { useRouter } from 'next/navigation'
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
+
+interface ResourceItemProps {
+  resource: Resource
+  index: number
+  isCollapsed: boolean
+  active: boolean
+  isEditing: boolean
+  editingId: string | null
+  tempTitle: string
+  setTempTitle: (title: string) => void
+  handleStartEditing: (resource: Resource) => void
+  handleFinishEditing: (resource: Resource) => void
+}
+
+const ResourceItem = memo(({ 
+  resource, 
+  index, 
+  isCollapsed, 
+  active, 
+  isEditing, 
+  tempTitle, 
+  setTempTitle, 
+  handleStartEditing, 
+  handleFinishEditing 
+}: ResourceItemProps) => {
+  const Icon = resource.type === 'note' ? FileText : Network
+
+  return (
+    <Draggable key={resource.id} draggableId={resource.id} index={index}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          onClick={(e) => e.stopPropagation()}
+          onDoubleClick={() => handleStartEditing(resource)}
+          className={`flex items-center group relative rounded-xl py-2
+            ${isCollapsed ? 'justify-center px-0' : 'gap-2 px-2'}
+            ${active 
+              ? 'bg-[#f5f5f5] text-foreground font-medium' 
+              : 'text-secondary hover:bg-[#f9f9f9] hover:text-foreground'}
+            ${snapshot.isDragging ? 'shadow-premium bg-white border border-border-main/50 z-50 scale-[1.02]' : ''}
+            transition-[background-color,color] duration-200
+          `}
+        >
+          <Link 
+            href={resource.type === 'note' ? `/mindspace/note/${resource.id}` : `/mindspace/canvas/${resource.id}`} 
+            className="absolute inset-0"
+            onClick={(e) => {
+              if (snapshot.isDragging) e.preventDefault()
+            }}
+          />
+          
+          {!isCollapsed && (
+            <div
+              {...provided.dragHandleProps}
+              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 cursor-grab active:cursor-grabbing text-secondary/40 hover:text-secondary z-10"
+            >
+              <GripVertical className="w-3.5 h-3.5" />
+            </div>
+          )}
+
+          <Icon strokeWidth={active ? 2.0 : 1.5} className={`w-[18px] h-[18px] shrink-0 transition-colors ${active ? 'text-primary' : 'text-secondary/70 group-hover:text-foreground'}`} />
+          
+          {!isCollapsed && (
+            <>
+              {isEditing ? (
+                <input
+                  autoFocus
+                  value={tempTitle}
+                  onChange={(e) => setTempTitle(e.target.value)}
+                  onBlur={() => handleFinishEditing(resource)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleFinishEditing(resource)}
+                  className="text-[13px] bg-white border border-border-main rounded px-1.5 py-0.5 flex-1 z-10 outline-none ring-1 ring-primary/20"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              ) : (
+                <span className="text-[13px] tracking-tight truncate flex-1">{resource.title}</span>
+              )}
+            </>
+          )}
+
+          {active && (
+            <div className={`absolute top-1/2 -translate-y-1/2 w-[2px] h-4 bg-primary rounded-full ${isCollapsed ? 'left-1' : 'left-[-1px]'}`} />
+          )}
+        </div>
+      )}
+    </Draggable>
+  )
+})
+
+ResourceItem.displayName = 'ResourceItem'
 
 interface ResourceSidebarProps {
   activeTitle?: string
@@ -26,6 +117,7 @@ const STORAGE_KEY = 'resource-sidebar-collapsed'
 const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSidebarProps) => {
   const [resources, setResources] = useState<Resource[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isSyncing, setIsSyncing] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [tempTitle, setTempTitle] = useState('')
@@ -50,12 +142,40 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
 
   useEffect(() => {
     const fetchResources = async () => {
-      const { data } = await loadAllResources()
-      setResources(data)
+      const { data, order } = await loadAllResources()
+      
+      if (order && order.length > 0) {
+        const orderedData = [...data].sort((a, b) => {
+          const indexA = order.indexOf(a.id)
+          const indexB = order.indexOf(b.id)
+          if (indexA === -1 && indexB === -1) return 0
+          if (indexA === -1) return 1
+          if (indexB === -1) return -1
+          return indexA - indexB
+        })
+        setResources(orderedData)
+      } else {
+        setResources(data)
+      }
       setIsLoading(false)
     }
     fetchResources()
   }, [])
+
+  const onDragEnd = async (result: DropResult) => {
+    if (!result.destination) return
+
+    const items = Array.from(resources)
+    const [reorderedItem] = items.splice(result.source.index, 1)
+    items.splice(result.destination.index, 0, reorderedItem)
+
+    setResources(items)
+    
+    const orderIds = items.map(item => item.id)
+    setIsSyncing(true)
+    await updateSidebarOrder(orderIds)
+    setIsSyncing(false)
+  }
 
   useEffect(() => {
     if (activeTitle && currentId) {
@@ -73,7 +193,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
 
   const handleCreateMap = async () => {
     const { data } = await createMindmap()
-    if (data) router.push(`/mindmap/${data.id}`)
+    if (data) router.push(`/mindspace/canvas/${data.id}`)
   }
 
   const handleStartEditing = (resource: Resource) => {
@@ -95,14 +215,32 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
 
   return (
     <aside
-      onClick={toggleCollapse}
+      onClick={(e) => {
+        // Only toggle if clicking the aside background itself
+        if (e.target === e.currentTarget) {
+          toggleCollapse()
+        }
+      }}
       className={`
         h-full shrink-0 bg-white rounded-2xl
-        flex flex-col transition-all duration-300 relative overflow-hidden cursor-col-resize
+        flex flex-col transition-all duration-300 relative
         ${isCollapsed ? 'w-[52px]' : 'w-[220px]'}
+        ${isCollapsed ? 'cursor-ew-resize' : 'cursor-default'}
       `}
     >
-      {!isCollapsed && isSaving && (
+      {/* Edge toggle hit area */}
+      <div 
+        onClick={(e) => {
+          e.stopPropagation()
+          toggleCollapse()
+        }}
+        className={`
+          absolute top-0 bottom-0 z-[60] cursor-ew-resize group/toggle
+          ${isCollapsed ? '-left-[30px] w-[42px]' : '-left-[30px] w-[38px]'}
+        `}
+      />
+
+      {!isCollapsed && (isSaving || isSyncing) && (
         <div 
           className="absolute top-2 right-2 z-10"
           onClick={(e) => e.stopPropagation()}
@@ -112,7 +250,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
       )}
 
       <div 
-        className="flex-1 overflow-y-auto no-scrollbar py-4 px-2 flex flex-col gap-1"
+        className="flex-1 overflow-y-auto no-scrollbar py-4 px-2 flex flex-col gap-1 rounded-2xl overflow-hidden"
       >
         {isCollapsed ? (
           <div className="flex flex-col items-center mb-4 relative">
@@ -177,50 +315,34 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
             {[1, 2, 3].map(i => <div key={i} className="h-9 bg-gray-100 rounded-main animate-pulse" />)}
           </div>
         ) : (
-          resources.map((resource) => {
-            const active = isActive(resource)
-            const Icon = resource.type === 'note' ? FileText : Network
-            const isEditing = editingId === resource.id
-
-            return (
-              <div
-                key={resource.id}
-                onClick={(e) => e.stopPropagation()}
-                onDoubleClick={() => handleStartEditing(resource)}
-                className={`flex items-center transition-all group relative rounded-xl py-2 cursor-pointer
-                  ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'}
-                  ${active 
-                    ? 'bg-[#f5f5f5] text-foreground font-medium' 
-                    : 'text-secondary hover:bg-[#f9f9f9] hover:text-foreground'}
-                `}
-              >
-                <Link href={resource.type === 'note' ? `/mindnote/${resource.id}` : `/mindmap/${resource.id}`} className="absolute inset-0" />
-                <Icon strokeWidth={active ? 2.0 : 1.5} className={`w-[18px] h-[18px] shrink-0 ${active ? 'text-primary' : 'text-secondary/70 group-hover:text-foreground'}`} />
-                
-                {!isCollapsed && (
-                  <>
-                    {isEditing ? (
-                      <input
-                        autoFocus
-                        value={tempTitle}
-                        onChange={(e) => setTempTitle(e.target.value)}
-                        onBlur={() => handleFinishEditing(resource)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleFinishEditing(resource)}
-                        className="text-[13px] bg-white border border-border-main rounded px-1.5 py-0.5 flex-1 z-10 outline-none ring-1 ring-primary/20"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    ) : (
-                      <span className="text-[13px] tracking-tight truncate flex-1">{resource.title}</span>
-                    )}
-                  </>
-                )}
-
-                {active && (
-                  <div className={`absolute top-1/2 -translate-y-1/2 w-[2px] h-4 bg-primary rounded-full ${isCollapsed ? 'left-1' : 'left-[-1px]'}`} />
-                )}
-              </div>
-            )
-          })
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="resources">
+              {(provided) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className="flex flex-col gap-1"
+                >
+                  {resources.map((resource, index) => (
+                    <ResourceItem
+                      key={resource.id}
+                      resource={resource}
+                      index={index}
+                      isCollapsed={isCollapsed}
+                      active={isActive(resource)}
+                      isEditing={editingId === resource.id}
+                      editingId={editingId}
+                      tempTitle={tempTitle}
+                      setTempTitle={setTempTitle}
+                      handleStartEditing={handleStartEditing}
+                      handleFinishEditing={handleFinishEditing}
+                    />
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         )}
       </div>
     </aside>

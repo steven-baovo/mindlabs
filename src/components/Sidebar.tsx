@@ -30,7 +30,7 @@ const PRIMARY_MENU = [
 
 const TOOLS_MENU = [
   { title: 'Clarity Planner', icon: Calendar, href: '/clarity' },
-  { title: 'Mindnote', icon: FileText, href: '/mindnote' },
+  { title: 'MindSpace', icon: FileText, href: '/mindspace' },
   { title: 'mindAI', icon: Sparkles, href: '/mindai' },
 ]
 
@@ -38,13 +38,13 @@ export default function Sidebar({ user, profile }: SidebarProps) {
   const pathname = usePathname()
   
   // Initialize collapsed state based on route
-  const isWorkspaceInitial = pathname ? (pathname.includes('/mindnote/') || pathname.includes('/mindmap/')) : false
+  const isWorkspaceInitial = pathname ? pathname.includes('/mindspace/') : false
   const [isCollapsed, setIsCollapsed] = useState(isWorkspaceInitial)
 
   // Automatically collapse on workspace routes when navigating
   useEffect(() => {
     if (!pathname) return
-    const isWorkspaceRoute = pathname.includes('/mindnote/') || pathname.includes('/mindmap/')
+    const isWorkspaceRoute = pathname.includes('/mindspace/')
     setIsCollapsed(isWorkspaceRoute)
   }, [pathname])
 
@@ -78,12 +78,29 @@ export default function Sidebar({ user, profile }: SidebarProps) {
 
   return (
     <aside 
-      onClick={() => setIsCollapsed(!isCollapsed)}
+      onClick={(e) => {
+        // Only toggle if clicking the aside background itself
+        if (e.target === e.currentTarget) {
+          setIsCollapsed(!isCollapsed)
+        }
+      }}
       className={`
-        hidden lg:flex flex-col bg-white rounded-2xl h-full transition-all duration-300 z-50 relative cursor-col-resize
+        hidden lg:flex flex-col bg-white rounded-2xl h-full transition-all duration-300 z-50 relative
         ${isCollapsed ? 'w-[52px]' : 'w-[220px]'}
+        ${isCollapsed ? 'cursor-ew-resize' : 'cursor-default'}
       `}
     >
+      {/* Edge toggle hit area */}
+      <div 
+        onClick={(e) => {
+          e.stopPropagation()
+          setIsCollapsed(!isCollapsed)
+        }}
+        className={`
+          absolute top-0 bottom-0 z-[60] cursor-ew-resize group/toggle
+          ${isCollapsed ? '-right-[30px] w-[42px]' : '-right-[30px] w-[38px]'}
+        `}
+      />
       {/* Logo & Toggle Section */}
       <div 
         className={`h-16 flex items-center mb-2 ${isCollapsed ? 'justify-center px-0' : 'justify-between px-6'}`}

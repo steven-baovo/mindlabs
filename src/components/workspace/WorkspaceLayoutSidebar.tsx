@@ -4,10 +4,10 @@ import { usePathname } from 'next/navigation'
 import ResourceSidebar from './ResourceSidebar'
 import { useWorkspace } from '@/contexts/WorkspaceContext'
 
-// Show ResourceSidebar on /mindnote, /mindmap, and any child routes
-const WORKSPACE_ROUTE = /^\/(mindnote|mindmap)/
+// Show ResourceSidebar on /mindspace and any child routes
+const WORKSPACE_ROUTE = /^\/mindspace/
 // Only pass activeTitle/isSaving when inside a specific document
-const RESOURCE_ROUTE = /^\/(mindnote|mindmap)\/[\w-]+/
+const RESOURCE_ROUTE = /^\/mindspace\/(note|canvas)\/[\w-]+/
 
 export default function WorkspaceLayoutSidebar() {
   const pathname = usePathname()

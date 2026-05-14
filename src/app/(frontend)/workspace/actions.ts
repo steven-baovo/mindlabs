@@ -11,12 +11,12 @@ export interface Resource {
   updated_at: string
 }
 
-export async function loadAllResources(): Promise<{ data: Resource[]; error: string | null }> {
+export async function loadAllResources(): Promise<{ data: Resource[]; order: string[]; error: string | null }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { data: [], error: 'Not authenticated' }
+  if (!user) return { data: [], order: [], error: 'Not authenticated' }
 
-  const [notesResult, mapsResult] = await Promise.all([
+  const [notesResult, mapsResult, profileResult] = await Promise.all([
     supabase
       .from('mind_notes')
       .select('id, title, updated_at')
@@ -26,6 +26,11 @@ export async function loadAllResources(): Promise<{ data: Resource[]; error: str
       .select('id, title, updated_at')
       .eq('user_id', user.id)
       .order('updated_at', { ascending: false }),
+    supabase
+      .from('profiles')
+      .select('sidebar_order')
+      .eq('id', user.id)
+      .maybeSingle()
   ])
 
   const notes: Resource[] = (notesResult.data ?? []).map((n) => ({
@@ -46,5 +51,20 @@ export async function loadAllResources(): Promise<{ data: Resource[]; error: str
     (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
   )
 
-  return { data: combined, error: null }
+  const order = (profileResult.data?.sidebar_order as string[]) || []
+
+  return { data: combined, order, error: null }
+}
+
+export async function updateSidebarOrder(order: string[]) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ sidebar_order: order })
+    .eq('id', user.id)
+
+  return { error: error?.message || null }
 }

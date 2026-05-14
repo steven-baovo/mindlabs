@@ -4,7 +4,7 @@ import { useState, useEffect, useTransition } from 'react'
 import { FileText, Plus, Search, Clock, Loader2, Cloud, CloudCheck, ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { loadNotes, createNote } from '@/app/(frontend)/mindnote/actions'
+import { loadNotes, createNote } from '@/app/(frontend)/mindspace/actions'
 
 interface NoteSidebarProps {
   activeTitle?: string
@@ -54,7 +54,7 @@ const NoteSidebar = ({ activeTitle, onTitleChange, isSaving }: NoteSidebarProps)
         <div className="p-4 bg-white border-b border-border-medium/10">
           <div className="flex items-center justify-between mb-3">
              <Link 
-              href="/mindnote"
+              href="/mindspace"
               className="flex items-center gap-1 text-[10px] text-gray-400 hover:text-secondary transition-colors"
             >
               <ChevronLeft className="w-3 h-3" />
@@ -127,7 +127,7 @@ const NoteSidebar = ({ activeTitle, onTitleChange, isSaving }: NoteSidebarProps)
           filteredNotes.map((note) => (
             <Link
               key={note.id}
-              href={`/mindnote/${note.id}`}
+              href={`/mindspace/note/${note.id}`}
               className={`flex flex-col gap-1 p-3 rounded-xl transition-all group ${
                 currentId === note.id 
                   ? 'bg-white shadow-sm border border-border-medium/50 ring-1 ring-primary/5' 

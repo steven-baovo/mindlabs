@@ -40,7 +40,7 @@ export async function createMindmap(title: string = 'Untitled Canvas'): Promise<
     .single()
 
   if (error) return { data: null, error: error.message }
-  revalidatePath('/mindmap')
+  revalidatePath('/mindspace')
   return { data: data as Mindmap, error: null }
 }
 
@@ -77,7 +77,7 @@ export async function updateMindmap(
   if (error) return { error: error.message }
   
   if (updates.title) {
-    revalidatePath('/mindmap')
+    revalidatePath('/mindspace')
   }
   return { error: null }
 }
@@ -94,6 +94,6 @@ export async function deleteMindmap(id: string): Promise<{ error: string | null 
     .eq('user_id', user.id)
 
   if (error) return { error: error.message }
-  revalidatePath('/mindmap')
+  revalidatePath('/mindspace')
   return { error: null }
 }

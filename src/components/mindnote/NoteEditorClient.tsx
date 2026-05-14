@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import ZenEditor from './ZenEditor'
-import { updateNote } from '@/app/(frontend)/mindnote/actions'
+import { updateNote } from '@/app/(frontend)/mindspace/actions'
 import { useWorkspace } from '@/contexts/WorkspaceContext'
 
 interface NoteEditorClientProps {

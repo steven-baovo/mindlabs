@@ -1,4 +1,4 @@
-import { loadNote } from '../actions'
+import { loadNote } from '../../actions'
 import NoteEditorClient from '@/components/mindnote/NoteEditorClient'
 import { notFound } from 'next/navigation'
 

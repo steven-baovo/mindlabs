@@ -23,7 +23,7 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import TextNode from './TextNode'
-import { updateMindmap } from '@/app/(frontend)/mindmap/actions'
+import { updateMindmap } from '@/app/(frontend)/mindspace/canvas/actions'
 import { SquarePlus, Hand, MousePointer2, Activity } from 'lucide-react'
 import MindmapEdge from './MindmapEdge'
 import { useWorkspace } from '@/contexts/WorkspaceContext'

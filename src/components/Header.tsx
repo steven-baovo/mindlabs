@@ -9,11 +9,11 @@ import { createClient } from '@/lib/supabase/client'
 import UserMenu from './UserMenu'
 import { useWorkspace } from '@/contexts/WorkspaceContext'
 
-const DEEP_WORKSPACE = /^\/(mindnote|mindmap)/
+const DEEP_WORKSPACE = /^\/mindspace/
 
 const NAV_ITEMS = [
   { name: 'Home', href: '/', icon: Home },
-  { name: 'Mindnote', href: '/mindnote', icon: FileText },
+  { name: 'MindSpace', href: '/mindspace', icon: FileText },
   { name: 'MindAI', href: '/mindai', icon: Sparkles },
 ]
 

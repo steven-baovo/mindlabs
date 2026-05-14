@@ -64,8 +64,8 @@ export async function createNote(formData?: FormData) {
 
   if (error) throw new Error(error.message)
 
-  revalidatePath('/mindnote')
-  redirect(`/mindnote/${data.id}`)
+  revalidatePath('/mindspace')
+  redirect(`/mindspace/note/${data.id}`)
 }
 
 export async function updateNote(id: string, updates: any) {
@@ -91,6 +91,6 @@ export async function deleteNote(id: string, formData?: FormData) {
 
   if (error) throw new Error(error.message)
   
-  revalidatePath('/mindnote')
-  redirect('/mindnote')
+  revalidatePath('/mindspace')
+  redirect('/mindspace')
 }
