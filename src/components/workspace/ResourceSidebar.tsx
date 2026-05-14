@@ -58,7 +58,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
 
   useEffect(() => {
     if (activeTitle && currentId) {
-      setResources(prev => prev.map(r => 
+      setResources(prev => prev.map(r =>
         r.id === currentId ? { ...r, title: activeTitle } : r
       ))
     }
@@ -99,10 +99,9 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
         ${isCollapsed ? 'w-16' : 'w-64'}
       `}
     >
-      {!isCollapsed && (
-        <div className="px-5 py-4 flex justify-between items-center border-b border-border-main">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-secondary">Resources</span>
-          {isSaving && <span className="text-[10px] text-primary animate-pulse font-medium">Saving...</span>}
+      {!isCollapsed && isSaving && (
+        <div className="absolute top-2 right-2 z-10">
+          <span className="text-[10px] text-primary animate-pulse font-medium bg-white/80 backdrop-blur px-2 py-1 rounded-full border border-border-main shadow-sm">Saving...</span>
         </div>
       )}
 
@@ -132,9 +131,8 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
               <div
                 key={resource.id}
                 onDoubleClick={() => handleStartEditing(resource)}
-                className={`flex items-center gap-3 px-3 py-2 transition-all group relative rounded-main cursor-pointer ${
-                  active ? 'bg-active-bg text-foreground font-bold border border-border-main shadow-sm' : 'text-secondary hover:bg-hover-bg hover:text-foreground'
-                }`}
+                className={`flex items-center gap-3 px-3 py-2 transition-all group relative rounded-main cursor-pointer ${active ? 'bg-active-bg text-foreground font-bold border border-border-main shadow-sm' : 'text-secondary hover:bg-hover-bg hover:text-foreground'
+                  }`}
               >
                 <Link href={resource.type === 'note' ? `/mindnote/${resource.id}` : `/mindmap/${resource.id}`} className="absolute inset-0" />
                 <Icon strokeWidth={active ? 2 : 1.5} className={`w-4 h-4 shrink-0 ${active ? 'text-primary' : 'text-secondary/70 group-hover:text-foreground'}`} />
@@ -161,7 +159,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
       </div>
 
       <div className="p-4 border-t border-border-main">
-        <button 
+        <button
           onClick={toggleCollapse}
           className="flex items-center justify-center p-1.5 text-secondary hover:text-foreground hover:bg-hover-bg rounded-main transition-colors w-full cursor-pointer"
         >

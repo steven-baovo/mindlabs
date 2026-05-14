@@ -1,12 +1,13 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import { client } from '@/sanity/client'
 import { mockPosts } from '@/lib/mockPosts'
+import PostCard from '@/components/blog/PostCard'
+import { Mic, Zap, BookOpen, Share2, Play } from 'lucide-react'
 
 export const revalidate = 60
 
 export default async function Home() {
-  // Fetch real posts from Sanity
+  // Fetch real posts from Sanity (if any)
   const sanityPosts = await client.fetch(`*[_type == "post"] | order(publishedAt desc) {
     _id,
     title,
@@ -14,126 +15,195 @@ export default async function Home() {
     publishedAt,
     excerpt,
     "category": categories[0]->title,
-    "imageUrl": mainImage.asset->url
+    "imageUrl": mainImage.asset->url,
+    "type": "article"
   }`)
 
-  // Combine with mock posts
   const allPosts = [...sanityPosts, ...mockPosts]
-
-  // Group posts by category
-  const categories = ["Yoga", "Gut Health", "Meditation", "Sleep", "Productivity"]
   
-  // Extract latest 4 posts overall
-  const latestPosts = allPosts.slice(0, 4)
+  // Categorize
+  const featuredPost = allPosts[0]
+  const recentArticles = allPosts.filter(p => p.type !== 'audio' && p._id !== featuredPost._id).slice(0, 4)
+  const podcastPosts = allPosts.filter(p => p.type === 'audio').slice(0, 3)
+  
+  const categories = ["Tập trung sâu", "Khoa học nhận thức", "Thiết kế hệ thống", "Lối sống", "Quản lý thời gian"]
 
-  const getPostsByCategory = (catName: string) => {
-    return allPosts.filter(post => post.category === catName).slice(0, 3)
-  }
-
-  // Component for rendering a Post Card
-  const PostCard = ({ post }: { post: any }) => {
-    return (
-      <Link href={post.slug?.current ? `/blog/${post.slug.current}` : '#'} className="group block cursor-pointer">
-        <div className="flex flex-col gap-3">
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-gray-100">
-            {post.imageUrl || post.image ? (
-              <img 
-                src={post.imageUrl || post.image} 
-                alt={post.title} 
-                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
-              />
-            ) : (
-              <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
-                No Image
-              </div>
-            )}
+  return (
+    <div className="w-full bg-[#fcfdfe] min-h-screen pb-32">
+      {/* Dynamic Hero Bento Section */}
+      <section className="pt-16 pb-20 container mx-auto px-6 max-w-7xl">
+        <div className="flex items-center gap-2 mb-10">
+          <div className="glass px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10 shadow-sm">
+            <Zap className="w-3.5 h-3.5 text-primary animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Nghiên cứu mới nhất</span>
           </div>
-          <div>
-            <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors leading-tight mb-2 line-clamp-2">
-              {post.title}
-            </h3>
-            <div className="flex items-center text-xs font-medium text-gray-500 gap-2">
-              <span>{post.readTime || '5 Min read'}</span>
-              <span>•</span>
-              <span>
-                {new Date(post.publishedAt || Date.now()).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric'
-                })}
-              </span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          {/* Featured Post - Immersion */}
+          <div className="lg:col-span-8 relative group">
+            <div className="absolute -inset-4 bg-gradient-to-r from-primary/5 to-transparent rounded-[40px] -z-10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+            <PostCard post={featuredPost as any} featured={true} />
+          </div>
+
+          {/* Secondary Posts - Refined Sidebar */}
+          <div className="lg:col-span-4 flex flex-col gap-10">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-secondary/40">Đáng chú ý</h3>
+              <div className="w-12 h-[1px] bg-border-main/50" />
+            </div>
+            
+            <div className="flex flex-col gap-8">
+              {recentArticles.slice(0, 3).map((post: any) => (
+                <Link key={post._id} href={`/blog/${post.slug.current}`} className="group flex gap-5 items-center">
+                  <div className="w-24 h-24 shrink-0 rounded-ncmaz-sm overflow-hidden bg-gray-100 shadow-sm group-hover:shadow-md transition-all duration-500">
+                    <img 
+                      src={post.image || post.imageUrl} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-primary/60">{post.category}</span>
+                    <h4 className="text-[15px] font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-tight tracking-tight">
+                      {post.title}
+                    </h4>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="w-1 h-1 rounded-full bg-secondary/30" />
+                      <span className="text-[10px] font-bold text-secondary/40 uppercase tracking-widest">5 min read</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
-      </Link>
-    )
-  }
-
-  return (
-    <div className="w-full bg-white min-h-screen pb-20">
-      {/* Header Welcome */}
-      <section className="pt-16 pb-12 text-center container mx-auto px-4">
-        <h1 className="text-4xl md:text-5xl font-bold text-[#1a2b49] mb-4">
-          Welcome to your Health Habitat!
-        </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-          Explore a healthier lifestyle with our blog, covering diet, sleep, and more. Let us be your wellness guide!
-        </p>
       </section>
 
-      {/* Explore Popular Topics (Pill Buttons) */}
-      <section className="py-8 container mx-auto px-4 text-center">
-        <h2 className="text-sm font-bold tracking-widest text-[#1a2b49] uppercase mb-4">Explore</h2>
-        <h3 className="text-3xl font-bold text-[#1a2b49] mb-8">Popular Topics</h3>
-        <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+      {/* Sleek Podcast Section - Ncmaz Inspired Dark Mode */}
+      <section className="py-24 bg-[#0a0a0a] rounded-[48px] mx-4 lg:mx-8 my-12 overflow-hidden relative">
+        {/* Background Decor */}
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/10 to-transparent pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="container mx-auto px-8 lg:px-16 max-w-7xl relative z-10">
+          <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-16 gap-6">
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-primary/20 rounded-lg">
+                  <Mic className="w-5 h-5 text-primary" />
+                </div>
+                <span className="text-xs font-black uppercase tracking-[0.3em] text-primary/80">Mindlabs Audio</span>
+              </div>
+              <h2 className="text-5xl lg:text-6xl font-black text-white tracking-tighter leading-none">
+                Nghe & <br/> <span className="text-primary/60">Suy ngẫm</span>
+              </h2>
+            </div>
+            <Link 
+              href="/blog?type=audio" 
+              className="px-8 py-4 glass text-[10px] font-black uppercase tracking-[0.2em] text-white hover:bg-white hover:text-black transition-all rounded-full"
+            >
+              Xem tất cả Podcast
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {podcastPosts.map((post: any) => (
+              <div key={post._id} className="relative group">
+                <PostCard post={{...post, featured: false}} />
+                {/* Specific Dark Mode overrides for cards in this section could be handled via props, 
+                    but here we'll assume the standard PostCard works or we style the container */}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Category Explore - Minimalist Grid */}
+      <section className="py-32 container mx-auto px-6 max-w-7xl">
+        <div className="flex items-center gap-4 mb-16">
+          <div className="w-12 h-[2px] bg-primary" />
+          <h2 className="text-3xl font-black text-foreground tracking-tighter uppercase">Chủ đề phổ biến</h2>
+        </div>
+        
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {categories.map((cat, idx) => (
             <Link 
               key={idx} 
               href={`/blog?category=${cat.toLowerCase().replace(' ', '-')}`}
-              className="px-6 py-2 rounded-full border border-gray-800 bg-white text-gray-800 hover:bg-gray-800 hover:text-white transition-colors text-sm font-medium"
+              className="group relative p-10 rounded-[32px] bg-white border border-border-main/50 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden"
             >
-              {cat}
+              <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/5 rounded-full group-hover:scale-150 transition-transform duration-700" />
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-sm">
+                  <Zap className="w-6 h-6 text-secondary/40 group-hover:text-white transition-colors" />
+                </div>
+                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-secondary group-hover:text-foreground transition-colors">
+                  {cat}
+                </span>
+                <p className="text-[10px] text-secondary/40 mt-2 font-bold uppercase tracking-widest">12 bài viết</p>
+              </div>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* Latest Articles Section */}
-      <section className="py-12 container mx-auto px-4 max-w-6xl">
-        <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
-          <h2 className="text-3xl font-bold text-[#1a2b49]">Latest Articles</h2>
-          <Link href="/blog" className="text-blue-600 hover:text-blue-800 font-medium text-sm">
-            View All →
-          </Link>
+      {/* Main Feed - Asymmetric Grid */}
+      <section className="py-24 container mx-auto px-6 max-w-7xl">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-20 gap-8">
+          <h2 className="text-5xl font-black text-foreground tracking-tighter">Bài viết <span className="text-secondary/20">mới</span></h2>
+          <div className="flex glass p-1.5 rounded-full">
+             {["Mới nhất", "Phổ biến", "Nghiên cứu"].map((tab, i) => (
+               <button 
+                key={tab} 
+                className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-full transition-all ${i === 0 ? 'bg-primary text-white shadow-lg' : 'text-secondary/50 hover:text-primary'}`}
+              >
+                 {tab}
+               </button>
+             ))}
+          </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {latestPosts.map((post: any, idx: number) => (
-            <PostCard key={idx} post={post} />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
+          {allPosts.slice(4, 10).map((post: any) => (
+            <PostCard key={post._id} post={post} />
           ))}
+        </div>
+        
+        <div className="mt-24 text-center">
+          <button className="group relative px-12 py-5 bg-foreground text-white rounded-full font-black text-[11px] uppercase tracking-[0.3em] overflow-hidden transition-all hover:pr-16 active:scale-95 shadow-2xl shadow-primary/20">
+            <span className="relative z-10">Xem tất cả bài viết</span>
+            <div className="absolute right-0 top-0 h-full w-0 group-hover:w-12 bg-primary transition-all duration-500 flex items-center justify-center">
+               <Zap className="w-4 h-4 text-white" />
+            </div>
+          </button>
         </div>
       </section>
 
-      {/* Dynamic Category Sections */}
-      {categories.map((category) => {
-        const catPosts = getPostsByCategory(category)
-        if (catPosts.length === 0) return null
-
-        return (
-          <section key={category} className="py-12 container mx-auto px-4 max-w-6xl">
-            <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
-              <h2 className="text-3xl font-bold text-[#1a2b49]">{category}</h2>
-              <Link href={`/blog?category=${category.toLowerCase().replace(' ', '-')}`} className="text-blue-600 hover:text-blue-800 font-medium text-sm">
-                View All {category} →
-              </Link>
+      {/* Ncmaz Style Sticky Player - Mock UI */}
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-4xl z-[100] animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-1000">
+        <div className="glass border-white/20 rounded-[32px] p-4 flex items-center gap-6 shadow-2xl shadow-black/20 backdrop-blur-2xl">
+          <div className="w-14 h-14 rounded-2xl overflow-hidden bg-primary shrink-0 relative group">
+            <img src={podcastPosts[0]?.image || podcastPosts[0]?.imageUrl} className="w-full h-full object-cover opacity-80" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-2 h-4 bg-white/40 rounded-full animate-pulse" />
+              <div className="w-2 h-8 bg-white/60 mx-1 rounded-full animate-pulse delay-75" />
+              <div className="w-2 h-5 bg-white/40 rounded-full animate-pulse delay-150" />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {catPosts.map((post: any, idx: number) => (
-                <PostCard key={idx} post={post} />
-              ))}
-            </div>
-          </section>
-        )
-      })}
+          </div>
+          <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+             <span className="text-[10px] font-black uppercase tracking-widest text-primary">Đang phát Podcast</span>
+             <h4 className="text-sm font-black text-foreground truncate">{podcastPosts[0]?.title}</h4>
+          </div>
+          <div className="flex items-center gap-4 pr-4">
+             <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors">
+               <Share2 className="w-4 h-4 text-secondary" />
+             </button>
+             <button className="w-12 h-12 bg-primary text-white flex items-center justify-center rounded-full shadow-lg hover:scale-105 transition-all">
+               <Play className="w-5 h-5 fill-current ml-1" />
+             </button>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

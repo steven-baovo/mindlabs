@@ -17,10 +17,12 @@
   --hover-bg: #f5f5f5;
   --active-bg: #f5f5f5;
   
-  /* Hình khối Sắc sảo */
-  --radius-pill: 4px;
-  --radius-card: 10px;
-  --radius-main: 8px;
+  /* Ncmaz Premium Style Extensions */
+  --radius-ncmaz: 32px;
+  --radius-ncmaz-sm: 20px;
+  --shadow-premium: 0 20px 40px -12px rgba(0, 0, 0, 0.08), 0 0 1px 0 rgba(0, 0, 0, 0.04);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.4);
 }
 
 @theme {
@@ -36,6 +38,9 @@
   --radius-pill: var(--radius-pill);
   --radius-card: var(--radius-card);
   --radius-main: var(--radius-main);
+  --radius-ncmaz: var(--radius-ncmaz);
+  --radius-ncmaz-sm: var(--radius-ncmaz-sm);
+  --shadow-premium: var(--shadow-premium);
   --font-sans: var(--font-inter);
 }
 
@@ -66,6 +71,17 @@ body {
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+  }
+
+  .shadow-premium {
+    box-shadow: var(--shadow-premium);
   }
 }
 
