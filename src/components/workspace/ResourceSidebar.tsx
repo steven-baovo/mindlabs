@@ -96,7 +96,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
       className={`
         h-full shrink-0 bg-white rounded-2xl shadow-sm border border-white/50
         flex flex-col transition-all duration-300 relative overflow-hidden
-        ${isCollapsed ? 'w-16' : 'w-64'}
+        ${isCollapsed ? 'w-[52px]' : 'w-[220px]'}
       `}
     >
       {!isCollapsed && isSaving && (
