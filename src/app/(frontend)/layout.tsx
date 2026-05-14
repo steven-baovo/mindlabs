@@ -19,7 +19,7 @@ export default async function FrontendLayout({
 
   return (
     <WorkspaceProvider>
-      <div className="flex h-screen bg-[#f3f4f6] p-3 gap-3 overflow-hidden">
+      <div className="flex h-screen bg-[#f3f4f6] p-1.5 gap-1.5 overflow-hidden">
         {/* Sidebar Island */}
         <div className="flex flex-col h-full shrink-0">
           <Sidebar user={user} profile={profile} />
