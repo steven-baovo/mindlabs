@@ -179,7 +179,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Ncmaz Style Sticky Player - Mock UI */}
+      {/* Ncmaz Style Sticky Player - Mock UI - Temporarily Hidden
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-4xl z-[100] animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-1000">
         <div className="glass border-white/20 rounded-[32px] p-4 flex items-center gap-6 shadow-2xl shadow-black/20 backdrop-blur-2xl">
           <div className="w-14 h-14 rounded-2xl overflow-hidden bg-primary shrink-0 relative group">
@@ -204,6 +204,7 @@ export default async function Home() {
           </div>
         </div>
       </div>
+      */}
     </div>
   )
 }

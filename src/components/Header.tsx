@@ -60,9 +60,9 @@ export default function Header() {
       }}
       className="fixed z-[100] px-6 pointer-events-none"
     >
-      <div className="flex h-16 w-full items-center justify-between px-8 glass rounded-full shadow-premium pointer-events-auto border border-black/15 ring-1 ring-white/50 relative group/header backdrop-blur-[64px] backdrop-saturate-[250%]">
+      <div className="flex h-16 w-full items-center justify-between px-8 glass rounded-full shadow-premium pointer-events-auto border border-black/75 ring-1 ring-white/50 relative group/header backdrop-blur-[64px] backdrop-saturate-[250%]">
         {/* Atmospheric Glow */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 opacity-0 group-hover/header:opacity-100 transition-opacity duration-1000" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 opacity-0 group-hover/header:opacity-100 transition-opacity duration-1000 rounded-full" />
         
         {/* Logo Section */}
         {!isDeepWorkspace && (
