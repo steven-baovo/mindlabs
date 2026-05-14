@@ -12,7 +12,8 @@ import {
   ChevronRight,
   FileText,
   Sparkles,
-  Calendar
+  Calendar,
+  MessageSquare
 } from 'lucide-react'
 import UserMenu from './UserMenu'
 
@@ -24,6 +25,7 @@ interface SidebarProps {
 const PRIMARY_MENU = [
   { title: 'Home', icon: Home, href: '/' },
   { title: 'Search', icon: Search, href: '#' },
+  { title: 'Contact', icon: MessageSquare, href: '/contact' },
 ]
 
 const TOOLS_MENU = [
