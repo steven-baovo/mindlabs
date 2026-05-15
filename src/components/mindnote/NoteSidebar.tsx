@@ -91,7 +91,11 @@ const NoteSidebar = ({ activeTitle, onTitleChange, isSaving }: NoteSidebarProps)
           <h2 className="text-sm font-semibold text-secondary uppercase tracking-wider">Ghi chú của bạn</h2>
           <button 
             onClick={() => startTransition(async () => {
-              await createNote()
+              const { data } = await createNote()
+              if (data) {
+                setNotes(prev => [data, ...prev])
+                router.push(`/mindspace/note/${data.id}`)
+              }
             })}
             disabled={isPending}
             className="p-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-md transition-colors disabled:opacity-50"

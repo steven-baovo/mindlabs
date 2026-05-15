@@ -1,16 +1,19 @@
 import { FileText, Network } from 'lucide-react'
 import { createNote } from '@/app/(frontend)/mindspace/actions'
 import { createMindmap } from '@/app/(frontend)/mindspace/canvas/actions'
+import { redirect } from 'next/navigation'
 
 export default function MindSpaceDashboardPage() {
   const handleCreateNoteAction = async () => {
     'use server'
-    await createNote()
+    const { data } = await createNote()
+    if (data) redirect(`/mindspace/note/${data.id}`)
   }
 
   const handleCreateMapAction = async () => {
     'use server'
-    await createMindmap()
+    const { data } = await createMindmap()
+    if (data) redirect(`/mindspace/canvas/${data.id}`)
   }
 
   return (

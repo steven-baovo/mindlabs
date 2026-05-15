@@ -65,7 +65,7 @@ export async function createNote(formData?: FormData) {
   if (error) throw new Error(error.message)
 
   revalidatePath('/mindspace')
-  redirect(`/mindspace/note/${data.id}`)
+  return { data, error: null }
 }
 
 export async function updateNote(id: string, updates: any) {

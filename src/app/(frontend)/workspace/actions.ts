@@ -11,7 +11,18 @@ export interface Resource {
   updated_at: string
 }
 
-export async function loadAllResources(): Promise<{ data: Resource[]; order: string[]; error: string | null }> {
+export type SidebarItemType = 'folder' | 'note' | 'map'
+
+export interface SidebarFolder {
+  id: string
+  type: 'folder'
+  title: string
+  children: string[]
+}
+
+export type SidebarOrder = (string | SidebarFolder)[]
+
+export async function loadAllResources(): Promise<{ data: Resource[]; order: SidebarOrder; error: string | null }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: [], order: [], error: 'Not authenticated' }
@@ -51,12 +62,12 @@ export async function loadAllResources(): Promise<{ data: Resource[]; order: str
     (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
   )
 
-  const order = (profileResult.data?.sidebar_order as string[]) || []
+  const order = (profileResult.data?.sidebar_order as SidebarOrder) || []
 
   return { data: combined, order, error: null }
 }
 
-export async function updateSidebarOrder(order: string[]) {
+export async function updateSidebarOrder(order: SidebarOrder) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
