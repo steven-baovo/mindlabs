@@ -104,7 +104,7 @@ export default function FocusTasks() {
   }
 
   return (
-    <div className="w-full max-w-xl mx-auto flex flex-col gap-8">
+    <div className="w-full max-w-xl mx-auto flex flex-col gap-6 sm:gap-8">
       <div className="flex items-center justify-between">
         <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40">Active Tasks</h2>
         {tasks.length > 0 && (
@@ -130,7 +130,7 @@ export default function FocusTasks() {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 10 }}
-                className={`group flex items-center gap-4 p-4 rounded-3xl transition-all cursor-pointer ${
+                className={`group flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-[24px] sm:rounded-3xl transition-all cursor-pointer ${
                   activeTaskId === task.id ? 'bg-black/[0.04]' : 'hover:bg-black/[0.02]'
                 }`}
                 onClick={() => setActiveTaskId(task.id)}
@@ -139,29 +139,29 @@ export default function FocusTasks() {
                   onClick={(e) => { e.stopPropagation(); handleToggleComplete(task) }}
                   className={`shrink-0 transition-all ${task.is_completed ? 'text-primary' : 'text-black/20 hover:text-primary'}`}
                 >
-                  {task.is_completed ? <CheckCircle2 className="w-6 h-6" /> : <Circle className="w-6 h-6" />}
+                  {task.is_completed ? <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6" /> : <Circle className="w-5 h-5 sm:w-6 sm:h-6" />}
                 </button>
 
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-bold truncate ${task.is_completed ? 'text-black/30 line-through' : 'text-foreground'}`}>
+                  <p className={`text-[13px] sm:text-sm font-bold truncate ${task.is_completed ? 'text-black/30 line-through' : 'text-foreground'}`}>
                     {task.title}
                   </p>
                   {task.notes && !task.is_completed && (
-                    <p className="text-[10px] mt-1 text-black/50 truncate font-medium uppercase tracking-wider">
+                    <p className="text-[9px] sm:text-[10px] mt-0.5 sm:mt-1 text-black/50 truncate font-medium uppercase tracking-wider">
                       {task.notes}
                     </p>
                   )}
                 </div>
 
-                <div className="flex items-center gap-4 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="text-[10px] font-black text-black/40">
+                <div className="flex items-center gap-3 sm:gap-4 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                  <span className="text-[9px] sm:text-[10px] font-black text-black/40">
                     {task.completed_pomodoros}/{task.estimated_pomodoros}
                   </span>
                   <button 
                     onClick={(e) => { e.stopPropagation(); handleDelete(task.id) }}
-                    className="p-2 rounded-full hover:bg-red-50 text-black/20 hover:text-red-500 transition-all"
+                    className="p-1.5 sm:p-2 rounded-full hover:bg-red-50 text-black/20 hover:text-red-500 transition-all"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                   </button>
                 </div>
               </motion.div>
@@ -173,24 +173,24 @@ export default function FocusTasks() {
           <motion.form
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-4 p-6 rounded-[32px] bg-black/[0.04] border border-black/[0.05] flex flex-col gap-4"
+            className="mt-4 p-5 sm:p-6 rounded-[28px] sm:rounded-[32px] bg-black/[0.04] border border-black/[0.05] flex flex-col gap-4"
             onSubmit={handleCreate}
           >
             <input
               autoFocus
               type="text"
               placeholder="What are you focusing on?"
-              className="w-full bg-transparent border-none outline-none text-base font-bold placeholder:text-black/30 text-foreground"
+              className="w-full bg-transparent border-none outline-none text-[15px] sm:text-base font-bold placeholder:text-black/30 text-foreground"
               value={newTaskTitle}
               onChange={e => setNewTaskTitle(e.target.value)}
             />
-            <div className="flex items-center gap-6">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
               <div className="flex flex-col gap-1">
                 <span className="text-[8px] font-black uppercase tracking-widest text-black/50">Est. Pomos</span>
                 <input
                   type="number"
                   min="1"
-                  className="w-16 bg-transparent border-none outline-none font-black text-sm text-foreground"
+                  className="w-full sm:w-16 bg-transparent border-none outline-none font-black text-sm text-foreground"
                   value={newTaskEst}
                   onChange={e => setNewTaskEst(Number(e.target.value))}
                 />
@@ -200,7 +200,7 @@ export default function FocusTasks() {
                 <input
                   type="text"
                   placeholder="Optional notes..."
-                  className="w-full bg-transparent border-none outline-none text-[11px] font-medium text-foreground placeholder:text-black/30"
+                  className="w-full bg-transparent border-none outline-none text-[10px] sm:text-[11px] font-medium text-foreground placeholder:text-black/30"
                   value={newTaskNotes}
                   onChange={e => setNewTaskNotes(e.target.value)}
                 />
@@ -210,14 +210,14 @@ export default function FocusTasks() {
               <button
                 type="button"
                 onClick={() => setIsAdding(false)}
-                className="text-[10px] font-black uppercase tracking-widest text-black/40 hover:text-black transition-colors"
+                className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-black/40 hover:text-black transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={!newTaskTitle.trim()}
-                className="px-6 py-2 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-full hover:opacity-90 transition-all disabled:opacity-50 shadow-lg"
+                className="px-5 sm:px-6 py-2 sm:py-2.5 bg-primary text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-full hover:opacity-90 transition-all disabled:opacity-50 shadow-lg"
               >
                 Save Task
               </button>
@@ -226,10 +226,10 @@ export default function FocusTasks() {
         ) : (
           <button
             onClick={() => setIsAdding(true)}
-            className="mt-4 w-full py-6 rounded-3xl border border-dashed border-black/10 flex items-center justify-center gap-3 text-black/40 hover:text-foreground hover:border-black/30 hover:bg-black/[0.02] transition-all"
+            className="mt-4 w-full py-5 sm:py-6 rounded-[24px] sm:rounded-3xl border border-dashed border-black/10 flex items-center justify-center gap-3 text-black/40 hover:text-foreground hover:border-black/30 hover:bg-black/[0.02] transition-all"
           >
             <Plus className="w-4 h-4" />
-            <span className="text-xs font-black uppercase tracking-[0.2em]">Add New Task</span>
+            <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em]">Add New Task</span>
           </button>
         )}
       </div>

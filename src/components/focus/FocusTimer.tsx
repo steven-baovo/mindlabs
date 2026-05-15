@@ -6,13 +6,13 @@ import { Play, Pause, SkipForward, Maximize2, Minimize2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function FocusTimer() {
-  const { 
-    mode, 
-    timeLeft, 
-    isActive, 
-    setMode, 
-    toggleTimer, 
-    skipTimer, 
+  const {
+    mode,
+    timeLeft,
+    isActive,
+    setMode,
+    toggleTimer,
+    skipTimer,
     formatTime,
     pomodorosCompleted
   } = useFocus()
@@ -39,23 +39,22 @@ export default function FocusTimer() {
   }
 
   const modes = [
-    { id: 'pomodoro', label: 'Pomodoro' },
-    { id: 'short_break', label: 'Short Break' },
-    { id: 'long_break', label: 'Long Break' },
+    { id: 'pomodoro', label: 'Focus' },
+    { id: 'short_break', label: 'Short' },
+    { id: 'long_break', label: 'Long' },
   ] as const
 
   return (
-    <div 
+    <div
       ref={containerRef}
-      className={`flex flex-col items-center justify-center transition-all duration-700 ${
-        isFullscreen 
-          ? 'fixed inset-0 bg-black z-[9999] h-screen w-screen' 
-          : 'p-12 bg-white rounded-[48px] border border-black/[0.03] shadow-premium relative overflow-hidden'
-      }`}
+      className={`flex flex-col items-center justify-center transition-all duration-700 ${isFullscreen
+          ? 'fixed inset-0 bg-black z-[9999] h-screen w-screen'
+          : 'p-6 sm:p-12 bg-white rounded-[48px] border border-black/[0.03] shadow-premium relative overflow-hidden'
+        }`}
     >
       {/* Fullscreen Close Button */}
       {isFullscreen && (
-        <button 
+        <button
           onClick={toggleFullscreen}
           className="absolute top-10 right-10 p-4 rounded-full bg-white/5 text-white/20 hover:text-white hover:bg-white/10 transition-all z-50"
         >
@@ -65,7 +64,7 @@ export default function FocusTimer() {
 
       {/* Mode Selector - Hidden in Fullscreen, replaced by simple label */}
       {!isFullscreen ? (
-        <div className="flex items-center gap-1 mb-16 relative z-10">
+        <div className="flex items-center gap-1 mb-12 sm:mb-16 relative z-10 w-full justify-center">
           {modes.map((m) => (
             <button
               key={m.id}
@@ -76,9 +75,8 @@ export default function FocusTimer() {
                 }
                 setMode(m.id)
               }}
-              className={`px-6 py-2.5 rounded-full text-[11px] font-black uppercase tracking-[0.2em] transition-all relative ${
-                mode === m.id ? 'text-white' : 'text-foreground/40 hover:text-foreground'
-              }`}
+              className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all relative shrink-0 ${mode === m.id ? 'text-white' : 'text-foreground/40 hover:text-foreground'
+                }`}
             >
               {mode === m.id && (
                 <motion.div
@@ -92,12 +90,11 @@ export default function FocusTimer() {
           ))}
         </div>
       ) : (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`mb-12 text-sm font-black uppercase tracking-[0.8em] ${
-            mode === 'pomodoro' ? 'text-white/40' : 'text-green-500/40'
-          }`}
+          className={`mb-12 text-sm font-black uppercase tracking-[0.8em] ${mode === 'pomodoro' ? 'text-white/40' : 'text-green-500/40'
+            }`}
         >
           {mode === 'pomodoro' ? 'Stay Focused' : 'Take a Break'}
         </motion.div>
@@ -106,8 +103,8 @@ export default function FocusTimer() {
       {/* Timer Display - Master Typography */}
       <div className={`relative z-10 font-black tracking-[-0.08em] leading-none select-none transition-all duration-700 ${
         isFullscreen 
-          ? `text-[320px] ${mode === 'pomodoro' ? 'text-white' : 'text-green-500'}` 
-          : 'text-[160px] text-foreground mb-16'
+          ? `text-[120px] sm:text-[320px] ${mode === 'pomodoro' ? 'text-white' : 'text-green-500'}` 
+          : 'text-[72px] sm:text-[160px] text-foreground mb-8 sm:mb-16'
       }`}>
         {formatTime(timeLeft)}
       </div>
@@ -116,13 +113,12 @@ export default function FocusTimer() {
       <div className={`flex items-center gap-6 relative z-10 transition-opacity duration-500 ${isFullscreen && !isActive ? 'opacity-100' : isFullscreen ? 'opacity-0 hover:opacity-100' : 'opacity-100'}`}>
         <button
           onClick={toggleTimer}
-          className={`flex items-center justify-center transition-all duration-500 active:scale-95 shadow-2xl border border-white/20 group/play ${
-            isFullscreen
+          className={`flex items-center justify-center transition-all duration-500 active:scale-95 shadow-2xl border border-white/20 group/play ${isFullscreen
               ? 'h-16 px-10 rounded-full bg-white/10 text-white hover:bg-white/20'
-              : isActive 
-                ? 'h-24 px-12 rounded-full bg-white text-primary hover:bg-gray-50' 
+              : isActive
+                ? 'h-24 px-12 rounded-full bg-white text-primary hover:bg-gray-50'
                 : 'h-24 px-12 rounded-full bg-primary text-white hover:opacity-90'
-          }`}
+            }`}
         >
           {isActive ? (
             <Pause className="w-8 h-8 fill-current" />
@@ -141,11 +137,10 @@ export default function FocusTimer() {
               animate={{ opacity: 1, scale: 1, x: 0 }}
               exit={{ opacity: 0, scale: 0.8, x: -20 }}
               onClick={skipTimer}
-              className={`flex items-center justify-center rounded-full transition-all active:scale-95 ${
-                isFullscreen 
-                  ? 'w-16 h-16 bg-white/5 text-white/40 hover:text-white' 
+              className={`flex items-center justify-center rounded-full transition-all active:scale-95 ${isFullscreen
+                  ? 'w-16 h-16 bg-white/5 text-white/40 hover:text-white'
                   : 'w-14 h-14 bg-black/5 text-foreground/40 hover:text-foreground hover:bg-black/10'
-              }`}
+                }`}
               title="Skip"
             >
               <SkipForward className="w-5 h-5 fill-current" />
@@ -168,9 +163,9 @@ export default function FocusTimer() {
       {!isFullscreen && (
         <div className="mt-16 flex items-center gap-2 opacity-20">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div 
-              key={i} 
-              className={`w-1.5 h-1.5 rounded-full ${i < (pomodorosCompleted % 4) ? 'bg-primary scale-125' : 'bg-black/20'}`} 
+            <div
+              key={i}
+              className={`w-1.5 h-1.5 rounded-full ${i < (pomodorosCompleted % 4) ? 'bg-primary scale-125' : 'bg-black/20'}`}
             />
           ))}
         </div>
