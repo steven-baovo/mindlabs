@@ -88,7 +88,7 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
 
     // Setup audio elements
     if (typeof window !== 'undefined') {
-      alarmAudioRef.current = new Audio('https://pixabay.com/static/audio/2022/03/15/audio_73229007f5.mp3')
+      alarmAudioRef.current = new Audio('/audio/alarm.wav')
       tickingAudioRef.current = new Audio('https://actions.google.com/sounds/v1/tools/clock_ticking.ogg')
       tickingAudioRef.current.loop = true
     }

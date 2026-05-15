@@ -96,13 +96,18 @@ export default function Sidebar({ user, profile }: SidebarProps) {
 
         {/* Live Timer Indicator in Sidebar */}
         {item.title === 'MindFocus' && focus.isActive && (
-          <div className={`ml-auto flex items-center gap-1.5 ${isCollapsed ? 'absolute -right-1 -top-1 bg-primary text-white w-4 h-4 rounded-full flex items-center justify-center text-[8px]' : 'bg-primary/10 text-primary px-2 py-0.5 rounded-full text-[10px] font-black tracking-widest'}`}>
-             {!isCollapsed && <span>{focus.formatTime(focus.timeLeft)}</span>}
-             {isCollapsed && <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-             </span>}
-          </div>
+          <>
+            {isCollapsed ? (
+              <span className="absolute top-0 right-0 flex h-2 w-2 z-20">
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${focus.mode === 'pomodoro' ? 'bg-primary' : 'bg-green-500'} opacity-75`}></span>
+                <span className={`relative inline-flex rounded-full h-2 w-2 ${focus.mode === 'pomodoro' ? 'bg-primary' : 'bg-green-500'}`}></span>
+              </span>
+            ) : (
+              <div className={`ml-auto flex items-center gap-1.5 ${focus.mode === 'pomodoro' ? 'bg-primary/10 text-primary' : 'bg-green-500/10 text-green-500'} px-2 py-0.5 rounded-full text-[10px] font-black tracking-widest animate-pulse`}>
+                <span>{focus.formatTime(focus.timeLeft)}</span>
+              </div>
+            )}
+          </>
         )}
       </Link>
     )

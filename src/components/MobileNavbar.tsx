@@ -22,9 +22,11 @@ export default function MobileNavbar({ onMenuClick }: MobileNavbarProps) {
 
   return (
     <nav className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-md">
-      <div className="glass backdrop-blur-2xl bg-white/70 border border-white/20 shadow-premium rounded-[24px] p-1 flex items-center justify-around relative overflow-hidden">
-        {/* Atmospheric Background Glow */}
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none" />
+      <div className="relative p-1 flex items-center justify-around">
+        {/* Background Layer with clipping for the glow */}
+        <div className="absolute inset-0 glass backdrop-blur-2xl bg-white/70 border border-white/20 shadow-premium rounded-[24px] overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent" />
+        </div>
         
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href))
@@ -45,9 +47,9 @@ export default function MobileNavbar({ onMenuClick }: MobileNavbarProps) {
                 
                 {/* Timer indicator on Focus icon */}
                 {isFocus && focus.isActive && (
-                  <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                  <span className="absolute top-0 right-0 flex h-2 w-2">
+                    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${focus.mode === 'pomodoro' ? 'bg-primary' : 'bg-green-500'} opacity-75`}></span>
+                    <span className={`relative inline-flex rounded-full h-2 w-2 ${focus.mode === 'pomodoro' ? 'bg-primary' : 'bg-green-500'}`}></span>
                   </span>
                 )}
               </div>

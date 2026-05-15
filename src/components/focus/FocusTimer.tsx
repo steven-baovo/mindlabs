@@ -18,7 +18,30 @@ export default function FocusTimer() {
   } = useFocus()
 
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [showFullscreenUI, setShowFullscreenUI] = useState(true)
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  const resetHideTimeout = () => {
+    if (!isFullscreen) return
+    if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current)
+    setShowFullscreenUI(true)
+    hideTimeoutRef.current = setTimeout(() => {
+      setShowFullscreenUI(false)
+    }, 3000)
+  }
+
+  useEffect(() => {
+    if (isFullscreen) {
+      resetHideTimeout()
+    } else {
+      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current)
+      setShowFullscreenUI(true)
+    }
+    return () => {
+      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current)
+    }
+  }, [isFullscreen])
 
   useEffect(() => {
     const handleFsChange = () => {
@@ -47,16 +70,23 @@ export default function FocusTimer() {
   return (
     <div
       ref={containerRef}
+      onPointerMove={resetHideTimeout}
+      onClick={resetHideTimeout}
+      onTouchStart={resetHideTimeout}
       className={`flex flex-col items-center justify-center transition-all duration-700 ${isFullscreen
-          ? 'fixed inset-0 bg-black z-[9999] h-screen w-screen'
+          ? 'fixed inset-0 bg-black z-[9999] h-screen w-screen cursor-none'
           : 'p-6 sm:p-12 bg-white rounded-[48px] border border-black/[0.03] shadow-premium relative overflow-hidden'
-        }`}
+        } ${isFullscreen && !showFullscreenUI ? 'cursor-none' : ''}`}
     >
       {/* Fullscreen Close Button */}
       {isFullscreen && (
         <button
-          onClick={toggleFullscreen}
-          className="absolute top-10 right-10 p-4 rounded-full bg-white/5 text-white/20 hover:text-white hover:bg-white/10 transition-all z-50"
+          onClick={(e) => {
+            e.stopPropagation()
+            toggleFullscreen()
+          }}
+          className={`absolute top-10 right-10 p-4 rounded-full bg-white/5 text-white/20 hover:text-white hover:bg-white/10 transition-all z-50 ${showFullscreenUI ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10 pointer-events-none'
+            }`}
         >
           <Minimize2 className="w-6 h-6" />
         </button>
@@ -110,7 +140,10 @@ export default function FocusTimer() {
       </div>
 
       {/* Controls */}
-      <div className={`flex items-center gap-6 relative z-10 transition-opacity duration-500 ${isFullscreen && !isActive ? 'opacity-100' : isFullscreen ? 'opacity-0 hover:opacity-100' : 'opacity-100'}`}>
+      <div className={`flex items-center gap-6 relative z-10 transition-all duration-500 ${isFullscreen
+          ? (showFullscreenUI ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none')
+          : 'opacity-100'
+        }`}>
         <button
           onClick={toggleTimer}
           className={`flex items-center justify-center transition-all duration-500 active:scale-95 shadow-2xl border border-white/20 group/play ${isFullscreen
