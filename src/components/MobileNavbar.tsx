@@ -1,0 +1,69 @@
+'use client'
+
+import { Home, FileText, Sparkles, Timer } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { motion } from 'framer-motion'
+import { useFocus } from '@/contexts/FocusContext'
+
+const NAV_ITEMS = [
+  { icon: Home, label: 'Home', href: '/' },
+  { icon: FileText, label: 'Space', href: '/mindspace' },
+  { icon: Sparkles, label: 'AI', href: '/mindai' },
+  { icon: Timer, label: 'Focus', href: '/pomodoro' },
+]
+
+export default function MobileNavbar() {
+  const pathname = usePathname()
+  const focus = useFocus()
+
+  return (
+    <nav className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-md">
+      <div className="glass backdrop-blur-2xl bg-white/70 border border-white/20 shadow-premium rounded-[24px] p-1 flex items-center justify-around relative overflow-hidden">
+        {/* Atmospheric Background Glow */}
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none" />
+        
+        {NAV_ITEMS.map((item) => {
+          const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href))
+          const Icon = item.icon
+          const isFocus = item.label === 'Focus'
+
+          return (
+            <Link 
+              key={item.href} 
+              href={item.href}
+              className="relative flex flex-col items-center justify-center w-14 h-12 group"
+            >
+              <div className={`
+                flex items-center justify-center rounded-xl transition-all duration-300 relative
+                ${isActive ? 'w-8 h-8 bg-primary text-white shadow-lg shadow-primary/30' : 'w-7 h-7 text-secondary/60 hover:text-primary'}
+              `}>
+                <Icon strokeWidth={isActive ? 2.5 : 2} className="w-4 h-4 relative z-10" />
+                
+                {/* Timer indicator on Focus icon */}
+                {isFocus && focus.isActive && (
+                  <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                  </span>
+                )}
+              </div>
+              
+              <span className={`text-[8px] font-black uppercase tracking-widest mt-1 transition-colors ${isActive ? 'text-primary' : 'text-secondary/40'}`}>
+                {item.label}
+              </span>
+
+              {isActive && (
+                <motion.div 
+                  layoutId="mobile-nav-indicator"
+                  className="absolute -bottom-0.5 w-1 h-1 bg-primary rounded-full"
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                />
+              )}
+            </Link>
+          )
+        })}
+      </div>
+    </nav>
+  )
+}

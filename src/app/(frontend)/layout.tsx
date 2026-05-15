@@ -4,6 +4,7 @@ import { WorkspaceProvider } from "@/contexts/WorkspaceContext";
 import WorkspaceLayoutSidebar from "@/components/workspace/WorkspaceLayoutSidebar";
 import { createClient } from '@/lib/supabase/server';
 import { FocusProvider } from "@/contexts/FocusContext";
+import MobileNavigationWrapper from "@/components/MobileNavigationWrapper";
 
 export default async function FrontendLayout({
   children,
@@ -22,14 +23,17 @@ export default async function FrontendLayout({
   return (
     <FocusProvider>
       <WorkspaceProvider>
-        <div className="flex h-screen bg-[#f3f4f6] p-1.5 gap-1.5 overflow-hidden">
-          {/* Sidebar Island */}
-          <div className="flex flex-col h-full shrink-0">
+        <div className="flex flex-col lg:flex-row h-screen bg-[#f3f4f6] lg:p-1.5 lg:gap-1.5 overflow-hidden">
+          {/* Mobile Navigation */}
+          <MobileNavigationWrapper user={user} profile={profile} />
+
+          {/* Sidebar Island (Desktop) */}
+          <div className="hidden lg:flex flex-col h-full shrink-0">
             <Sidebar user={user} profile={profile} />
           </div>
 
           {/* Main Content Island */}
-          <div className="flex-1 flex flex-col h-full bg-white rounded-2xl overflow-hidden relative">
+          <div className="flex-1 flex flex-col h-full bg-white lg:rounded-2xl overflow-hidden relative">
             <main className="flex-1 min-w-0 h-full overflow-y-auto no-scrollbar relative">
               <div className="w-full h-full">
                 {children}
@@ -37,8 +41,10 @@ export default async function FrontendLayout({
             </main>
           </div>
 
-          {/* Right Sidebar Island (conditional) */}
-          <WorkspaceLayoutSidebar />
+          {/* Right Sidebar Island (conditional, hidden on mobile by default usually) */}
+          <div className="hidden lg:block">
+            <WorkspaceLayoutSidebar />
+          </div>
         </div>
       </WorkspaceProvider>
     </FocusProvider>

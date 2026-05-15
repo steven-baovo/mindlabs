@@ -161,11 +161,12 @@ interface ResourceSidebarProps {
   activeTitle?: string
   onTitleChange?: (title: string) => void
   isSaving?: boolean
+  isMobile?: boolean
 }
 
 const STORAGE_KEY = 'resource-sidebar-collapsed'
 
-const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSidebarProps) => {
+const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving, isMobile }: ResourceSidebarProps) => {
   const [resources, setResources] = useState<Resource[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSyncing, setIsSyncing] = useState(false)
@@ -302,28 +303,30 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
     <aside
       onClick={(e) => {
         // Only toggle if clicking the aside background itself
-        if (e.target === e.currentTarget) {
+        if (e.target === e.currentTarget && !isMobile) {
           toggleCollapse()
         }
       }}
       className={`
         h-full shrink-0 bg-white rounded-2xl
         flex flex-col transition-all duration-300 relative
-        ${isCollapsed ? 'w-[52px]' : 'w-[220px]'}
-        ${isCollapsed ? 'cursor-ew-resize' : 'cursor-default'}
+        ${isMobile ? 'w-full' : (isCollapsed ? 'w-[52px]' : 'w-[220px]')}
+        ${isCollapsed && !isMobile ? 'cursor-ew-resize' : 'cursor-default'}
       `}
     >
-      {/* Edge toggle hit area */}
-      <div 
-        onClick={(e) => {
-          e.stopPropagation()
-          toggleCollapse()
-        }}
-        className={`
-          absolute top-0 bottom-0 z-[60] cursor-ew-resize group/toggle
-          ${isCollapsed ? '-left-[30px] w-[42px]' : '-left-[30px] w-[38px]'}
-        `}
-      />
+      {/* Edge toggle hit area - Disable on mobile */}
+      {!isMobile && (
+        <div 
+          onClick={(e) => {
+            e.stopPropagation()
+            toggleCollapse()
+          }}
+          className={`
+            absolute top-0 bottom-0 z-[60] cursor-ew-resize group/toggle
+            ${isCollapsed ? '-left-[30px] w-[42px]' : '-left-[30px] w-[38px]'}
+          `}
+        />
+      )}
 
 
       {/* Tabs */}
