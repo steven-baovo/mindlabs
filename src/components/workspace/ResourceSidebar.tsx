@@ -64,7 +64,7 @@ const ResourceItem = memo(({
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           className={`flex items-center group relative rounded-xl py-1 transition-[background-color,color] duration-200
-            ${isCollapsed ? 'justify-center px-0' : 'px-2 gap-1.5'}
+            ${isCollapsed ? 'justify-center px-0' : 'px-2 gap-2'}
             ${active 
               ? 'bg-[#f5f5f5] text-foreground font-medium' 
               : 'text-secondary hover:bg-[#f9f9f9] hover:text-foreground'}
@@ -198,7 +198,7 @@ const FolderItem = memo(({ folder, index, ...props }: FolderItemProps) => {
           <div 
             onClick={() => props.toggleFolder(folder.id)}
             className={`flex items-center group relative rounded-xl py-1 transition-all duration-200
-              ${props.isCollapsed ? 'justify-center px-0' : 'px-2 pl-7 pr-2'}
+              ${props.isCollapsed ? 'justify-center px-0' : 'px-2'}
               hover:bg-[#f9f9f9] text-secondary hover:text-foreground
               ${snapshot.isDragging ? 'shadow-premium bg-white border border-border-main/50 z-50 scale-[1.02]' : ''}
             `}
@@ -207,10 +207,10 @@ const FolderItem = memo(({ folder, index, ...props }: FolderItemProps) => {
               <ChevronRight className={`w-3 h-3 shrink-0 transition-transform text-secondary/50 mr-1 ${props.isOpen ? 'rotate-90' : ''}`} />
             )}
             
-            <Folder strokeWidth={1.5} className="w-4 h-4 shrink-0 text-primary/70 mr-0" />
+            <Folder strokeWidth={1.5} className="w-4 h-4 shrink-0 text-primary/70 mr-1.5" />
             
             {!props.isCollapsed && (
-              <div className="flex-1 min-w-0 ml-1.5">
+              <div className="flex-1 min-w-0">
                 {props.isEditing ? (
                   <input
                     autoFocus
