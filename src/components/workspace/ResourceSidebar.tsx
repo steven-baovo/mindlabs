@@ -197,70 +197,81 @@ const FolderItem = memo(({ folder, index, ...props }: FolderItemProps) => {
         <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="flex flex-col mb-1">
           <div 
             onClick={() => props.toggleFolder(folder.id)}
-            className={`flex items-center group relative rounded-xl py-1 px-2 hover:bg-[#f9f9f9] text-secondary hover:text-foreground transition-all duration-200 ${snapshot.isDragging ? 'shadow-premium bg-white border border-border-main/50 z-50 scale-[1.02]' : ''}`}
+            className={`flex items-center group relative rounded-xl py-1 transition-all duration-200
+              ${props.isCollapsed ? 'justify-center px-0' : 'px-2 pl-7 pr-2'}
+              hover:bg-[#f9f9f9] text-secondary hover:text-foreground
+              ${snapshot.isDragging ? 'shadow-premium bg-white border border-border-main/50 z-50 scale-[1.02]' : ''}
+            `}
           >
-            <ChevronRight className={`w-3 h-3 shrink-0 transition-transform text-secondary/50 mr-1 ${props.isOpen ? 'rotate-90' : ''}`} />
-            <Folder strokeWidth={1.5} className="w-4 h-4 shrink-0 text-primary/70 mr-1.5" />
+            {!props.isCollapsed && (
+              <ChevronRight className={`w-3 h-3 shrink-0 transition-transform text-secondary/50 mr-1 ${props.isOpen ? 'rotate-90' : ''}`} />
+            )}
             
-            <div className="flex-1 min-w-0">
-              {props.isEditing ? (
-                <input
-                  autoFocus
-                  value={props.tempTitle}
-                  onChange={(e) => props.setTempTitle(e.target.value)}
-                  onBlur={() => props.handleFinishEditing(folder)}
-                  onKeyDown={(e) => e.key === 'Enter' && props.handleFinishEditing(folder)}
-                  className="w-full text-[11px] font-bold bg-white border border-border-main rounded px-1 py-0.5 outline-none ring-1 ring-primary/20"
-                  onClick={(e) => e.stopPropagation()}
-                />
-              ) : (
-                <span className="text-[11px] font-bold tracking-tight truncate block">{folder.title}</span>
-              )}
-            </div>
+            <Folder strokeWidth={1.5} className="w-4 h-4 shrink-0 text-primary/70 mr-0" />
+            
+            {!props.isCollapsed && (
+              <div className="flex-1 min-w-0 ml-1.5">
+                {props.isEditing ? (
+                  <input
+                    autoFocus
+                    value={props.tempTitle}
+                    onChange={(e) => props.setTempTitle(e.target.value)}
+                    onBlur={() => props.handleFinishEditing(folder)}
+                    onKeyDown={(e) => e.key === 'Enter' && props.handleFinishEditing(folder)}
+                    className="w-full text-[11px] font-bold bg-white border border-border-main rounded px-1 py-0.5 outline-none ring-1 ring-primary/20"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                ) : (
+                  <span className="text-[11px] font-bold tracking-tight truncate block">{folder.title}</span>
+                )}
+              </div>
+            )}
 
-            <div className="relative flex items-center opacity-0 group-hover:opacity-100 transition-opacity pr-1 z-20">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setIsMenuOpen(!isMenuOpen)
-                }}
-                className={`p-1 transition-all rounded-lg border border-transparent ${isMenuOpen ? 'bg-white shadow-sm border-border-main text-primary scale-110' : 'text-secondary/30 hover:text-foreground hover:bg-gray-100'}`}
-              >
-                <MoreHorizontal className="w-4 h-4" />
-              </button>
-
-              {isMenuOpen && (
-                <div 
-                  className="absolute right-0 top-full mt-2 w-48 bg-white border border-border-main shadow-premium rounded-2xl p-1.5 z-[100] animate-in fade-in zoom-in slide-in-from-top-2 duration-200"
-                  onClick={(e) => e.stopPropagation()}
+            {!props.isCollapsed && (
+              <div className="relative flex items-center opacity-0 group-hover:opacity-100 transition-opacity pr-1 z-20">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setIsMenuOpen(!isMenuOpen)
+                  }}
+                  className={`p-1 transition-all rounded-lg border border-transparent ${isMenuOpen ? 'bg-white shadow-sm border-border-main text-primary scale-110' : 'text-secondary/30 hover:text-foreground hover:bg-gray-100'}`}
                 >
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      props.handleStartEditing(folder)
-                      setIsMenuOpen(false)
-                    }}
-                    className="flex items-center gap-2.5 w-full px-2.5 py-2 text-[11px] font-bold text-secondary hover:bg-gray-50 rounded-xl transition-all"
+                  <MoreHorizontal className="w-4 h-4" />
+                </button>
+
+                {isMenuOpen && (
+                  <div 
+                    className="absolute right-0 top-full mt-2 w-48 bg-white border border-border-main shadow-premium rounded-2xl p-1.5 z-[100] animate-in fade-in zoom-in slide-in-from-top-2 duration-200"
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    Đổi tên
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      props.handleDelete(folder)
-                      setIsMenuOpen(false)
-                    }}
-                    className="flex items-center gap-2.5 w-full px-2.5 py-2 text-[11px] font-bold text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Xóa (giữ lại file)</span>
-                  </button>
-                </div>
-              )}
-            </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        props.handleStartEditing(folder)
+                        setIsMenuOpen(false)
+                      }}
+                      className="flex items-center gap-2.5 w-full px-2.5 py-2 text-[11px] font-bold text-secondary hover:bg-gray-50 rounded-xl transition-all"
+                    >
+                      Đổi tên
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        props.handleDelete(folder)
+                        setIsMenuOpen(false)
+                      }}
+                      className="flex items-center gap-2.5 w-full px-2.5 py-2 text-[11px] font-bold text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Xóa (giữ lại file)</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           
-          {props.isOpen && (
+          {!props.isCollapsed && props.isOpen && (
             <Droppable droppableId={`folder-${folder.id}`} type="DEFAULT">
               {(prov, snap) => (
                 <div 
@@ -605,9 +616,9 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving, isMobile }: Res
         />
       )}
 
-      <div className="flex-1 overflow-y-auto no-scrollbar py-4 px-2 flex flex-col gap-1 rounded-2xl overflow-hidden">
+      <div className="p-4 px-2 pb-2">
         {isCollapsed ? (
-          <div className="flex flex-col items-center mb-4 relative">
+          <div className="flex flex-col items-center relative">
             <button 
               onClick={(e) => {
                 e.stopPropagation()
@@ -620,7 +631,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving, isMobile }: Res
             
             {isCreateMenuOpen && (
               <div 
-                className="absolute left-full ml-2 top-0 bg-white border border-[#f5f5f5] rounded-xl shadow-xl p-1.5 flex flex-col gap-1 z-[100] w-36 animate-in fade-in zoom-in slide-in-from-left-2 duration-200"
+                className="absolute right-full mr-2 top-0 bg-white border border-[#f5f5f5] rounded-xl shadow-xl p-1.5 flex flex-col gap-1 z-[100] w-36 animate-in fade-in zoom-in slide-in-from-right-2 duration-200"
                 onClick={(e) => e.stopPropagation()}
               >
                 <button onClick={() => { handleCreateNote(); setIsCreateMenuOpen(false) }} className="flex items-center gap-2 px-3 py-2 hover:bg-[#f9f9f9] rounded-lg text-[12px] font-medium text-secondary hover:text-foreground transition-colors">
@@ -636,7 +647,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving, isMobile }: Res
             )}
           </div>
         ) : (
-          <div className="flex gap-1.5 mb-4 px-1" onClick={(e) => e.stopPropagation()}>
+          <div className="flex gap-1.5 px-1" onClick={(e) => e.stopPropagation()}>
             <button onClick={handleCreateNote} title="Tạo Ghi chú" className="flex-1 flex items-center justify-center py-2 bg-[#f5f5f5] text-foreground rounded-xl hover:bg-[#eeeeee] transition-all text-secondary hover:text-foreground">
               <FileText className="w-4 h-4" />
             </button>
@@ -648,6 +659,9 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving, isMobile }: Res
             </button>
           </div>
         )}
+      </div>
+
+      <div className="flex-1 overflow-y-auto no-scrollbar py-2 px-2 flex flex-col gap-1 rounded-2xl">
 
         {isLoading ? (
           <div className="px-2 pt-2 space-y-1">
