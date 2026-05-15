@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import MobileHeader from './MobileHeader'
 import MobileNavbar from './MobileNavbar'
 import MobileSidebar from './MobileSidebar'
 import MobileResourceSidebar from './MobileResourceSidebar'
+import MobileResourceButton from './MobileResourceButton'
 
 interface MobileNavigationWrapperProps {
   user: any
@@ -24,10 +24,7 @@ export default function MobileNavigationWrapper({ user, profile }: MobileNavigat
 
   return (
     <>
-      <MobileHeader 
-        onMenuClick={() => setIsSidebarOpen(true)} 
-        onResourceClick={() => setIsResourceOpen(true)}
-      />
+      <MobileResourceButton onClick={() => setIsResourceOpen(true)} />
       
       <MobileSidebar 
         isOpen={isSidebarOpen} 
@@ -41,7 +38,7 @@ export default function MobileNavigationWrapper({ user, profile }: MobileNavigat
         onClose={() => setIsResourceOpen(false)}
       />
 
-      <MobileNavbar />
+      <MobileNavbar onMenuClick={() => setIsSidebarOpen(true)} />
     </>
   )
 }

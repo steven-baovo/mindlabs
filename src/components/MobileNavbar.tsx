@@ -1,6 +1,6 @@
 'use client'
 
-import { Home, FileText, Sparkles, Timer } from 'lucide-react'
+import { Home, FileText, Timer, Menu } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
@@ -9,11 +9,14 @@ import { useFocus } from '@/contexts/FocusContext'
 const NAV_ITEMS = [
   { icon: Home, label: 'Home', href: '/' },
   { icon: FileText, label: 'Space', href: '/mindspace' },
-  { icon: Sparkles, label: 'AI', href: '/mindai' },
   { icon: Timer, label: 'Focus', href: '/pomodoro' },
 ]
 
-export default function MobileNavbar() {
+interface MobileNavbarProps {
+  onMenuClick: () => void
+}
+
+export default function MobileNavbar({ onMenuClick }: MobileNavbarProps) {
   const pathname = usePathname()
   const focus = useFocus()
 
@@ -63,6 +66,22 @@ export default function MobileNavbar() {
             </Link>
           )
         })}
+
+        {/* Menu Button */}
+        <button 
+          onClick={(e) => {
+            e.preventDefault()
+            onMenuClick()
+          }}
+          className="relative flex flex-col items-center justify-center w-14 h-12 group"
+        >
+          <div className="w-7 h-7 flex items-center justify-center rounded-xl text-secondary/60 hover:text-primary transition-colors">
+            <Menu strokeWidth={2} className="w-4 h-4 relative z-10" />
+          </div>
+          <span className="text-[8px] font-black uppercase tracking-widest mt-1 text-secondary/40 transition-colors group-hover:text-primary">
+            Menu
+          </span>
+        </button>
       </div>
     </nav>
   )
