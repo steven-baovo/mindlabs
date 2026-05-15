@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Bell, Home, FileText, Sparkles, Cloud, CloudCheck, Calendar } from 'lucide-react'
+import { Search, Bell, Home, FileText, Sparkles, Cloud, CloudCheck, Calendar, Timer } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import UserMenu from './UserMenu'
 import { useWorkspace } from '@/contexts/WorkspaceContext'
+import { useFocus } from '@/contexts/FocusContext'
 
 const DEEP_WORKSPACE = /^\/mindspace/
 
@@ -20,6 +21,7 @@ const NAV_ITEMS = [
 export default function Header() {
   const pathname = usePathname()
   const { isSaving } = useWorkspace()
+  const focus = useFocus()
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
   const supabase = createClient()
@@ -105,6 +107,17 @@ export default function Header() {
 
         {/* Right Section */}
         <div className="flex items-center gap-3 ml-auto relative z-10">
+          {/* Focus Timer Global Indicator */}
+          {focus.isActive && (
+            <Link 
+              href="/pomodoro"
+              className="hidden sm:flex items-center gap-2 bg-primary/5 text-primary hover:bg-primary hover:text-white px-3 py-1.5 rounded-full transition-all text-xs font-bold mr-2 group/timer border border-primary/10"
+            >
+              <Timer className="w-3.5 h-3.5" />
+              <span className="w-10 text-center font-black tracking-widest">{focus.formatTime(focus.timeLeft)}</span>
+            </Link>
+          )}
+
           {!isDeepWorkspace && (
             <div className="hidden sm:flex items-center bg-black/5 rounded-full px-4 py-1 border border-black/5 focus-within:border-primary/20 transition-all w-44 group/search">
               <Search strokeWidth={2.5} className="w-3 h-3 text-foreground/50 group-focus-within/search:text-primary transition-colors mr-2 shrink-0" />

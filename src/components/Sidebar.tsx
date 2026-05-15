@@ -20,9 +20,11 @@ import {
   HelpCircle,
   BookOpen,
   LayoutGrid,
-  ExternalLink
+  ExternalLink,
+  Timer
 } from 'lucide-react'
 import UserMenu from './UserMenu'
+import { useFocus } from '@/contexts/FocusContext'
 
 interface SidebarProps {
   user: any
@@ -47,10 +49,12 @@ const TOOLS_MENU = [
   { title: 'Clarity Planner', icon: Calendar, href: '/clarity' },
   { title: 'MindSpace', icon: FileText, href: '/mindspace' },
   { title: 'mindAI', icon: Sparkles, href: '/mindai' },
+  { title: 'MindFocus', icon: Timer, href: '/pomodoro' },
 ]
 
 export default function Sidebar({ user, profile }: SidebarProps) {
   const pathname = usePathname()
+  const focus = useFocus()
   
   // Initialize collapsed state based on route
   const isWorkspaceInitial = pathname ? pathname.includes('/mindspace/') : false
@@ -88,6 +92,17 @@ export default function Sidebar({ user, profile }: SidebarProps) {
           <span className="text-[13px] tracking-tight truncate">
             {item.title}
           </span>
+        )}
+
+        {/* Live Timer Indicator in Sidebar */}
+        {item.title === 'MindFocus' && focus.isActive && (
+          <div className={`ml-auto flex items-center gap-1.5 ${isCollapsed ? 'absolute -right-1 -top-1 bg-primary text-white w-4 h-4 rounded-full flex items-center justify-center text-[8px]' : 'bg-primary/10 text-primary px-2 py-0.5 rounded-full text-[10px] font-black tracking-widest'}`}>
+             {!isCollapsed && <span>{focus.formatTime(focus.timeLeft)}</span>}
+             {isCollapsed && <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+             </span>}
+          </div>
         )}
       </Link>
     )
