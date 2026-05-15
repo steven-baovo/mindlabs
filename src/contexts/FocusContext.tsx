@@ -35,8 +35,8 @@ const defaultSettings: FocusSettings = {
   pomodoro_duration: 25,
   short_break_duration: 5,
   long_break_duration: 15,
-  auto_start_breaks: false,
-  auto_start_pomodoros: false,
+  auto_start_breaks: true,
+  auto_start_pomodoros: true,
   long_break_interval: 4,
   alarm_sound: 'bell',
   ticking_sound: 'none'
@@ -55,6 +55,7 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const alarmAudioRef = useRef<HTMLAudioElement | null>(null)
   const tickingAudioRef = useRef<HTMLAudioElement | null>(null)
+  const isHandlingComplete = useRef(false)
   
   // Load settings and tasks on mount
   useEffect(() => {
@@ -93,8 +94,9 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  // Sync timeLeft when mode or settings change (only if not active)
+  // Sync timeLeft when mode or settings change
   useEffect(() => {
+    // We only auto-sync if NOT active, or if we are forced to (handled in setMode)
     if (!isActive) {
       if (mode === 'pomodoro') setTimeLeft(settings.pomodoro_duration * 60)
       else if (mode === 'short_break') setTimeLeft(settings.short_break_duration * 60)
@@ -124,6 +126,9 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
   }, [isActive, timeLeft, settings.ticking_sound])
 
   const handleTimerComplete = async () => {
+    if (isHandlingComplete.current) return
+    isHandlingComplete.current = true
+    
     setIsActive(false)
     if (tickingAudioRef.current) tickingAudioRef.current.pause()
 
@@ -134,8 +139,8 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-      const title = mode === 'pomodoro' ? 'Time to take a break!' : 'Time to focus!'
-      const body = mode === 'pomodoro' ? 'Great job! You finished a focus session.' : 'Break is over. Let\'s get back to work.'
+      const title = mode === 'pomodoro' ? 'Đã đến giờ nghỉ ngơi!' : 'Đã đến lúc tập trung!'
+      const body = mode === 'pomodoro' ? 'Làm tốt lắm! Bạn đã hoàn thành một phiên tập trung.' : 'Thời gian nghỉ đã hết. Hãy quay lại làm việc thôi.'
       new Notification(title, { body, icon: '/favicon.ico' })
     }
 
@@ -169,22 +174,29 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
             t.id === activeTaskId ? { ...t, completed_pomodoros: t.completed_pomodoros + 1 } : t
           )
           localStorage.setItem('mindfocus_tasks', JSON.stringify(updated))
-          // We need a way to refresh the UI tasks, but for now this works on reload
         }
       }
     }
-
+    
     if (mode === 'pomodoro') {
       const newCount = pomodorosCompleted + 1
       setPomodorosCompleted(newCount)
       const isLongBreak = newCount % settings.long_break_interval === 0
       const nextMode = isLongBreak ? 'long_break' : 'short_break'
+      
+      const nextDuration = nextMode === 'short_break' ? settings.short_break_duration : settings.long_break_duration
+      setTimeLeft(nextDuration * 60)
       setMode(nextMode)
+      
       if (settings.auto_start_breaks) setIsActive(true)
     } else {
+      setTimeLeft(settings.pomodoro_duration * 60)
       setMode('pomodoro')
+      
       if (settings.auto_start_pomodoros) setIsActive(true)
     }
+    
+    isHandlingComplete.current = false
   }
 
   const toggleTimer = () => setIsActive(!isActive)

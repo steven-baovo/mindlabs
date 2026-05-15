@@ -106,7 +106,7 @@ export default function FocusTasks() {
   return (
     <div className="w-full max-w-xl mx-auto flex flex-col gap-6 sm:gap-8">
       <div className="flex items-center justify-between">
-        <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40">Active Tasks</h2>
+        <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40">Nhiệm vụ</h2>
         {tasks.length > 0 && (
           <span className="text-[10px] font-black text-black/40">{tasks.filter(t => t.is_completed).length}/{tasks.length}</span>
         )}
@@ -119,7 +119,7 @@ export default function FocusTasks() {
           </div>
         ) : tasks.length === 0 && !isAdding ? (
           <div className="text-center py-12 text-xs font-bold text-black/40 uppercase tracking-widest">
-            Your task list is empty
+            Danh sách nhiệm vụ trống
           </div>
         ) : (
           <AnimatePresence mode="popLayout">
@@ -179,14 +179,14 @@ export default function FocusTasks() {
             <input
               autoFocus
               type="text"
-              placeholder="What are you focusing on?"
+              placeholder="Bạn đang tập trung vào điều gì?"
               className="w-full bg-transparent border-none outline-none text-[15px] sm:text-base font-bold placeholder:text-black/30 text-foreground"
               value={newTaskTitle}
               onChange={e => setNewTaskTitle(e.target.value)}
             />
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
               <div className="flex flex-col gap-1">
-                <span className="text-[8px] font-black uppercase tracking-widest text-black/50">Est. Pomos</span>
+                <span className="text-[8px] font-black uppercase tracking-widest text-black/50">Dự kiến (Pomo)</span>
                 <input
                   type="number"
                   min="1"
@@ -196,10 +196,10 @@ export default function FocusTasks() {
                 />
               </div>
               <div className="flex-1">
-                <span className="text-[8px] font-black uppercase tracking-widest text-black/50 block mb-1">Notes</span>
+                <span className="text-[8px] font-black uppercase tracking-widest text-black/50 block mb-1">Ghi chú</span>
                 <input
                   type="text"
-                  placeholder="Optional notes..."
+                  placeholder="Thêm ghi chú (không bắt buộc)..."
                   className="w-full bg-transparent border-none outline-none text-[10px] sm:text-[11px] font-medium text-foreground placeholder:text-black/30"
                   value={newTaskNotes}
                   onChange={e => setNewTaskNotes(e.target.value)}
@@ -212,14 +212,14 @@ export default function FocusTasks() {
                 onClick={() => setIsAdding(false)}
                 className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-black/40 hover:text-black transition-colors"
               >
-                Cancel
+                Hủy
               </button>
               <button
                 type="submit"
                 disabled={!newTaskTitle.trim()}
                 className="px-5 sm:px-6 py-2 sm:py-2.5 bg-primary text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-full hover:opacity-90 transition-all disabled:opacity-50 shadow-lg"
               >
-                Save Task
+                Lưu nhiệm vụ
               </button>
             </div>
           </motion.form>
@@ -229,7 +229,7 @@ export default function FocusTasks() {
             className="mt-4 w-full py-5 sm:py-6 rounded-[24px] sm:rounded-3xl border border-dashed border-black/10 flex items-center justify-center gap-3 text-black/40 hover:text-foreground hover:border-black/30 hover:bg-black/[0.02] transition-all"
           >
             <Plus className="w-4 h-4" />
-            <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em]">Add New Task</span>
+            <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em]">Thêm nhiệm vụ mới</span>
           </button>
         )}
       </div>

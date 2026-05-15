@@ -39,9 +39,9 @@ export default function FocusTimer() {
   }
 
   const modes = [
-    { id: 'pomodoro', label: 'Focus' },
-    { id: 'short_break', label: 'Short' },
-    { id: 'long_break', label: 'Long' },
+    { id: 'pomodoro', label: 'Tập trung' },
+    { id: 'short_break', label: 'Nghỉ ngắn' },
+    { id: 'long_break', label: 'Nghỉ dài' },
   ] as const
 
   return (
@@ -70,7 +70,7 @@ export default function FocusTimer() {
               key={m.id}
               onClick={() => {
                 if (isActive) {
-                  const confirm = window.confirm('Switch mode? Current session will reset.')
+                  const confirm = window.confirm('Chuyển chế độ? Phiên hiện tại sẽ bị đặt lại.')
                   if (!confirm) return
                 }
                 setMode(m.id)
@@ -96,7 +96,7 @@ export default function FocusTimer() {
           className={`mb-12 text-sm font-black uppercase tracking-[0.8em] ${mode === 'pomodoro' ? 'text-white/40' : 'text-green-500/40'
             }`}
         >
-          {mode === 'pomodoro' ? 'Stay Focused' : 'Take a Break'}
+          {mode === 'pomodoro' ? 'Hãy tập trung' : 'Hãy nghỉ ngơi'}
         </motion.div>
       )}
 
@@ -125,7 +125,7 @@ export default function FocusTimer() {
           ) : (
             <div className="flex items-center gap-3">
               <Play className="w-6 h-6 fill-current" />
-              <span className="text-sm font-black uppercase tracking-[0.3em]">Start</span>
+              <span className="text-sm font-black uppercase tracking-[0.3em]">Bắt đầu</span>
             </div>
           )}
         </button>
@@ -141,7 +141,7 @@ export default function FocusTimer() {
                   ? 'w-16 h-16 bg-white/5 text-white/40 hover:text-white'
                   : 'w-14 h-14 bg-black/5 text-foreground/40 hover:text-foreground hover:bg-black/10'
                 }`}
-              title="Skip"
+              title="Bỏ qua"
             >
               <SkipForward className="w-5 h-5 fill-current" />
             </motion.button>
@@ -152,7 +152,7 @@ export default function FocusTimer() {
           <button
             onClick={toggleFullscreen}
             className="w-14 h-14 flex items-center justify-center rounded-full bg-black/5 text-foreground/40 hover:text-foreground hover:bg-black/10 transition-all active:scale-95"
-            title="Fullscreen"
+            title="Toàn màn hình"
           >
             <Maximize2 className="w-5 h-5" />
           </button>
