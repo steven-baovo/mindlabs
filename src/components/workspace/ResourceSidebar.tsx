@@ -3,15 +3,16 @@ import {
   FileText,
   Network,
   Plus,
-  ChevronLeft,
   ChevronRight,
   GripVertical,
+  MoreHorizontal,
+  Trash2
 } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { loadAllResources, Resource, updateSidebarOrder } from '@/app/(frontend)/workspace/actions'
-import { createNote } from '@/app/(frontend)/mindspace/actions'
-import { createMindmap } from '@/app/(frontend)/mindspace/canvas/actions'
+import { createNote, deleteNote } from '@/app/(frontend)/mindspace/actions'
+import { createMindmap, deleteMindmap } from '@/app/(frontend)/mindspace/canvas/actions'
 import { useRouter } from 'next/navigation'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 
@@ -26,6 +27,7 @@ interface ResourceItemProps {
   setTempTitle: (title: string) => void
   handleStartEditing: (resource: Resource) => void
   handleFinishEditing: (resource: Resource) => void
+  handleDelete: (resource: Resource) => void
 }
 
 const ResourceItem = memo(({ 
@@ -37,9 +39,19 @@ const ResourceItem = memo(({
   tempTitle, 
   setTempTitle, 
   handleStartEditing, 
-  handleFinishEditing 
+  handleFinishEditing,
+  handleDelete
 }: ResourceItemProps) => {
   const Icon = resource.type === 'note' ? FileText : Network
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  // Close menu on click outside
+  useEffect(() => {
+    if (!isMenuOpen) return
+    const close = () => setIsMenuOpen(false)
+    window.addEventListener('click', close)
+    return () => window.removeEventListener('click', close)
+  }, [isMenuOpen])
 
   return (
     <Draggable key={resource.id} draggableId={resource.id} index={index}>
@@ -98,6 +110,45 @@ const ResourceItem = memo(({
           {active && (
             <div className={`absolute top-1/2 -translate-y-1/2 w-[2px] h-4 bg-primary rounded-full ${isCollapsed ? 'left-1' : 'left-[-1px]'}`} />
           )}
+
+          {!isCollapsed && (
+            <div className="relative flex items-center opacity-0 group-hover:opacity-100 transition-opacity pr-1 z-20">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsMenuOpen(!isMenuOpen)
+                }}
+                className={`p-1 transition-all rounded-lg border border-transparent ${isMenuOpen ? 'bg-white shadow-sm border-border-main text-primary scale-110' : 'text-secondary/30 hover:text-foreground hover:bg-gray-100'}`}
+                title="Thêm thao tác"
+              >
+                <MoreHorizontal className="w-4 h-4" />
+              </button>
+
+              {isMenuOpen && (
+                <div 
+                  className="absolute right-0 top-full mt-2 w-36 bg-white border border-border-main shadow-premium rounded-2xl p-1.5 z-[100] animate-in fade-in zoom-in slide-in-from-top-2 duration-200"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="px-2 py-1.5 mb-1 border-b border-border-main/50">
+                    <span className="text-[9px] uppercase tracking-widest font-black text-secondary/30">Thao tác</span>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDelete(resource)
+                      setIsMenuOpen(false)
+                    }}
+                    className="flex items-center gap-2.5 w-full px-2.5 py-2 text-[11px] font-bold text-red-500 hover:bg-red-50 rounded-xl transition-all group/del"
+                  >
+                    <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center group-hover/del:bg-red-500 group-hover/del:text-white transition-colors">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </div>
+                    <span>Xóa tệp</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </Draggable>
@@ -122,6 +173,8 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
   const [editingId, setEditingId] = useState<string | null>(null)
   const [tempTitle, setTempTitle] = useState('')
   const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<'note' | 'map'>('note')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const params = useParams()
   const router = useRouter()
 
@@ -213,6 +266,38 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
     setEditingId(null)
   }
 
+  const handleDelete = async (resource: Resource) => {
+    setDeletingId(resource.id)
+  }
+
+  const confirmDelete = async (resource: Resource) => {
+    // Optimistic update
+    const previousResources = [...resources]
+    setResources(prev => prev.filter(r => r.id !== resource.id))
+    setDeletingId(null)
+    
+    try {
+      if (resource.type === 'note') {
+        await deleteNote(resource.id)
+      } else {
+        const res = await deleteMindmap(resource.id)
+        if (res.error) throw new Error(res.error)
+      }
+
+      if (resource.id === currentId) {
+        router.push('/mindspace')
+        router.refresh()
+      }
+    } catch (err: any) {
+      if (err.message?.includes('NEXT_REDIRECT')) return
+      console.error('Delete failed:', err)
+      alert('Xóa không thành công. Vui lòng thử lại.')
+      setResources(previousResources)
+    }
+  }
+
+  const filteredResources = resources.filter(r => r.type === activeTab)
+
   return (
     <aside
       onClick={(e) => {
@@ -240,12 +325,22 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
         `}
       />
 
-      {!isCollapsed && (isSaving || isSyncing) && (
-        <div 
-          className="absolute top-2 right-2 z-10"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <span className="text-[10px] text-primary animate-pulse font-medium bg-white/80 backdrop-blur px-2 py-1 rounded-full border border-border-main shadow-sm">Saving...</span>
+
+      {/* Tabs */}
+      {!isCollapsed && (
+        <div className="flex gap-1 p-1 mx-2 mt-2 bg-gray-50 rounded-xl border border-border-main/50">
+          <button
+            onClick={() => setActiveTab('note')}
+            className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition-all ${activeTab === 'note' ? 'bg-white shadow-sm text-primary' : 'text-secondary/40 hover:text-secondary'}`}
+          >
+            Ghi chú
+          </button>
+          <button
+            onClick={() => setActiveTab('map')}
+            className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition-all ${activeTab === 'map' ? 'bg-white shadow-sm text-primary' : 'text-secondary/40 hover:text-secondary'}`}
+          >
+            Bản đồ
+          </button>
         </div>
       )}
 
@@ -323,7 +418,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
                   ref={provided.innerRef}
                   className="flex flex-col gap-1"
                 >
-                  {resources.map((resource, index) => (
+                  {filteredResources.map((resource, index) => (
                     <ResourceItem
                       key={resource.id}
                       resource={resource}
@@ -336,6 +431,7 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
                       setTempTitle={setTempTitle}
                       handleStartEditing={handleStartEditing}
                       handleFinishEditing={handleFinishEditing}
+                      handleDelete={handleDelete}
                     />
                   ))}
                   {provided.placeholder}
@@ -345,6 +441,36 @@ const ResourceSidebar = ({ activeTitle, onTitleChange, isSaving }: ResourceSideb
           </DragDropContext>
         )}
       </div>
+
+      {/* Custom Delete Confirmation Overlay */}
+      {deletingId && (
+        <div className="absolute inset-0 z-[200] bg-white/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white border border-border-main shadow-premium rounded-2xl p-4 w-full animate-in zoom-in slide-in-from-bottom-2 duration-300">
+            <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center mb-3 mx-auto">
+              <Trash2 className="w-5 h-5 text-red-500" />
+            </div>
+            <h3 className="text-sm font-black text-center text-foreground mb-1">Xóa tài nguyên?</h3>
+            <p className="text-[11px] text-center text-secondary mb-4 px-2">Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa?</p>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => {
+                  const res = resources.find(r => r.id === deletingId)
+                  if (res) confirmDelete(res)
+                }}
+                className="w-full py-2 bg-red-500 text-white rounded-xl text-[11px] font-bold hover:bg-red-600 transition-colors shadow-sm"
+              >
+                Xác nhận xóa
+              </button>
+              <button
+                onClick={() => setDeletingId(null)}
+                className="w-full py-2 bg-gray-50 text-secondary rounded-xl text-[11px] font-bold hover:bg-gray-100 transition-colors"
+              >
+                Hủy bỏ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   )
 }

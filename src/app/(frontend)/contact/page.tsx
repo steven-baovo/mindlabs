@@ -125,7 +125,7 @@ export default function ContactPage() {
             <div className="lg:col-span-5 flex flex-col gap-10">
               <div className="grid grid-cols-1 gap-4">
                 {[
-                  { icon: Mail, label: "Email", value: "mindlabsvn@gmail.com", sub: "Phản hồi trong 24h" },
+                  { icon: Mail, label: "Email", value: "contact@mindlabs.io.vn", sub: "Phản hồi trong 24h" },
                   { icon: Phone, label: "Hotline", value: "+84 865642110", sub: "Thứ 2 - Thứ 6, 8:00 - 17:00" },
                   { icon: MapPin, label: "Văn phòng", value: "Ho Chi Minh City, Vietnam", sub: "Mindlabs Creative Space" },
                   { icon: MessageSquare, label: "Cộng đồng", value: "@mindlabs.io.vn", sub: "Facebook, Instagram" }

@@ -13,7 +13,14 @@ import {
   FileText,
   Sparkles,
   Calendar,
-  MessageSquare
+  MessageSquare,
+  Info,
+  History,
+  ShieldCheck,
+  HelpCircle,
+  BookOpen,
+  LayoutGrid,
+  ExternalLink
 } from 'lucide-react'
 import UserMenu from './UserMenu'
 
@@ -25,7 +32,15 @@ interface SidebarProps {
 const PRIMARY_MENU = [
   { title: 'Home', icon: Home, href: '/' },
   { title: 'Search', icon: Search, href: '#' },
-  { title: 'Contact', icon: MessageSquare, href: '/contact' },
+]
+
+const EXPLORE_MENU = [
+  { title: 'About Us', icon: Info, href: '/about', desc: 'Câu chuyện về Mindlabs' },
+  { title: 'Contact', icon: MessageSquare, href: '/contact', desc: 'Liên hệ hỗ trợ' },
+  { title: 'Changelog', icon: History, href: '/changelog', desc: 'Nhật ký cập nhật' },
+  { title: 'FAQ', icon: HelpCircle, href: '/faq', desc: 'Câu hỏi thường gặp' },
+  { title: 'Help Center', icon: BookOpen, href: '/docs', desc: 'Tài liệu hướng dẫn' },
+  { title: 'Legal', icon: ShieldCheck, href: '/legal', desc: 'Điều khoản & Bảo mật' },
 ]
 
 const TOOLS_MENU = [
@@ -47,6 +62,8 @@ export default function Sidebar({ user, profile }: SidebarProps) {
     const isWorkspaceRoute = pathname.includes('/mindspace/')
     setIsCollapsed(isWorkspaceRoute)
   }, [pathname])
+
+  const [isExploreOpen, setIsExploreOpen] = useState(false)
 
   const renderMenuItem = (item: any, index: number) => {
     const Icon = item.icon
@@ -139,6 +156,80 @@ export default function Sidebar({ user, profile }: SidebarProps) {
       >
         <div className="mb-6">
           {PRIMARY_MENU.map((item, index) => renderMenuItem(item, index))}
+          
+          {/* Explore Item */}
+          <div className="relative group/explore">
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsExploreOpen(!isExploreOpen)
+              }}
+              onMouseEnter={() => isCollapsed && setIsExploreOpen(true)}
+              onMouseLeave={() => isCollapsed && setIsExploreOpen(false)}
+              className={`flex items-center transition-all group relative rounded-xl py-2 cursor-pointer w-full text-left
+                ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'}
+                ${isExploreOpen ? 'bg-[#f5f5f5] text-foreground font-medium' : 'text-secondary hover:text-foreground hover:bg-[#f9f9f9]'}
+              `}
+            >
+              <LayoutGrid strokeWidth={isExploreOpen ? 2.0 : 1.5} className={`w-[18px] h-[18px] shrink-0 ${isExploreOpen ? 'text-primary' : 'text-secondary/70 group-hover:text-foreground'}`} />
+              {!isCollapsed && <span className="text-[13px] tracking-tight truncate">Khám phá</span>}
+              {!isCollapsed && (
+                <ChevronRight className={`w-3 h-3 ml-auto transition-transform ${isExploreOpen ? 'rotate-90 text-primary' : 'text-secondary/30'}`} />
+              )}
+            </button>
+
+            {/* Expanded Accordion List */}
+            {!isCollapsed && isExploreOpen && (
+              <div className="mt-1 ml-4 border-l border-border-main/50 pl-2 flex flex-col gap-0.5 animate-in slide-in-from-top-2 duration-200">
+                {EXPLORE_MENU.map((item, index) => (
+                  <Link
+                    key={index}
+                    href={item.href}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12px] transition-all
+                      ${pathname === item.href ? 'text-primary font-bold bg-primary/5' : 'text-secondary/60 hover:text-foreground hover:bg-gray-50'}
+                    `}
+                  >
+                    <span>{item.title}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {/* Collapsed Flyout Panel */}
+            {isCollapsed && isExploreOpen && (
+              <div 
+                onMouseEnter={() => setIsExploreOpen(true)}
+                onMouseLeave={() => setIsExploreOpen(false)}
+                className="absolute left-[56px] top-0 w-[240px] glass p-4 rounded-2xl border border-primary/10 shadow-premium z-[100] animate-in fade-in slide-in-from-left-2 duration-300"
+              >
+                <div className="flex flex-col gap-3">
+                  <div className="px-2 pb-2 border-b border-border-main/50">
+                    <span className="text-[10px] uppercase tracking-[0.2em] font-black text-secondary/40">Khám phá</span>
+                  </div>
+                  <div className="grid grid-cols-1 gap-1">
+                    {EXPLORE_MENU.map((item, index) => {
+                      const Icon = item.icon
+                      return (
+                        <Link
+                          key={index}
+                          href={item.href}
+                          className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-50 transition-all group/item"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover/item:bg-primary group-hover/item:text-white transition-all">
+                             <Icon className="w-4 h-4 text-secondary/40 group-hover/item:text-white" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-xs font-bold text-foreground leading-none mb-1">{item.title}</span>
+                            <span className="text-[10px] text-secondary/40 leading-none truncate w-[140px]">{item.desc}</span>
+                          </div>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-col gap-1">

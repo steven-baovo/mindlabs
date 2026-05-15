@@ -92,5 +92,5 @@ export async function deleteNote(id: string, formData?: FormData) {
   if (error) throw new Error(error.message)
   
   revalidatePath('/mindspace')
-  redirect('/mindspace')
+  return { success: true }
 }
