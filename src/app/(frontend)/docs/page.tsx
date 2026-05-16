@@ -63,7 +63,7 @@ export default function DocsPage() {
         {/* Header Section */}
         <div className="text-center mb-24">
           <div className="flex justify-center mb-6">
-            <div className="glass px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10 shadow-sm">
+            <div className="glass px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10">
               <BookOpen className="w-3.5 h-3.5 text-primary" />
               <span className="text-premium text-primary">Trung tâm học liệu</span>
             </div>
@@ -81,7 +81,7 @@ export default function DocsPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Tìm kiếm tài liệu hướng dẫn..."
-              className="w-full pl-16 pr-8 py-6 bg-white border border-border-main/50 rounded-[32px] shadow-sm focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-medium"
+              className="w-full pl-16 pr-8 py-6 bg-white border border-border-main/50 rounded-[32px] focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-medium"
             />
           </div>
         </div>
@@ -89,7 +89,7 @@ export default function DocsPage() {
         {/* Categories Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {CATEGORIES.map((cat, idx) => (
-            <div key={idx} className="group glass p-10 rounded-[48px] border border-primary/5 hover:border-primary/20 hover:shadow-premium transition-all duration-500 flex flex-col h-full">
+            <div key={idx} className="group glass p-10 rounded-[48px] border border-primary/5 hover:border-primary/20 hover:-premium transition-all duration-500 flex flex-col h-full">
               <div className="w-14 h-14 rounded-2xl bg-primary/5 text-primary flex items-center justify-center mb-8 group-hover:bg-primary group-hover:text-white transition-all duration-500">
                 {cat.icon}
               </div>
@@ -144,7 +144,7 @@ export default function DocsPage() {
            <p className="text-secondary/60 mb-10 max-w-md mx-auto">
              Chúng tôi luôn sẵn sàng hỗ trợ trực tiếp. Hãy gửi tin nhắn cho đội ngũ hỗ trợ của Mindlabs.
            </p>
-           <Link href="/contact" className="inline-flex items-center gap-3 px-10 py-5 bg-foreground text-white rounded-full font-black text-[11px] uppercase tracking-[0.3em] hover:scale-105 transition-all shadow-xl">
+           <Link href="/contact" className="inline-flex items-center gap-3 px-10 py-5 bg-foreground text-white rounded-full font-black text-[11px] uppercase tracking-[0.3em] hover:scale-105 transition-all">
              Yêu cầu hỗ trợ ngay
            </Link>
         </div>

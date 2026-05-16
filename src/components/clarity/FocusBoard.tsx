@@ -322,7 +322,7 @@ export default function FocusBoard({ initialBlocks }: Props) {
             </button>
 
             {showSettings && (
-              <div className="absolute right-0 top-10 w-56 bg-white border border-[#e5e5e5] rounded-xl shadow-xl p-4 z-40">
+              <div className="absolute right-0 top-10 w-56 bg-white border border-[#e5e5e5] rounded-xl p-4 z-40">
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Cài đặt bảng</p>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -382,7 +382,7 @@ export default function FocusBoard({ initialBlocks }: Props) {
                       COPY
                     </button>
                     {duplicateMenu?.fromDay === i && (
-                      <div className="absolute top-10 right-2 z-50 bg-white rounded-lg border border-gray-200 shadow-xl p-2 min-w-[140px]">
+                      <div className="absolute top-10 right-2 z-50 bg-white rounded-lg border border-gray-200 p-2 min-w-[140px]">
                         <p className="text-[9px] font-black text-gray-400 mb-2 px-1 uppercase">Sao chép sang:</p>
                         {DAYS.map((td, ti) => ti !== i && (
                           <button

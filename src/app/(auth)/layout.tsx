@@ -15,7 +15,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </div>
 
       <div className="relative z-10 sm:mx-auto sm:w-full sm:max-w-md px-4">
-        <div className="bg-white/80 backdrop-blur-3xl p-8 sm:p-10 rounded-[2rem] border border-black/[0.03] shadow-2xl shadow-black/[0.02]">
+        <div className="bg-white/80 backdrop-blur-3xl p-8 sm:p-10 rounded-[2rem] border border-black/[0.03] -black/[0.02]">
           {children}
         </div>
       </div>

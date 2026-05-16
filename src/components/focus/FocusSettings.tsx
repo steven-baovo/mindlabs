@@ -66,7 +66,7 @@ export default function FocusSettings() {
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="relative w-full max-w-md bg-white rounded-[32px] sm:rounded-[40px] shadow-2xl overflow-hidden flex flex-col border border-black/5"
+                className="relative w-full max-w-md bg-white rounded-[32px] sm:rounded-[40px] overflow-hidden flex flex-col border border-black/5"
               >
                 <div className="flex items-center justify-between p-6 sm:p-8 border-b border-black/[0.03]">
                   <h2 className="text-lg sm:text-xl font-black tracking-tighter text-foreground uppercase">CÀI ĐẶT</h2>
@@ -114,7 +114,7 @@ export default function FocusSettings() {
                         >
                           <motion.div
                             animate={{ x: localSettings[item.key as keyof typeof localSettings] ? (window.innerWidth < 640 ? 22 : 26) : 4 }}
-                            className="w-3 h-3 sm:w-4 sm:h-4 bg-white rounded-full absolute top-1 shadow-sm"
+                            className="w-3 h-3 sm:w-4 sm:h-4 bg-white rounded-full absolute top-1"
                           />
                         </button>
                       </div>
@@ -139,7 +139,7 @@ export default function FocusSettings() {
                   <button
                     onClick={handleSave}
                     disabled={isSaving}
-                    className="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 bg-primary text-white rounded-full font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px] hover:opacity-90 transition-all disabled:opacity-50 shadow-xl shadow-primary/20"
+                    className="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 bg-primary text-white rounded-full font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px] hover:opacity-90 transition-all disabled:opacity-50 -primary/20"
                   >
                     {isSaving ? 'Đang lưu...' : 'CẬP NHẬT'}
                   </button>

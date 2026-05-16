@@ -67,7 +67,7 @@ export default function FAQPage() {
         {/* Header */}
         <div className="text-center mb-20">
           <div className="flex justify-center mb-6">
-            <div className="glass px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10 shadow-sm">
+            <div className="glass px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10">
               <HelpCircle className="w-3.5 h-3.5 text-primary" />
               <span className="text-premium text-primary">Trung tâm hỗ trợ</span>
             </div>
@@ -84,7 +84,7 @@ export default function FAQPage() {
             <input 
               type="text" 
               placeholder="Tìm kiếm câu trả lời..."
-              className="w-full pl-16 pr-8 py-5 bg-white border border-border-main/50 rounded-full shadow-sm focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-medium"
+              className="w-full pl-16 pr-8 py-5 bg-white border border-border-main/50 rounded-full focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-medium"
             />
           </div>
         </div>
@@ -152,7 +152,7 @@ export default function FAQPage() {
                  <h3 className="text-2xl font-black text-foreground">Vẫn còn thắc mắc?</h3>
                  <p className="text-secondary/60 text-sm">Chúng tôi luôn sẵn lòng lắng nghe và hỗ trợ bạn.</p>
               </div>
-              <a href="/contact" className="flex items-center gap-3 px-10 py-5 bg-primary text-white rounded-full font-black text-[11px] uppercase tracking-[0.3em] shadow-xl shadow-primary/20 hover:scale-105 transition-all">
+              <a href="/contact" className="flex items-center gap-3 px-10 py-5 bg-primary text-white rounded-full font-black text-[11px] uppercase tracking-[0.3em] -primary/20 hover:scale-105 transition-all">
                  <MessageSquare className="w-4 h-4" />
                  Liên hệ ngay
               </a>

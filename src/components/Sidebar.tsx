@@ -21,7 +21,8 @@ import {
   BookOpen,
   LayoutGrid,
   ExternalLink,
-  Timer
+  Timer,
+  ListTodo
 } from 'lucide-react'
 import UserMenu from './UserMenu'
 import { useFocus } from '@/contexts/FocusContext'
@@ -32,11 +33,11 @@ interface SidebarProps {
 }
 
 const PRIMARY_MENU = [
-  { title: 'Home', icon: Home, href: '/' },
-  { title: 'Search', icon: Search, href: '#' },
+  { title: 'Dashboard', icon: Home, href: '/' },
 ]
 
 const EXPLORE_MENU = [
+  { title: 'Journal', icon: BookOpen, href: '/journal', desc: 'Tạp chí tri thức' },
   { title: 'About Us', icon: Info, href: '/about', desc: 'Câu chuyện về Mindlabs' },
   { title: 'Contact', icon: MessageSquare, href: '/contact', desc: 'Liên hệ hỗ trợ' },
   { title: 'Changelog', icon: History, href: '/changelog', desc: 'Nhật ký cập nhật' },
@@ -50,6 +51,8 @@ const TOOLS_MENU = [
   { title: 'MindSpace', icon: FileText, href: '/mindspace' },
   { title: 'mindAI', icon: Sparkles, href: '/mindai' },
   { title: 'MindFocus', icon: Timer, href: '/pomodoro' },
+  { title: 'Todo List', icon: ListTodo, href: '/todo' },
+  { title: 'Kanban Board', icon: LayoutGrid, href: '/kanban' },
 ]
 
 export default function Sidebar({ user, profile }: SidebarProps) {
@@ -219,7 +222,7 @@ export default function Sidebar({ user, profile }: SidebarProps) {
               <div 
                 onMouseEnter={() => setIsExploreOpen(true)}
                 onMouseLeave={() => setIsExploreOpen(false)}
-                className="absolute left-[56px] top-0 w-[240px] glass p-4 rounded-2xl border border-primary/10 shadow-premium z-[100] animate-in fade-in slide-in-from-left-2 duration-300"
+                className="absolute left-[56px] top-0 w-[240px] glass p-4 rounded-2xl border border-primary/10 -premium z-[100] animate-in fade-in slide-in-from-left-2 duration-300"
               >
                 <div className="flex flex-col gap-3">
                   <div className="px-2 pb-2 border-b border-border-main/50">

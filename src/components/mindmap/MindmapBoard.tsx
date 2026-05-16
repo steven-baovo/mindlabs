@@ -431,12 +431,12 @@ export default function MindmapBoard({
           ` }} />
           <Background variant={BackgroundVariant.Dots} gap={16} size={1.2} color="#cbd5e1" />
           <Controls 
-            className="!bg-white !border-gray-200 !shadow-sm !rounded-xl overflow-hidden [&>button]:!border-[#e5e5e5] [&>button]:hover:!bg-gray-50"
+            className="!bg-white !border-gray-200 ! !rounded-xl overflow-hidden [&>button]:!border-[#e5e5e5] [&>button]:hover:!bg-gray-50"
             position="bottom-right" 
             showInteractive={false}
           />
           
-          <Panel position="bottom-center" className="mb-6 flex items-center gap-2 bg-white/90 backdrop-blur-md p-1.5 rounded-xl border border-gray-200 shadow-lg">
+          <Panel position="bottom-center" className="mb-6 flex items-center gap-2 bg-white/90 backdrop-blur-md p-1.5 rounded-xl border border-gray-200">
             <button
               onClick={addCard}
               className="p-2.5 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors flex items-center gap-2 group relative"
@@ -486,7 +486,7 @@ export default function MindmapBoard({
                 </span>
               </button>
               {isPathMenuOpen && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white border border-gray-200 shadow-xl rounded-xl p-1.5 flex flex-col gap-1 z-50 w-36 animate-in fade-in zoom-in slide-in-from-bottom-2 duration-200">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white border border-gray-200 rounded-xl p-1.5 flex flex-col gap-1 z-50 w-36 animate-in fade-in zoom-in slide-in-from-bottom-2 duration-200">
                   <button onClick={() => updateGlobalPathType('bezier')} className={`px-3 py-2 text-sm rounded-lg text-left transition-colors ${edgePathType === 'bezier' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}>
                     Curved
                   </button>

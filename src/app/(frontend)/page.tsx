@@ -1,223 +1,257 @@
 import Link from 'next/link'
-import { client } from '@/sanity/client'
-import { mockPosts } from '@/lib/mockPosts'
-import PostCard from '@/components/blog/PostCard'
-import { Mic, Zap, BookOpen, Share2, Play } from 'lucide-react'
-
-export const revalidate = 60
+import { createClient } from '@/lib/supabase/server'
+import { Zap, Brain, Clock, Sparkles, ArrowRight, FileText, Calendar, BookOpen } from 'lucide-react'
 
 export default async function Home() {
-  // Fetch real posts from Sanity (if any)
-  let sanityPosts: any[] = []
-  try {
-    sanityPosts = await client.fetch(`*[_type == "post"] | order(publishedAt desc) {
-      _id,
-      title,
-      slug,
-      publishedAt,
-      excerpt,
-      "category": categories[0]->title,
-      "imageUrl": mainImage.asset->url,
-      "type": "article"
-    }`)
-  } catch (error) {
-    console.error("Sanity fetch failed:", error)
-  }
+  const supabase = await createClient()
+  const { data: { session } } = await supabase.auth.getSession()
 
-  const allPosts = [...sanityPosts, ...mockPosts]
-  
-  // Categorize
-  if (allPosts.length === 0) {
+  // 1. Nếu ĐÃ ĐĂNG NHẬP -> Hiện Command Center
+  if (session) {
+    const user = session.user
+    const displayName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'Bạn'
+
+    // Mock data cho các file gần đây
+    const recentFiles = [
+      { id: 1, title: 'Kế hoạch phát triển Mindlabs', type: 'note', updated: '2 giờ trước' },
+      { id: 2, title: 'Sơ đồ tư duy Hệ sinh thái', type: 'map', updated: 'Hôm qua' },
+      { id: 3, title: 'Ghi chú cuộc họp', type: 'note', updated: '3 ngày trước' },
+    ]
+
     return (
-      <div className="w-full min-h-screen flex items-center justify-center">
-        <p className="text-secondary">Chưa có bài viết nào.</p>
+      <div className="w-full bg-[#fcfdfe] min-h-screen pb-20">
+        <div className="container mx-auto px-6 max-w-7xl pt-16">
+          {/* Greeting */}
+          <div className="mb-12">
+            <h1 className="text-4xl font-black text-foreground tracking-tighter mb-2">
+              Chào buổi chiều, <span className="text-primary">{displayName}</span>!
+            </h1>
+            <p className="text-secondary font-medium opacity-70">Hôm nay bạn muốn tập trung vào việc gì?</p>
+          </div>
+
+          {/* Grid Layout cho Dashboard */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            {/* Cột chính: Công cụ và File */}
+            <div className="lg:col-span-8 flex flex-col gap-8">
+              
+              {/* Widget Mở nhanh */}
+              <div className="bg-white rounded-[32px] border border-border-main/50 p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-black text-foreground uppercase tracking-wider">Tài liệu gần đây</h2>
+                  <Link href="/workspace" className="text-xs font-bold text-primary hover:underline">
+                    Xem tất cả
+                  </Link>
+                </div>
+                
+                <div className="flex flex-col gap-3">
+                  {recentFiles.map((file) => (
+                    <Link key={file.id} href={`/mindspace/${file.id}`} className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 transition-all border border-transparent hover:border-border-main/50 group">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                          {file.type === 'note' ? (
+                            <FileText className="w-5 h-5 text-secondary/70 group-hover:text-primary transition-colors" />
+                          ) : (
+                            <Zap className="w-5 h-5 text-secondary/70 group-hover:text-primary transition-colors" />
+                          )}
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{file.title}</h3>
+                          <span className="text-[11px] text-secondary/50 font-medium">{file.updated}</span>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-secondary/30 group-hover:text-primary transition-colors group-hover:translate-x-1" />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* Grid 2 cột cho các công cụ khác */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* MindAI Quick Ask */}
+                <div className="bg-white rounded-[32px] border border-border-main/50 p-8 flex flex-col justify-between h-64">
+                  <div>
+                    <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center mb-6">
+                      <Brain className="w-6 h-6 text-secondary/40" />
+                    </div>
+                    <h3 className="text-xl font-bold text-foreground mb-2">Hỏi MindAI</h3>
+                    <p className="text-xs text-secondary opacity-70">Mở rộng ý tưởng hoặc tóm tắt kiến thức ngay lập tức.</p>
+                  </div>
+                  <Link href="/mindai" className="text-[11px] font-black uppercase tracking-widest text-primary flex items-center gap-2 group">
+                    Bắt đầu chat <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+
+                {/* Planner Quick Access */}
+                <div className="bg-white rounded-[32px] border border-border-main/50 p-8 flex flex-col justify-between h-64">
+                  <div>
+                    <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center mb-6">
+                      <Calendar className="w-6 h-6 text-secondary/40" />
+                    </div>
+                    <h3 className="text-xl font-bold text-foreground mb-2">Lên kế hoạch</h3>
+                    <p className="text-xs text-secondary opacity-70">Sắp xếp công việc và tối ưu hóa thời gian trong ngày.</p>
+                  </div>
+                  <Link href="/clarity" className="text-[11px] font-black uppercase tracking-widest text-primary flex items-center gap-2 group">
+                    Mở Planner <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Cột phụ: Pomodoro và Journal */}
+            <div className="lg:col-span-4 flex flex-col gap-8">
+              
+              {/* Widget Pomodoro */}
+              <div className="bg-[#0a0a0a] text-white rounded-[32px] p-8 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/10 to-transparent pointer-events-none" />
+                <div className="relative z-10">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 bg-primary/20 rounded-lg">
+                      <Clock className="w-5 h-5 text-primary" />
+                    </div>
+                    <span className="text-xs font-black uppercase tracking-[0.2em] text-primary/80">MindFocus</span>
+                  </div>
+                  <h3 className="text-2xl font-black mb-2 tracking-tighter">Sẵn sàng tập trung?</h3>
+                  <p className="text-xs text-white/60 mb-8 font-medium">Bắt đầu một phiên Pomodoro 25 phút để hoàn thành công việc.</p>
+                  <Link href="/pomodoro" className="inline-block w-full text-center py-4 bg-primary text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] hover:scale-105 transition-all -primary/20">
+                    Bật Timer Ngay
+                  </Link>
+                </div>
+              </div>
+
+              {/* Widget Journal */}
+              <div className="bg-white rounded-[32px] border border-border-main/50 p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 bg-gray-50 rounded-lg">
+                    <BookOpen className="w-5 h-5 text-secondary/40" />
+                  </div>
+                  <span className="text-xs font-black uppercase tracking-[0.2em] text-secondary/40">Góc Đọc</span>
+                </div>
+                <h3 className="text-lg font-bold text-foreground mb-2">Đọc nghiên cứu mới</h3>
+                <p className="text-xs text-secondary opacity-70 mb-6">Nâng cấp tư duy với các bài viết chuyên sâu trên Mindlabs Journal.</p>
+                <Link href="/journal" className="text-[11px] font-black uppercase tracking-widest text-primary flex items-center gap-2 group">
+                  Vào Journal <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
 
-  const featuredPost = allPosts[0]
-  const recentArticles = allPosts.filter(p => p.type !== 'audio' && p._id !== featuredPost._id).slice(0, 4)
-  const podcastPosts = allPosts.filter(p => p.type === 'audio').slice(0, 3)
-  
-  const categories = ["Tập trung sâu", "Khoa học nhận thức", "Thiết kế hệ thống", "Lối sống", "Quản lý thời gian"]
-
+  // 2. Nếu CHƯA ĐĂNG NHẬP -> Hiện Landing Page
   return (
-    <div className="w-full bg-[#fcfdfe] min-h-screen pb-32">
-      {/* Dynamic Hero Bento Section */}
-      <section className="pt-16 pb-20 container mx-auto px-6 max-w-7xl">
-        <div className="flex items-center gap-2 mb-10">
-          <div className="glass px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10 shadow-sm">
-            <Zap className="w-3.5 h-3.5 text-primary animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Nghiên cứu mới nhất</span>
+    <div className="w-full bg-[#fcfdfe] min-h-screen overflow-hidden">
+      {/* Hero Section */}
+      <section className="relative pt-24 pb-32 container mx-auto px-6 max-w-7xl flex flex-col items-center text-center">
+        {/* Background Gradients */}
+        <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-gradient-to-b from-primary/10 to-transparent rounded-full blur-[100px] -z-10" />
+        
+        <div className="flex items-center gap-2 mb-6">
+          <div className="glass px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10">
+            <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Chào mừng đến với Mindlabs</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          {/* Featured Post - Immersion */}
-          <div className="lg:col-span-8 relative group">
-            <div className="absolute -inset-4 bg-gradient-to-r from-primary/5 to-transparent rounded-[40px] -z-10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-            <PostCard post={featuredPost as any} featured={true} />
+        <h1 className="text-6xl lg:text-7xl font-black text-foreground tracking-tighter leading-none mb-6">
+          Nâng Cấp <span className="text-primary">Tâm Trí</span>,<br/>Tối Ưu <span className="text-secondary/60">Hiệu Suất</span>
+        </h1>
+        
+        <p className="text-xl text-secondary font-medium max-w-2xl mb-12 opacity-80">
+          Mindlabs là hệ sinh thái công cụ hỗ trợ tư duy, tập trung và phát triển bản thân dựa trên khoa học nhận thức.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Link href="/workspace" className="group relative px-8 py-4 bg-foreground text-white rounded-full font-black text-[11px] uppercase tracking-[0.3em] overflow-hidden transition-all hover:pr-12 active:scale-95 -primary/20">
+            <span className="relative z-10">Khám phá Workspace</span>
+            <div className="absolute right-0 top-0 h-full w-0 group-hover:w-10 bg-primary transition-all duration-500 flex items-center justify-center">
+               <ArrowRight className="w-4 h-4 text-white" />
+            </div>
+          </Link>
+          <Link href="/journal" className="px-8 py-4 glass text-[11px] font-black uppercase tracking-[0.3em] text-foreground hover:bg-black/5 transition-all rounded-full border border-border-main">
+            Đọc Nghiên Cứu
+          </Link>
+        </div>
+      </section>
+
+      {/* Products Bento Grid */}
+      <section className="py-24 container mx-auto px-6 max-w-7xl">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-black text-foreground tracking-tighter uppercase mb-4">Hệ sinh thái Mindlabs</h2>
+          <p className="text-secondary font-medium opacity-70">Các công cụ được thiết kế để tối ưu hóa từng khía cạnh trong công việc của bạn.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Pomodoro */}
+          <div className="group relative p-10 rounded-[32px] bg-white border border-border-main/50 hover: hover:-translate-y-2 transition-all duration-500 overflow-hidden">
+            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/5 rounded-full group-hover:scale-150 transition-transform duration-700" />
+            <div className="relative z-10">
+              <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                <Clock className="w-6 h-6 text-secondary/40 group-hover:text-white transition-colors" />
+              </div>
+              <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary">Công cụ</span>
+              <h3 className="text-2xl font-bold text-foreground mt-2 mb-3">MindPomodoro</h3>
+              <p className="text-sm text-secondary opacity-70 mb-6">Phương pháp Pomodoro nâng cao giúp bạn duy trì sự tập trung sâu và quản lý thời gian hiệu quả.</p>
+              <Link href="/pomodoro" className="text-[11px] font-black uppercase tracking-widest text-foreground group-hover:text-primary transition-colors flex items-center gap-2">
+                Trải nghiệm <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
           </div>
 
-          {/* Secondary Posts - Refined Sidebar */}
-          <div className="lg:col-span-4 flex flex-col gap-10">
-            <div className="flex items-center justify-between">
-              <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-secondary/40">Đáng chú ý</h3>
-              <div className="w-12 h-[1px] bg-border-main/50" />
+          {/* MindAI */}
+          <div className="group relative p-10 rounded-[32px] bg-white border border-border-main/50 hover: hover:-translate-y-2 transition-all duration-500 overflow-hidden">
+            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/5 rounded-full group-hover:scale-150 transition-transform duration-700" />
+            <div className="relative z-10">
+              <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                <Brain className="w-6 h-6 text-secondary/40 group-hover:text-white transition-colors" />
+              </div>
+              <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary">Trí tuệ nhân tạo</span>
+              <h3 className="text-2xl font-bold text-foreground mt-2 mb-3">MindAI</h3>
+              <p className="text-sm text-secondary opacity-70 mb-6">Trợ lý AI đồng hành cùng tư duy, giúp bạn tóm tắt kiến thức và mở rộng ý tưởng.</p>
+              <Link href="/mindai" className="text-[11px] font-black uppercase tracking-widest text-foreground group-hover:text-primary transition-colors flex items-center gap-2">
+                Trải nghiệm <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
-            
-            <div className="flex flex-col gap-8">
-              {recentArticles.slice(0, 3).map((post: any) => (
-                <Link key={post._id} href={`/blog/${post.slug.current}`} className="group flex gap-5 items-center">
-                  <div className="w-24 h-24 shrink-0 rounded-ncmaz-sm overflow-hidden bg-gray-100 shadow-sm group-hover:shadow-md transition-all duration-500">
-                    <img 
-                      src={post.image || post.imageUrl} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-primary/60">{post.category}</span>
-                    <h4 className="text-[15px] font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-tight tracking-tight">
-                      {post.title}
-                    </h4>
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="w-1 h-1 rounded-full bg-secondary/30" />
-                      <span className="text-[10px] font-bold text-secondary/40 uppercase tracking-widest">5 min read</span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+          </div>
+
+          {/* Mindspace */}
+          <div className="group relative p-10 rounded-[32px] bg-white border border-border-main/50 hover: hover:-translate-y-2 transition-all duration-500 overflow-hidden">
+            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/5 rounded-full group-hover:scale-150 transition-transform duration-700" />
+            <div className="relative z-10">
+              <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                <Zap className="w-6 h-6 text-secondary/40 group-hover:text-white transition-colors" />
+              </div>
+              <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary">Không gian</span>
+              <h3 className="text-2xl font-bold text-foreground mt-2 mb-3">Mindspace</h3>
+              <p className="text-sm text-secondary opacity-70 mb-6">Không gian làm việc tối giản, giúp bạn tổ chức tài liệu và ghi chú một cách khoa học.</p>
+              <Link href="/mindspace" className="text-[11px] font-black uppercase tracking-widest text-foreground group-hover:text-primary transition-colors flex items-center gap-2">
+                Trải nghiệm <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Sleek Podcast Section - Ncmaz Inspired Dark Mode */}
+      {/* CTA Section */}
       <section className="py-24 bg-[#0a0a0a] rounded-[48px] mx-4 lg:mx-8 my-12 overflow-hidden relative">
-        {/* Background Decor */}
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/10 to-transparent pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
 
-        <div className="container mx-auto px-8 lg:px-16 max-w-7xl relative z-10">
-          <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-16 gap-6">
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-primary/20 rounded-lg">
-                  <Mic className="w-5 h-5 text-primary" />
-                </div>
-                <span className="text-xs font-black uppercase tracking-[0.3em] text-primary/80">Mindlabs Audio</span>
-              </div>
-              <h2 className="text-5xl lg:text-6xl font-black text-white tracking-tighter leading-none">
-                Nghe & <br/> <span className="text-primary/60">Suy ngẫm</span>
-              </h2>
-            </div>
-            <Link 
-              href="/blog?type=audio" 
-              className="px-8 py-4 glass text-[10px] font-black uppercase tracking-[0.2em] text-white hover:bg-white hover:text-black transition-all rounded-full"
-            >
-              Xem tất cả Podcast
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {podcastPosts.map((post: any) => (
-              <div key={post._id} className="relative group">
-                <PostCard post={{...post, featured: false}} />
-                {/* Specific Dark Mode overrides for cards in this section could be handled via props, 
-                    but here we'll assume the standard PostCard works or we style the container */}
-              </div>
-            ))}
-          </div>
+        <div className="container mx-auto px-8 lg:px-16 max-w-7xl relative z-10 text-center text-white">
+          <h2 className="text-5xl lg:text-6xl font-black mb-6 tracking-tighter leading-none">
+            Sẵn sàng nâng cấp <br/> <span className="text-primary">tư duy của bạn?</span>
+          </h2>
+          <p className="text-lg text-white/60 mb-12 max-w-xl mx-auto font-medium">
+            Bắt đầu hành trình tối ưu hóa hiệu suất ngay hôm nay với các công cụ chuyên sâu.
+          </p>
+          <Link href="/auth/register" className="inline-block px-12 py-5 bg-primary text-white rounded-full font-black text-[11px] uppercase tracking-[0.3em] hover:scale-105 transition-all -primary/30">
+            Bắt đầu miễn phí
+          </Link>
         </div>
       </section>
-
-      {/* Category Explore - Minimalist Grid */}
-      <section className="py-32 container mx-auto px-6 max-w-7xl">
-        <div className="flex items-center gap-4 mb-16">
-          <div className="w-12 h-[2px] bg-primary" />
-          <h2 className="text-3xl font-black text-foreground tracking-tighter uppercase">Chủ đề phổ biến</h2>
-        </div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {categories.map((cat, idx) => (
-            <Link 
-              key={idx} 
-              href={`/blog?category=${cat.toLowerCase().replace(' ', '-')}`}
-              className="group relative p-10 rounded-[32px] bg-white border border-border-main/50 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden"
-            >
-              <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/5 rounded-full group-hover:scale-150 transition-transform duration-700" />
-              <div className="relative z-10">
-                <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-sm">
-                  <Zap className="w-6 h-6 text-secondary/40 group-hover:text-white transition-colors" />
-                </div>
-                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-secondary group-hover:text-foreground transition-colors">
-                  {cat}
-                </span>
-                <p className="text-[10px] text-secondary/40 mt-2 font-bold uppercase tracking-widest">12 bài viết</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Main Feed - Asymmetric Grid */}
-      <section className="py-24 container mx-auto px-6 max-w-7xl">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-20 gap-8">
-          <h2 className="text-5xl font-black text-foreground tracking-tighter">Bài viết <span className="text-secondary/20">mới</span></h2>
-          <div className="flex glass p-1.5 rounded-full">
-             {["Mới nhất", "Phổ biến", "Nghiên cứu"].map((tab, i) => (
-               <button 
-                key={tab} 
-                className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-full transition-all ${i === 0 ? 'bg-primary text-white shadow-lg' : 'text-secondary/50 hover:text-primary'}`}
-              >
-                 {tab}
-               </button>
-             ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
-          {allPosts.slice(4, 10).map((post: any) => (
-            <PostCard key={post._id} post={post} />
-          ))}
-        </div>
-        
-        <div className="mt-24 text-center">
-          <button className="group relative px-12 py-5 bg-foreground text-white rounded-full font-black text-[11px] uppercase tracking-[0.3em] overflow-hidden transition-all hover:pr-16 active:scale-95 shadow-2xl shadow-primary/20">
-            <span className="relative z-10">Xem tất cả bài viết</span>
-            <div className="absolute right-0 top-0 h-full w-0 group-hover:w-12 bg-primary transition-all duration-500 flex items-center justify-center">
-               <Zap className="w-4 h-4 text-white" />
-            </div>
-          </button>
-        </div>
-      </section>
-
-      {/* Ncmaz Style Sticky Player - Mock UI - Temporarily Hidden
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-4xl z-[100] animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-1000">
-        <div className="glass border-white/20 rounded-[32px] p-4 flex items-center gap-6 shadow-2xl shadow-black/20 backdrop-blur-2xl">
-          <div className="w-14 h-14 rounded-2xl overflow-hidden bg-primary shrink-0 relative group">
-            <img src={podcastPosts[0]?.image || podcastPosts[0]?.imageUrl} className="w-full h-full object-cover opacity-80" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-2 h-4 bg-white/40 rounded-full animate-pulse" />
-              <div className="w-2 h-8 bg-white/60 mx-1 rounded-full animate-pulse delay-75" />
-              <div className="w-2 h-5 bg-white/40 rounded-full animate-pulse delay-150" />
-            </div>
-          </div>
-          <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-             <span className="text-[10px] font-black uppercase tracking-widest text-primary">Đang phát Podcast</span>
-             <h4 className="text-sm font-black text-foreground truncate">{podcastPosts[0]?.title}</h4>
-          </div>
-          <div className="flex items-center gap-4 pr-4">
-             <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors">
-               <Share2 className="w-4 h-4 text-secondary" />
-             </button>
-             <button className="w-12 h-12 bg-primary text-white flex items-center justify-center rounded-full shadow-lg hover:scale-105 transition-all">
-               <Play className="w-5 h-5 fill-current ml-1" />
-             </button>
-          </div>
-        </div>
-      </div>
-      */}
     </div>
   )
 }

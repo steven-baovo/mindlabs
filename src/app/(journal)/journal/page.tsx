@@ -6,7 +6,7 @@ import { Mic, Zap, BookOpen, Share2, Play } from 'lucide-react'
 
 export const revalidate = 60
 
-export default async function BlogHub() {
+export default async function JournalPage() {
   // Fetch real posts from Sanity (if any)
   let sanityPosts: any[] = []
   try {
@@ -30,7 +30,7 @@ export default async function BlogHub() {
   if (allPosts.length === 0) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center">
-        <p className="text-secondary">Chưa có bài viết nào.</p>
+        <p className="text-secondary">Chưa có nội dung nào.</p>
       </div>
     )
   }
@@ -44,11 +44,13 @@ export default async function BlogHub() {
   return (
     <div className="w-full bg-[#fcfdfe] min-h-screen pb-32">
       {/* Dynamic Hero Bento Section */}
-      <section className="pt-16 pb-20 container mx-auto px-6 max-w-7xl">
-        <div className="flex items-center gap-2 mb-10">
-          <div className="glass px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10">
-            <Zap className="w-3.5 h-3.5 text-primary animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Nghiên cứu mới nhất</span>
+      <section className="pt-10 pb-20 container mx-auto px-6 max-w-7xl">
+        <div className="flex items-center justify-between mb-10">
+          <div className="flex items-center gap-2">
+            <div className="glass px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10">
+              <Zap className="w-3.5 h-3.5 text-primary animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Mindlabs Journal</span>
+            </div>
           </div>
         </div>
 

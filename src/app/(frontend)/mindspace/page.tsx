@@ -38,9 +38,9 @@ export default function MindSpaceDashboardPage() {
         <form action={handleCreateNoteAction} className="h-full">
           <button
             type="submit"
-            className="w-full h-full group glass rounded-ncmaz p-8 flex flex-col items-start gap-8 hover:bg-white/80 transition-all duration-500 cursor-pointer text-left hover:scale-[1.02] hover:shadow-premium"
+            className="w-full h-full group glass rounded-ncmaz p-8 flex flex-col items-start gap-8 hover:bg-white/80 transition-all duration-500 cursor-pointer text-left hover:scale-[1.02] hover:-premium"
           >
-            <div className="w-14 h-14 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500">
+            <div className="w-14 h-14 rounded-2xl bg-primary text-white flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
               <FileText className="w-6 h-6" />
             </div>
             <div>
@@ -53,9 +53,9 @@ export default function MindSpaceDashboardPage() {
         <form action={handleCreateMapAction} className="h-full">
           <button
             type="submit"
-            className="w-full h-full group glass rounded-ncmaz p-8 flex flex-col items-start gap-8 hover:bg-white/80 transition-all duration-500 cursor-pointer text-left hover:scale-[1.02] hover:shadow-premium"
+            className="w-full h-full group glass rounded-ncmaz p-8 flex flex-col items-start gap-8 hover:bg-white/80 transition-all duration-500 cursor-pointer text-left hover:scale-[1.02] hover:-premium"
           >
-            <div className="w-14 h-14 rounded-2xl bg-white border border-border-main flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-500">
+            <div className="w-14 h-14 rounded-2xl bg-white border border-border-main flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
               <Network className="w-6 h-6 text-primary" />
             </div>
             <div>

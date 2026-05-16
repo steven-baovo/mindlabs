@@ -24,7 +24,7 @@ export default function MobileNavbar({ onMenuClick }: MobileNavbarProps) {
     <nav className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-md">
       <div className="relative p-1 flex items-center justify-around">
         {/* Background Layer with clipping for the glow */}
-        <div className="absolute inset-0 glass backdrop-blur-2xl bg-white/70 border border-white/20 shadow-premium rounded-[24px] overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 glass backdrop-blur-2xl bg-white/70 border border-white/20 -premium rounded-[24px] overflow-hidden pointer-events-none">
           <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent" />
         </div>
         

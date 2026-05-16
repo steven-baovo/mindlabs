@@ -46,7 +46,7 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
 
         {/* Category Badge */}
         <div className="absolute top-5 left-5 z-20">
-          <span className="px-4 py-1.5 glass rounded-full text-[10px] font-black uppercase tracking-[0.1em] text-primary shadow-sm">
+          <span className="px-4 py-1.5 glass rounded-full text-[10px] font-black uppercase tracking-[0.1em] text-primary">
             {post.category}
           </span>
         </div>
@@ -54,7 +54,7 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
         {/* Audio Play Overlay */}
         {isAudio && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/5 group-hover:bg-black/20 transition-colors z-15">
-            <div className="w-16 h-16 glass border-white/20 rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500">
+            <div className="w-16 h-16 glass border-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
               <Play className="w-7 h-7 text-primary fill-primary ml-1" />
             </div>
             {/* Pulsing effect */}
@@ -65,14 +65,14 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
         {/* Interaction Bar (Ncmaz Style - Floating on hover) */}
         <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 z-20">
           <div className="flex items-center gap-2">
-            <button className="w-10 h-10 glass rounded-full flex items-center justify-center shadow-lg hover:bg-primary hover:text-white transition-all transform hover:-translate-y-1">
+            <button className="w-10 h-10 glass rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all transform hover:-translate-y-1">
               <Heart className="w-4 h-4" />
             </button>
-            <button className="w-10 h-10 glass rounded-full flex items-center justify-center shadow-lg hover:bg-primary hover:text-white transition-all transform hover:-translate-y-1">
+            <button className="w-10 h-10 glass rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all transform hover:-translate-y-1">
               <MessageCircle className="w-4 h-4" />
             </button>
           </div>
-          <button className="w-10 h-10 glass rounded-full flex items-center justify-center shadow-lg hover:bg-primary hover:text-white transition-all transform hover:-translate-y-1">
+          <button className="w-10 h-10 glass rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all transform hover:-translate-y-1">
             <Share2 className="w-4 h-4" />
           </button>
         </div>

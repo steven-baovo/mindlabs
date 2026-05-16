@@ -22,7 +22,7 @@ export default function ArtifactPanel({ content, isOpen, onClose }: ArtifactPane
   if (!isOpen) return null
 
   return (
-    <div className="w-[600px] border-l border-[#e5e5e5] bg-white flex flex-col h-full animate-in slide-in-from-right duration-300 shadow-2xl z-20">
+    <div className="w-[600px] border-l border-[#e5e5e5] bg-white flex flex-col h-full animate-in slide-in-from-right duration-300 z-20">
       {/* Header */}
       <header className="h-14 border-b border-[#e5e5e5] px-6 flex items-center justify-between bg-gray-50/50">
         <div className="flex items-center gap-2">
@@ -52,7 +52,7 @@ export default function ArtifactPanel({ content, isOpen, onClose }: ArtifactPane
       <div className="flex-1 overflow-y-auto p-8 no-scrollbar bg-[#fcfcfc]">
         {content ? (
           <div className="max-w-none">
-            <div className="bg-white border border-[#e5e5e5] rounded-2xl shadow-sm overflow-hidden p-8">
+            <div className="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden p-8">
               <div className="prose prose-sm prose-slate max-w-none 
                   prose-th:bg-gray-50 prose-th:px-4 prose-th:py-2 prose-th:text-xs prose-th:font-bold prose-th:uppercase prose-th:tracking-wider
                   prose-td:px-4 prose-td:py-3 prose-td:text-xs prose-td:border-b prose-td:border-gray-50

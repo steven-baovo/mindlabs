@@ -62,7 +62,7 @@ export default function Header() {
       }}
       className="fixed z-[100] px-6 pointer-events-none"
     >
-      <div className="flex h-12 w-full items-center justify-between px-6 glass rounded-full shadow-premium pointer-events-auto border border-black/75 ring-1 ring-white/50 relative group/header backdrop-blur-[64px] backdrop-saturate-[250%]">
+      <div className="flex h-12 w-full items-center justify-between px-6 glass rounded-full -premium pointer-events-auto border border-black/75 ring-1 ring-white/50 relative group/header backdrop-blur-[64px] backdrop-saturate-[250%]">
         {/* Atmospheric Glow */}
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 opacity-0 group-hover/header:opacity-100 transition-opacity duration-1000 rounded-full" />
         
@@ -163,7 +163,7 @@ export default function Header() {
               <Link href="/login" className="text-[11px] font-black text-foreground/60 hover:text-foreground uppercase tracking-widest transition-colors px-2">
                 Log in
               </Link>
-              <Link href="/register" className="bg-foreground text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-80 transition-all active:scale-95 shadow-lg">
+              <Link href="/register" className="bg-foreground text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-80 transition-all active:scale-95">
                 Get Started
               </Link>
             </div>

@@ -17,7 +17,7 @@ export default function LegalPage() {
         {/* Header */}
         <div className="mb-16">
           <div className="flex items-center gap-2 mb-6">
-            <div className="glass px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10 shadow-sm">
+            <div className="glass px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10">
               <ShieldCheck className="w-3.5 h-3.5 text-primary" />
               <span className="text-premium text-primary">Trung tâm Pháp lý</span>
             </div>
@@ -49,7 +49,7 @@ export default function LegalPage() {
         </div>
 
         {/* Content Area */}
-        <div className="glass p-10 md:p-16 rounded-[40px] border border-primary/5 shadow-premium bg-white/50 relative">
+        <div className="glass p-10 md:p-16 rounded-[40px] border border-primary/5 -premium bg-white/50 relative">
           <div className="absolute top-0 right-0 p-8 opacity-5">
              {activeTab === 'terms' ? <Scale className="w-32 h-32" /> : <ShieldCheck className="w-32 h-32" />}
           </div>

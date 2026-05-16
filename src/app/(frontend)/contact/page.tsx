@@ -29,7 +29,7 @@ export default function ContactPage() {
           {/* Header */}
           <div className="max-w-2xl">
             <div className="flex items-center gap-2 mb-6">
-              <div className="glass px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10 shadow-sm">
+              <div className="glass px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10">
                 <Zap className="w-3.5 h-3.5 text-primary animate-pulse" />
                 <span className="text-premium text-primary">Liên hệ</span>
               </div>
@@ -111,7 +111,7 @@ export default function ContactPage() {
                   <button
                     disabled={isSubmitting}
                     type="submit"
-                    className="mt-4 relative group flex items-center justify-between px-10 py-5 bg-primary text-white rounded-full font-black text-[11px] uppercase tracking-[0.3em] overflow-hidden transition-all active:scale-95 shadow-xl shadow-primary/20 disabled:opacity-50"
+                    className="mt-4 relative group flex items-center justify-between px-10 py-5 bg-primary text-white rounded-full font-black text-[11px] uppercase tracking-[0.3em] overflow-hidden transition-all active:scale-95 -primary/20 disabled:opacity-50"
                   >
                     <span className="relative z-10">{isSubmitting ? 'Đang gửi...' : 'Gửi tin nhắn'}</span>
                     <Send className={`w-4 h-4 relative z-10 transition-transform duration-500 group-hover:translate-x-1 ${isSubmitting ? 'animate-bounce' : ''}`} />
@@ -130,7 +130,7 @@ export default function ContactPage() {
                   { icon: MapPin, label: "Văn phòng", value: "Ho Chi Minh City, Vietnam", sub: "Mindlabs Creative Space" },
                   { icon: MessageSquare, label: "Cộng đồng", value: "@mindlabs.io.vn", sub: "Facebook, Instagram" }
                 ].map((item, idx) => (
-                  <div key={idx} className="group p-8 rounded-[32px] bg-white border border-border-main/50 hover:border-primary/20 hover:shadow-premium transition-all duration-500 flex items-start gap-6">
+                  <div key={idx} className="group p-8 rounded-[32px] bg-white border border-border-main/50 hover:border-primary/20 hover:-premium transition-all duration-500 flex items-start gap-6">
                     <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-all duration-500">
                       <item.icon className="w-5 h-5 text-secondary/40 group-hover:text-white transition-colors" />
                     </div>

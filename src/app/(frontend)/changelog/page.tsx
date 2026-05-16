@@ -63,7 +63,7 @@ export default function ChangelogPage() {
         {/* Header */}
         <div className="mb-24">
           <div className="flex items-center gap-2 mb-6">
-            <div className="glass px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10 shadow-sm">
+            <div className="glass px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10">
               <History className="w-3.5 h-3.5 text-primary" />
               <span className="text-premium text-primary">Changelog</span>
             </div>
@@ -101,7 +101,7 @@ export default function ChangelogPage() {
                   {/* Changes Cards */}
                   <div className="grid grid-cols-1 gap-4">
                     {update.changes.map((change, cIdx) => (
-                      <div key={cIdx} className="group glass p-6 rounded-3xl border border-primary/5 hover:border-primary/20 hover:shadow-premium transition-all duration-500">
+                      <div key={cIdx} className="group glass p-6 rounded-3xl border border-primary/5 hover:border-primary/20 hover:-premium transition-all duration-500">
                         <div className="flex items-start gap-4">
                           <div className={`mt-1 px-2.5 py-1 rounded-lg border flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider shrink-0 ${getBadgeStyle(change.type)}`}>
                             {getIcon(change.type)}

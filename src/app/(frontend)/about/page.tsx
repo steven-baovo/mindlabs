@@ -17,7 +17,7 @@ export default function AboutPage() {
           {/* Section 1: Hero - The Vision */}
           <div className="max-w-3xl">
             <div className="flex items-center gap-2 mb-8">
-              <div className="glass px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10 shadow-sm">
+              <div className="glass px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10">
                 <Info className="w-3.5 h-3.5 text-primary" />
                 <span className="text-premium text-primary">Câu chuyện của chúng tôi</span>
               </div>
@@ -51,16 +51,16 @@ export default function AboutPage() {
               </div>
             </div>
             <div className="relative">
-              <div className="glass p-1 rounded-[40px] border border-primary/5 shadow-2xl overflow-hidden aspect-square flex items-center justify-center">
+              <div className="glass p-1 rounded-[40px] border border-primary/5 overflow-hidden aspect-square flex items-center justify-center">
                 <div className="w-full h-full bg-gradient-to-br from-primary/5 via-transparent to-primary/5 flex items-center justify-center relative">
-                   <div className="w-32 h-32 bg-primary rounded-3xl flex items-center justify-center animate-pulse shadow-2xl shadow-primary/40">
+                   <div className="w-32 h-32 bg-primary rounded-3xl flex items-center justify-center animate-pulse -primary/40">
                       <div className="w-16 h-16 bg-white rounded-md rotate-45" />
                    </div>
                    {/* Floating Elements */}
-                   <div className="absolute top-1/4 left-1/4 glass p-4 rounded-2xl border border-primary/10 shadow-lg animate-bounce duration-[3000ms]">
+                   <div className="absolute top-1/4 left-1/4 glass p-4 rounded-2xl border border-primary/10 animate-bounce duration-[3000ms]">
                       <Sparkles className="w-6 h-6 text-primary" />
                    </div>
-                   <div className="absolute bottom-1/4 right-1/4 glass p-4 rounded-2xl border border-primary/10 shadow-lg animate-bounce duration-[4000ms]">
+                   <div className="absolute bottom-1/4 right-1/4 glass p-4 rounded-2xl border border-primary/10 animate-bounce duration-[4000ms]">
                       <Target className="w-6 h-6 text-primary" />
                    </div>
                 </div>
@@ -87,7 +87,7 @@ export default function AboutPage() {
                 desc: "Suy nghĩ của bạn là tài sản quý giá nhất. Chúng tôi bảo vệ chúng bằng những tiêu chuẩn an ninh cao nhất." 
               }
             ].map((item, idx) => (
-              <div key={idx} className="group p-10 rounded-[40px] bg-white border border-border-main/50 hover:border-primary/20 hover:shadow-premium transition-all duration-500">
+              <div key={idx} className="group p-10 rounded-[40px] bg-white border border-border-main/50 hover:border-primary/20 hover:-premium transition-all duration-500">
                 <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mb-8 group-hover:bg-primary group-hover:text-white transition-all duration-500">
                   <item.icon className="w-6 h-6 text-secondary/40 group-hover:text-white transition-colors" />
                 </div>
@@ -132,7 +132,7 @@ export default function AboutPage() {
                 Hãy cùng chúng tôi <br /> <span className="text-secondary/20">viết tiếp tương lai.</span>
              </h2>
              <div className="flex flex-wrap justify-center gap-6">
-                <Link href="/contact" className="px-10 py-5 bg-primary text-white rounded-full font-black text-[11px] uppercase tracking-[0.3em] shadow-xl shadow-primary/20 hover:scale-105 transition-all">
+                <Link href="/contact" className="px-10 py-5 bg-primary text-white rounded-full font-black text-[11px] uppercase tracking-[0.3em] -primary/20 hover:scale-105 transition-all">
                    Kết nối với chúng tôi
                 </Link>
                 <div className="flex items-center gap-3 text-secondary/40 font-medium italic">

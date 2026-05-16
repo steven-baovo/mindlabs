@@ -69,7 +69,7 @@ export default function MobileSidebar({ isOpen, onClose, user, profile }: Mobile
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 left-0 bottom-0 w-[85%] max-w-[320px] bg-white z-[160] lg:hidden flex flex-col shadow-2xl"
+            className="fixed top-0 left-0 bottom-0 w-[85%] max-w-[320px] bg-white z-[160] lg:hidden flex flex-col"
           >
             {/* Header */}
             <div className="p-6 flex items-center justify-between border-b border-black/5">
@@ -145,7 +145,7 @@ export default function MobileSidebar({ isOpen, onClose, user, profile }: Mobile
               ) : (
                 <div className="grid grid-cols-2 gap-3">
                   <Link href="/login" onClick={onClose} className="px-4 py-3 rounded-2xl bg-gray-100 text-center text-sm font-black uppercase tracking-widest text-foreground">Login</Link>
-                  <Link href="/register" onClick={onClose} className="px-4 py-3 rounded-2xl bg-primary text-white text-center text-sm font-black uppercase tracking-widest shadow-lg">Join</Link>
+                  <Link href="/register" onClick={onClose} className="px-4 py-3 rounded-2xl bg-primary text-white text-center text-sm font-black uppercase tracking-widest">Join</Link>
                 </div>
               )}
               

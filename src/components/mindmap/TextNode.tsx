@@ -76,7 +76,7 @@ export default function TextNode({ id, data, selected }: { id: string; data: any
   return (
     <>
       <NodeToolbar isVisible={selected} position={Position.Top} offset={10}>
-        <div className="flex items-center gap-0.5 bg-white border border-gray-200 shadow-xl rounded-lg p-0.5 animate-in fade-in zoom-in duration-200">
+        <div className="flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg p-0.5 animate-in fade-in zoom-in duration-200">
           <button
             onClick={deleteNode}
             className="p-1 hover:bg-red-50 text-gray-500 hover:text-red-600 rounded-md transition-colors"
@@ -96,7 +96,7 @@ export default function TextNode({ id, data, selected }: { id: string; data: any
               <Palette className="w-3.5 h-3.5" />
             </button>
             {activeMenu === 'color' && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-white border border-gray-200 shadow-lg rounded-lg p-2 flex gap-1.5 z-50 animate-in fade-in zoom-in duration-150">
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-white border border-gray-200 rounded-lg p-2 flex gap-1.5 z-50 animate-in fade-in zoom-in duration-150">
                 {nodeColors.map((c) => (
                   <button
                     key={c.name}

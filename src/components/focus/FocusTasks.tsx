@@ -243,7 +243,7 @@ export default function FocusTasks() {
               <button
                 type="submit"
                 disabled={!newTaskTitle.trim()}
-                className="px-5 sm:px-6 py-2 sm:py-2.5 bg-primary text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-full hover:opacity-90 transition-all disabled:opacity-50 shadow-lg"
+                className="px-5 sm:px-6 py-2 sm:py-2.5 bg-primary text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-full hover:opacity-90 transition-all disabled:opacity-50"
               >
                 Lưu nhiệm vụ
               </button>
