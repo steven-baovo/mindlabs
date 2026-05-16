@@ -44,11 +44,11 @@ export default async function BlogHub() {
                   </p>
                   <div className="pt-4 border-t border-border-main flex items-center justify-between">
                     <span className="text-[11px] font-bold text-secondary/50 uppercase tracking-wider">
-                      {new Date(post.publishedAt || Date.now()).toLocaleDateString('vi-VN', {
+                      {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('vi-VN', {
                         day: 'numeric',
                         month: 'long',
                         year: 'numeric'
-                      })}
+                      }) : 'Đang cập nhật'}
                     </span>
                     <span className="text-[11px] font-black text-primary opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-widest">
                       Đọc tiếp

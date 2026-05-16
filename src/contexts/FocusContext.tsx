@@ -102,28 +102,7 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
       else if (mode === 'short_break') setTimeLeft(settings.short_break_duration * 60)
       else if (mode === 'long_break') setTimeLeft(settings.long_break_duration * 60)
     }
-  }, [mode, settings])
-
-  // Timer tick logic
-  useEffect(() => {
-    if (isActive && timeLeft > 0) {
-      if (settings.ticking_sound !== 'none' && tickingAudioRef.current) {
-        tickingAudioRef.current.play().catch(() => {})
-      }
-
-      timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => prev - 1)
-      }, 1000)
-    } else {
-      if (tickingAudioRef.current) tickingAudioRef.current.pause()
-      if (isActive && timeLeft === 0) handleTimerComplete()
-    }
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current)
-      if (tickingAudioRef.current) tickingAudioRef.current.pause()
-    }
-  }, [isActive, timeLeft, settings.ticking_sound])
+  }, [mode, settings, isActive])
 
   const handleTimerComplete = async () => {
     if (isHandlingComplete.current) return
@@ -198,6 +177,27 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
     
     isHandlingComplete.current = false
   }
+
+  // Timer tick logic
+  useEffect(() => {
+    if (isActive && timeLeft > 0) {
+      if (settings.ticking_sound !== 'none' && tickingAudioRef.current) {
+        tickingAudioRef.current.play().catch(() => {})
+      }
+
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prev) => prev - 1)
+      }, 1000)
+    } else {
+      if (tickingAudioRef.current) tickingAudioRef.current.pause()
+      if (isActive && timeLeft === 0) handleTimerComplete()
+    }
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+      if (tickingAudioRef.current) tickingAudioRef.current.pause()
+    }
+  }, [isActive, timeLeft, settings.ticking_sound])
 
   const toggleTimer = () => setIsActive(!isActive)
   const skipTimer = () => { setIsActive(false); handleTimerComplete() }

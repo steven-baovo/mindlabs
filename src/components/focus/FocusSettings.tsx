@@ -12,13 +12,16 @@ export default function FocusSettings() {
   const { settings, updateSettings } = useFocus()
   const [localSettings, setLocalSettings] = useState(settings)
   const [isSaving, setIsSaving] = useState(false)
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
+  const [prevSettings, setPrevSettings] = useState(settings)
 
-  // Sync local settings when modal opens
-  useEffect(() => {
+  if (isOpen !== prevIsOpen || settings !== prevSettings) {
+    setPrevIsOpen(isOpen)
+    setPrevSettings(settings)
     if (isOpen) {
       setLocalSettings(settings)
     }
-  }, [isOpen, settings])
+  }
 
   const handleSave = async () => {
     setIsSaving(true)

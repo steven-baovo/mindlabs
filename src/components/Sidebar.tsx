@@ -59,13 +59,12 @@ export default function Sidebar({ user, profile }: SidebarProps) {
   // Initialize collapsed state based on route
   const isWorkspaceInitial = pathname ? pathname.includes('/mindspace/') : false
   const [isCollapsed, setIsCollapsed] = useState(isWorkspaceInitial)
+  const [prevPathname, setPrevPathname] = useState(pathname)
 
-  // Automatically collapse on workspace routes when navigating
-  useEffect(() => {
-    if (!pathname) return
-    const isWorkspaceRoute = pathname.includes('/mindspace/')
-    setIsCollapsed(isWorkspaceRoute)
-  }, [pathname])
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname)
+    setIsCollapsed(pathname ? pathname.includes('/mindspace/') : false)
+  }
 
   const [isExploreOpen, setIsExploreOpen] = useState(false)
 

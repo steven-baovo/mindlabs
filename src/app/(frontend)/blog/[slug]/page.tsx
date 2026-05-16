@@ -60,7 +60,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           {post.title}
         </h1>
         <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-          <span>{new Date(post.publishedAt || Date.now()).toLocaleDateString('vi-VN')}</span>
+          <span>{post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('vi-VN') : 'Đang cập nhật'}</span>
           <span>•</span>
           <span>Đọc mất 5 phút</span>
         </div>

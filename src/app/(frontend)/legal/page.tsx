@@ -93,7 +93,7 @@ export default function LegalPage() {
                   </div>
                   <p className="text-secondary/70 leading-relaxed">
                     Chúng tôi nỗ lực tối đa để đảm bảo dịch vụ hoạt động ổn định. Tuy nhiên, Mindlabs được cung cấp 
-                    theo hình thức "nguyên trạng" và chúng tôi không chịu trách nhiệm cho bất kỳ tổn thất dữ liệu 
+                    theo hình thức &quot;nguyên trạng&quot; và chúng tôi không chịu trách nhiệm cho bất kỳ tổn thất dữ liệu 
                     nào do các nguyên nhân bất khả kháng hoặc lỗi từ phía người dùng.
                   </p>
                 </section>
@@ -137,7 +137,7 @@ export default function LegalPage() {
                   </div>
                   <p className="text-secondary/70 leading-relaxed">
                     Dữ liệu của bạn được mã hóa và bảo mật bằng các công nghệ tiêu chuẩn ngành. 
-                    Chúng tôi thực hiện sao lưu định kỳ để đảm bảo an toàn tối đa cho "tài sản trí tuệ" của bạn.
+                    Chúng tôi thực hiện sao lưu định kỳ để đảm bảo an toàn tối đa cho &quot;tài sản trí tuệ&quot; của bạn.
                   </p>
                 </section>
               </>

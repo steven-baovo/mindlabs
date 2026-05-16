@@ -16,7 +16,6 @@ interface Props {
 
 export default function BlockItem({ block, onDragStart, onDelete, onLabelUpdate, onTimeUpdate, visualOffset }: Props) {
   const cfg = BLOCK_CONFIGS[block.block_type]
-  if (!cfg) return null
 
   let initialLabel = block.custom_label ?? ''
   let initialColor = 0
@@ -36,8 +35,11 @@ export default function BlockItem({ block, onDragStart, onDelete, onLabelUpdate,
   const [timeInput, setTimeInput] = useState(`${minutesToTime(block.start_minutes)} - ${minutesToTime(block.start_minutes + block.duration_minutes)}`)
   const [showActions, setShowActions] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
+  const [isDraggingLocal, setIsDraggingLocal] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const timeInputRef = useRef<HTMLInputElement>(null)
+
+  if (!cfg) return null
 
   const height = minutesToPx(block.duration_minutes)
   const visualMinutes = (block.start_minutes - visualOffset + 1440) % 1440
@@ -45,8 +47,6 @@ export default function BlockItem({ block, onDragStart, onDelete, onLabelUpdate,
 
   const bgColor = block.block_type === 'custom' ? CUSTOM_COLORS[selectedColor % CUSTOM_COLORS.length]?.bg ?? cfg.bgColor : cfg.bgColor
   const textColor = block.block_type === 'custom' ? CUSTOM_COLORS[selectedColor % CUSTOM_COLORS.length]?.text ?? cfg.textColor : cfg.textColor
-
-  const [isDraggingLocal, setIsDraggingLocal] = useState(false)
 
   const handleDragStart = (e: React.DragEvent) => {
     setIsDraggingLocal(true)

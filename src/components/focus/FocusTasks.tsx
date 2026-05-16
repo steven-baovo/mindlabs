@@ -25,10 +25,6 @@ export default function FocusTasks() {
 
   const { activeTaskId, setActiveTaskId } = useFocus()
 
-  useEffect(() => {
-    fetchTasks()
-  }, [])
-
   const fetchTasks = async () => {
     setIsLoading(true)
     const { data, error } = await loadFocusTasks()
@@ -43,63 +39,93 @@ export default function FocusTasks() {
     setIsLoading(false)
   }
 
+  useEffect(() => {
+    fetchTasks()
+  }, [])
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newTaskTitle.trim()) return
     
     setIsAdding(false)
+    
+    const tempId = `temp-${Date.now()}`
+    const tempTask: Task = {
+      id: tempId,
+      title: newTaskTitle,
+      notes: newTaskNotes,
+      estimated_pomodoros: newTaskEst,
+      completed_pomodoros: 0,
+      is_completed: false
+    }
+    
+    // Optimistic update
+    setTasks(prev => [tempTask, ...prev])
+    setNewTaskTitle('')
+    setNewTaskEst(1)
+    setNewTaskNotes('')
+    
+    const isFirstTask = tasks.length === 0
+    if (isFirstTask) setActiveTaskId(tempId)
+
     const { data, error } = await createFocusTask(newTaskTitle, newTaskEst, newTaskNotes)
     
     if (error === 'Unauthorized') {
-      // Guest mode creation
-      const newTask: Task = {
-        id: Math.random().toString(36).substr(2, 9),
-        title: newTaskTitle,
-        notes: newTaskNotes,
-        estimated_pomodoros: newTaskEst,
-        completed_pomodoros: 0,
-        is_completed: false
-      }
-      const updated = [newTask, ...tasks]
-      setTasks(updated)
-      localStorage.setItem('mindfocus_tasks', JSON.stringify(updated))
-      if (tasks.length === 0) setActiveTaskId(newTask.id)
-      setNewTaskTitle('')
-      setNewTaskEst(1)
-      setNewTaskNotes('')
+      // Guest mode: generate real random ID for guest
+      const guestId = Math.random().toString(36).substr(2, 9)
+      setTasks(prev => {
+        const updated = prev.map(t => t.id === tempId ? { ...t, id: guestId } : t)
+        localStorage.setItem('mindfocus_tasks', JSON.stringify(updated))
+        return updated
+      })
+      if (isFirstTask) setActiveTaskId(guestId)
     } else if (data) {
-      setTasks([data, ...tasks])
-      setNewTaskTitle('')
-      setNewTaskEst(1)
-      setNewTaskNotes('')
-      if (tasks.length === 0) setActiveTaskId(data.id)
+      // Server success: replace temp task with data from server
+      setTasks(prev => prev.map(t => t.id === tempId ? data : t))
+      if (isFirstTask) setActiveTaskId(data.id)
+    } else {
+      // Error: remove temp task
+      setTasks(prev => prev.filter(t => t.id !== tempId))
+      if (isFirstTask) setActiveTaskId(null)
     }
   }
 
   const handleToggleComplete = async (task: Task) => {
     const updatedStatus = { is_completed: !task.is_completed }
+    
+    // Optimistic update
+    setTasks(prev => prev.map(t => t.id === task.id ? { ...t, ...updatedStatus } : t))
+    
     const { error } = await updateFocusTask(task.id, updatedStatus)
     
     if (error === 'Unauthorized') {
-      const updated = tasks.map(t => t.id === task.id ? { ...t, ...updatedStatus } : t)
-      setTasks(updated)
-      localStorage.setItem('mindfocus_tasks', JSON.stringify(updated))
-    } else {
-      fetchTasks()
+      // Guest mode: update local storage
+      setTasks(prev => {
+        localStorage.setItem('mindfocus_tasks', JSON.stringify(prev))
+        return prev
+      })
+    } else if (error) {
+      // Error: revert state
+      setTasks(prev => prev.map(t => t.id === task.id ? { ...t, is_completed: task.is_completed } : t))
     }
   }
 
   const handleDelete = async (id: string) => {
+    // Optimistic update
+    setTasks(prev => prev.filter(t => t.id !== id))
+    if (activeTaskId === id) setActiveTaskId(null)
+    
     const { error } = await deleteFocusTask(id)
     
     if (error === 'Unauthorized') {
-      const updated = tasks.filter(t => t.id !== id)
-      setTasks(updated)
-      localStorage.setItem('mindfocus_tasks', JSON.stringify(updated))
-      if (activeTaskId === id) setActiveTaskId(null)
-    } else {
-      setTasks(tasks.filter(t => t.id !== id))
-      if (activeTaskId === id) setActiveTaskId(null)
+      // Guest mode: update local storage
+      setTasks(prev => {
+        localStorage.setItem('mindfocus_tasks', JSON.stringify(prev))
+        return prev
+      })
+    } else if (error) {
+      // Error: revert state by refetching
+      fetchTasks()
     }
   }
 
