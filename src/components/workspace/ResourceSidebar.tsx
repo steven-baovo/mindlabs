@@ -68,7 +68,7 @@ const ResourceItem = memo(({
             ${active 
               ? 'bg-[#f5f5f5] text-foreground font-medium' 
               : 'text-secondary hover:bg-[#f9f9f9] hover:text-foreground'}
-            ${snapshot.isDragging ? 'shadow-premium bg-white border border-border-main/50 z-50 scale-[1.02]' : ''}
+            ${snapshot.isDragging ? 'bg-white border border-border-main/50 z-50 scale-[1.02]' : ''}
           `}
         >
           <Link 
@@ -110,7 +110,7 @@ const ResourceItem = memo(({
                   e.stopPropagation()
                   setIsMenuOpen(!isMenuOpen)
                 }}
-                className={`p-1 transition-all rounded-lg border border-transparent ${isMenuOpen ? 'bg-white shadow-sm border-border-main text-primary scale-110' : 'text-secondary/30 hover:text-foreground hover:bg-gray-100'}`}
+                className={`p-1 transition-all rounded-lg border border-transparent ${isMenuOpen ? 'bg-white border-border-main text-primary scale-110' : 'text-secondary/30 hover:text-foreground hover:bg-gray-100'}`}
                 title="Thêm thao tác"
               >
                 <MoreHorizontal className="w-4 h-4" />
@@ -200,7 +200,7 @@ const FolderItem = memo(({ folder, index, ...props }: FolderItemProps) => {
             className={`flex items-center group relative rounded-xl py-1 transition-all duration-200
               ${props.isCollapsed ? 'justify-center px-0' : 'px-2'}
               hover:bg-[#f9f9f9] text-secondary hover:text-foreground
-              ${snapshot.isDragging ? 'shadow-premium bg-white border border-border-main/50 z-50 scale-[1.02]' : ''}
+              ${snapshot.isDragging ? 'bg-white border border-border-main/50 z-50 scale-[1.02]' : ''}
             `}
           >
             {!props.isCollapsed && (
@@ -234,7 +234,7 @@ const FolderItem = memo(({ folder, index, ...props }: FolderItemProps) => {
                     e.stopPropagation()
                     setIsMenuOpen(!isMenuOpen)
                   }}
-                  className={`p-1 transition-all rounded-lg border border-transparent ${isMenuOpen ? 'bg-white shadow-sm border-border-main text-primary scale-110' : 'text-secondary/30 hover:text-foreground hover:bg-gray-100'}`}
+                  className={`p-1 transition-all rounded-lg border border-transparent ${isMenuOpen ? 'bg-white border-border-main text-primary scale-110' : 'text-secondary/30 hover:text-foreground hover:bg-gray-100'}`}
                 >
                   <MoreHorizontal className="w-4 h-4" />
                 </button>

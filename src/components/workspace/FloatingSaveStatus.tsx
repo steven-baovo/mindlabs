@@ -25,7 +25,7 @@ export default function FloatingSaveStatus() {
   return (
     <div className="fixed top-20 right-8 z-[100] pointer-events-none">
       <div className={`
-        flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-sm transition-all duration-500
+        flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-500
         ${isSaving 
           ? 'bg-blue-50 border-blue-100 text-blue-600 animate-pulse' 
           : 'bg-emerald-50 border-emerald-100 text-emerald-600'

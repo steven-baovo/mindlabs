@@ -134,7 +134,7 @@ const NoteSidebar = ({ activeTitle, onTitleChange, isSaving }: NoteSidebarProps)
               href={`/mindspace/note/${note.id}`}
               className={`flex flex-col gap-1 p-3 rounded-xl transition-all group ${
                 currentId === note.id 
-                  ? 'bg-white shadow-sm border border-border-medium/50 ring-1 ring-primary/5' 
+                  ? 'bg-white border border-border-medium/50 ring-1 ring-primary/5' 
                   : 'hover:bg-white/60 text-gray-600'
               }`}
             >
